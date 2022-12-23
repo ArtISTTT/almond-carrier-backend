@@ -11,7 +11,7 @@ import helmet from 'helmet';
 
 dotenv.config();
 
-const connectionString = process.env.MONGODB_URI as string;
+const connectionString = process.env.MONGO_URL as string;
 
 const corsOptions = {
     origin: 'http://localhost:8000'
@@ -54,7 +54,7 @@ db.mongoose
     });
 
     app.get("/", (req, res) => {
-        res.json({ message: "Welcome to Friendly Carrier application." });
+        res.json({ message: "Welcome to Friendly Carrier back-end application." });
     });
 
 authRoutes(app);
