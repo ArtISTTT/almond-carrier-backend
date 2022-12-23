@@ -9,12 +9,12 @@ const User: mongoose.Model<any> = db.user;
 const Role: mongoose.Model<any> = db.role;
 
 export const signup = (req: Request, res: Response) => {
-    console.log(req);
-
     const user = new User({
-      username: req.body.username,
+      firstName: req.body.firstName,
+      secondName: req.body.secondName,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 8),
+      dateOfBirth: req.body.dateOfBirth,
     });
   
     user.save((err: any, user: any) => {
@@ -68,7 +68,7 @@ export const signup = (req: Request, res: Response) => {
   
 export const signin = (req: Request, res: Response) => {
     User.findOne({
-      username: req.body.username,
+      email: req.body.email,
     })
       .populate("roles", "-__v")
       .exec((err, user) => {
@@ -106,6 +106,7 @@ export const signin = (req: Request, res: Response) => {
           id: user._id,
           username: user.username,
           email: user.email,
+          dateOfBirth: user.dateOfBirth,
           roles: authorities,
         });
       });
