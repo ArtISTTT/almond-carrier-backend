@@ -19,7 +19,7 @@ export default (app: Express) => {
 
     app.get('/api/test/all', allAccess);
 
-    app.get('/api/test/user', [middlewares.authJwt.verifyToken], userBoard);
+    app.get('/api/user', [middlewares.authJwt.verifyToken], userBoard);
 
     app.get(
         '/api/test/mod',
