@@ -11,7 +11,7 @@ const Role: mongoose.Model<any> = db.role;
 export const signup = (req: Request, res: Response) => {
     const user = new User({
       firstName: req.body.firstName,
-      secondName: req.body.secondName,
+      secondName: req.body.lastName,
       email: req.body.email,
       password: bcrypt.hashSync(req.body.password, 8),
       dateOfBirth: req.body.dateOfBirth,

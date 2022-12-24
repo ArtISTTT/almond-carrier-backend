@@ -14,7 +14,7 @@ dotenv.config();
 const connectionString = process.env.MONGO_URL as string;
 
 const corsOptions = {
-    origin: 'http://localhost:8000'
+    origin: '*'
 };
 
 const app: Express = express();
