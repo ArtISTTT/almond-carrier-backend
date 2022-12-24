@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
-import cors from "cors";
-import cookieSession from "cookie-session";
+import cors from 'cors';
+import cookieSession from 'cookie-session';
 import dotenv from 'dotenv';
 import db from './app/models';
 import authRoutes from './app/routes/auth.routes';
@@ -14,7 +14,7 @@ dotenv.config();
 const connectionString = process.env.MONGO_URL as string;
 
 const corsOptions = {
-    origin: '*'
+    origin: '*',
 };
 
 const app: Express = express();
@@ -32,34 +32,34 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use(
     cookieSession({
-      name: "friendly-session",
-      secret: "COOKIE_SECRET", // should use as secret environment variable
-      httpOnly: true
+        name: 'friendly-session',
+        secret: 'COOKIE_SECRET', // should use as secret environment variable
+        httpOnly: true,
     })
-  );
+);
 
 console.log(connectionString);
 db.mongoose
     .connect(connectionString, {
         useNewUrlParser: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
     })
     .then(() => {
-        console.log("Successfully connect to MongoDB.");
+        console.log('Successfully connect to MongoDB.');
         initializeRoles();
     })
     .catch((err: any) => {
-        console.error("Connection error", err);
+        console.error('Connection error', err);
         process.exit();
     });
 
-    app.get("/", (req, res) => {
-        res.json({ message: "Welcome to Friendly Carrier back-end application." });
-    });
+app.get('/', (req, res) => {
+    res.json({ message: 'Welcome to Friendly Carrier back-end application.' });
+});
 
 authRoutes(app);
 userRoutes(app);
 
 app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+    console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
 });
