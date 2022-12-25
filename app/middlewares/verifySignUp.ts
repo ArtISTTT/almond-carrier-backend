@@ -5,7 +5,7 @@ import db from '../models';
 const { ROLES } = db;
 const User: mongoose.Model<any> = db.user;
 
-const checkDuplicateUsernameOrEmail = (
+const checkDuplicateEmail = (
     req: Request,
     res: Response,
     next: NextFunction
@@ -46,6 +46,6 @@ const checkRolesExisted = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const verifySignUp = {
-    checkDuplicateUsernameOrEmail,
+    checkDuplicateEmail,
     checkRolesExisted,
 };

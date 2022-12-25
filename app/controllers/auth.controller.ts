@@ -11,7 +11,7 @@ const Role: mongoose.Model<any> = db.role;
 export const signup = (req: Request, res: Response) => {
     const user = new User({
         firstName: req.body.firstName,
-        secondName: req.body.lastName,
+        lastName: req.body.lastName,
         email: req.body.email,
         password: bcrypt.hashSync(req.body.password, 8),
         dateOfBirth: req.body.dateOfBirth,
@@ -64,7 +64,8 @@ export const signup = (req: Request, res: Response) => {
 
                         res.status(200).send({
                             id: user._id,
-                            username: user.username,
+                            firstName: user.firstName,
+                            lastName: user.lastName,
                             email: user.email,
                             dateOfBirth: user.dateOfBirth,
                             roles: authorities,
@@ -132,7 +133,8 @@ export const signin = (req: Request, res: Response) => {
 
             res.status(200).send({
                 id: user._id,
-                username: user.username,
+                firstName: user.firstName,
+                lastName: user.lastName,
                 email: user.email,
                 dateOfBirth: user.dateOfBirth,
                 roles: authorities,
