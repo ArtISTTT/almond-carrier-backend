@@ -38,6 +38,7 @@ app.use(
         name: 'friendly-session',
         secret: process.env.SESSION_SECRET,
         httpOnly: true,
+        sameSite: 'none',
         secure: false,
     })
 );
