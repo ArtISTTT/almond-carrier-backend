@@ -37,6 +37,7 @@ app.use(
     cookieSession({
         name: 'friendly-session',
         secret: process.env.SESSION_SECRET,
+        httpOnly: true,
     })
 );
 
