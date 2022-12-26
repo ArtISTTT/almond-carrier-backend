@@ -34,8 +34,6 @@ export const userBoard = (req: Request, res: Response) => {
             roles: authorities,
         });
     });
-
-    res.status(200).send('User Content.');
 };
 
 export const adminBoard = (req: Request, res: Response) => {
