@@ -5,10 +5,10 @@ import * as controller from '../controllers/auth.controller';
 
 export default (app: Express) => {
     app.use((req, res, next) => {
-        // res.setHeader('Access-Control-Allow-Origin', [
-        //     'https://friendlycarrier.com',
-        //     'http://localhost:3000',
-        // ]);
+        res.setHeader(
+            'Access-Control-Allow-Origin',
+            'https://friendlycarrier.com'
+        );
         res.header(
             'Access-Control-Allow-Headers',
             'Origin, Content-Type, Accept'
