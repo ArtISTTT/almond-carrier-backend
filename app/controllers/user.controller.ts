@@ -19,20 +19,12 @@ export const userBoard = (req: Request, res: Response) => {
             return res.status(404).send({ message: 'User Not found.' });
         }
 
-        const authorities = [];
-
-        for (let i = 0; i < user.roles.length; i++) {
-            console.log(user.roles);
-            authorities.push(`ROLE_${user.roles[i].name.toUpperCase()}`);
-        }
-
         res.status(200).send({
             id: user._id,
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
             dateOfBirth: user.dateOfBirth,
-            roles: authorities,
         });
     });
 };

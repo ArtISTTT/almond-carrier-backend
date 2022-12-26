@@ -53,22 +53,12 @@ export const signup = (req: Request, res: Response) => {
                             req.session as CookieSessionInterfaces.CookieSessionObject
                         ).token = token;
 
-                        // TODO: Double logic from sign in
-                        const authorities = [];
-
-                        for (let i = 0; i < user.roles.length; i++) {
-                            authorities.push(
-                                `ROLE_${user.roles[i].name.toUpperCase()}`
-                            );
-                        }
-
                         res.status(200).send({
                             id: user._id,
                             firstName: user.firstName,
                             lastName: user.lastName,
                             email: user.email,
                             dateOfBirth: user.dateOfBirth,
-                            roles: authorities,
                         });
                     });
                 }
@@ -95,22 +85,12 @@ export const signup = (req: Request, res: Response) => {
                         req.session as CookieSessionInterfaces.CookieSessionObject
                     ).token = token;
 
-                    // TODO: Double logic from sign in
-                    const authorities = [];
-
-                    for (let i = 0; i < user.roles.length; i++) {
-                        authorities.push(
-                            `ROLE_${user.roles[i].name.toUpperCase()}`
-                        );
-                    }
-
                     res.status(200).send({
                         id: user._id,
                         firstName: user.firstName,
                         lastName: user.lastName,
                         email: user.email,
                         dateOfBirth: user.dateOfBirth,
-                        roles: authorities,
                     });
                 });
             });
@@ -146,12 +126,6 @@ export const signin = (req: Request, res: Response) => {
                 expiresIn: 86400, // 24 hours
             });
 
-            const authorities = [];
-
-            for (let i = 0; i < user.roles.length; i++) {
-                authorities.push(`ROLE_${user.roles[i].name.toUpperCase()}`);
-            }
-
             (req.session as CookieSessionInterfaces.CookieSessionObject).token =
                 token;
 
@@ -161,7 +135,6 @@ export const signin = (req: Request, res: Response) => {
                 lastName: user.lastName,
                 email: user.email,
                 dateOfBirth: user.dateOfBirth,
-                roles: authorities,
             });
         });
 };
