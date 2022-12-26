@@ -39,6 +39,7 @@ app.use(
         secret: process.env.SESSION_SECRET,
         httpOnly: true,
         sameSite: 'none',
+        secure: true,
     })
 );
 
