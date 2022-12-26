@@ -9,7 +9,7 @@ export const allAccess = (req: Request, res: Response) => {
 const User: mongoose.Model<any> = db.user;
 
 export const userBoard = (req: Request, res: Response) => {
-    User.findById(req.body.id).exec((err, user) => {
+    User.findById(req.body.userId).exec((err, user) => {
         if (err != null) {
             res.status(500).send({ message: err });
             return;
