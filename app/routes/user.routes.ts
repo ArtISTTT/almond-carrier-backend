@@ -10,6 +10,7 @@ import middlewares from '../middlewares';
 
 export default (app: Express) => {
     app.use((req, res, next) => {
+        res.setHeader('Access-Control-Allow-Origin', '*');
         res.header(
             'Access-Control-Allow-Headers',
             'Origin, Content-Type, Accept'

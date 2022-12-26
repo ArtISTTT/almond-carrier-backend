@@ -38,7 +38,6 @@ app.use(
     })
 );
 
-console.log(connectionString);
 db.mongoose
     .connect(connectionString, {
         useNewUrlParser: true,
