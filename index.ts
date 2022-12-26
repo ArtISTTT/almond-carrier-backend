@@ -14,7 +14,11 @@ dotenv.config();
 const connectionString = process.env.MONGO_URL as string;
 
 const corsOptions = {
-    origin: ['https://friendlycarrier.com', 'http://localhost:3000'],
+    origin: function (_: any, callback: any) {
+        return callback(null, true);
+    },
+    optionsSuccessStatus: 200,
+    credentials: true,
 };
 
 const app: Express = express();
@@ -22,7 +26,7 @@ const port = process.env.PORT;
 
 app.use(compression());
 app.use(helmet());
-app.use(cors());
+app.use(cors(corsOptions));
 
 // parse requests of content-type - application/json
 app.use(express.json());
