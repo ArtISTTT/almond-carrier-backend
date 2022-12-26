@@ -23,7 +23,7 @@ export const userBoard = (req: Request, res: Response) => {
 
         for (let i = 0; i < user.roles.length; i++) {
             console.log(user.roles);
-            authorities.push(`ROLE_${user.roles[i].toUpperCase()}`);
+            authorities.push(`ROLE_${user.roles[i].name.toUpperCase()}`);
         }
 
         res.status(200).send({
