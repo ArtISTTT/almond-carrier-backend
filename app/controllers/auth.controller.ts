@@ -4,16 +4,24 @@ import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../models';
 import authConfig from '../config/auth.config';
+import crypto from 'crypto';
+import {
+    sendRecoverPasswordEmail,
+    sendRecoverPasswordSuccessfullyEmail,
+} from '../mailService/recoverPassword';
 
 const User: mongoose.Model<any> = db.user;
 const Role: mongoose.Model<any> = db.role;
+const Token: mongoose.Model<any> = db.token;
+
+const BRYPTO_KEY = process.env.BCRYPTO_KEY;
 
 export const signup = (req: Request, res: Response) => {
     const user = new User({
         firstName: req.body.firstName,
         lastName: req.body.lastName,
         email: req.body.email,
-        password: bcrypt.hashSync(req.body.password, 8),
+        password: bcrypt.hashSync(req.body.password, Number(BRYPTO_KEY)),
         dateOfBirth: req.body.dateOfBirth,
     });
 
@@ -147,3 +155,71 @@ export function signout(req: Request, res: Response) {
         console.log(err);
     }
 }
+
+export const recover = async (req: Request, res: Response) => {
+    const user = await User.findOne({
+        email: req.body.email,
+    });
+
+    if (!user) {
+        return res.status(404).send({ message: 'User Not found.' });
+    }
+
+    let token = await Token.findOne({ userId: user._id });
+    if (token) await token.deleteOne();
+    let resetToken = crypto.randomBytes(32).toString('hex');
+    const hash = await bcrypt.hash(resetToken, Number(BRYPTO_KEY));
+
+    await new Token({
+        userId: user._id,
+        token: hash,
+        createdAt: Date.now(),
+    }).save();
+
+    const link = `${req.headers.origin}/password-reset?token=${resetToken}&id=${user._id}`;
+
+    sendRecoverPasswordEmail(link, req.body.email);
+
+    res.status(200).send({
+        message: 'Message sent',
+    });
+};
+
+export const processRecover = async (req: Request, res: Response) => {
+    let passwordResetToken = await Token.findOne({ userId: req.body.userId });
+
+    if (!passwordResetToken) {
+        return res
+            .status(404)
+            .send({ message: 'Invalid or expired password reset token.' });
+    }
+
+    const isValid = await bcrypt.compare(
+        req.body.token,
+        passwordResetToken.token
+    );
+
+    if (!isValid) {
+        return res
+            .status(404)
+            .send({ message: 'Invalid or expired password reset token!' });
+    }
+
+    const hash = bcrypt.hashSync(
+        req.body.password,
+        Number(process.env.BCRYPTO_KEY)
+    );
+
+    await User.updateOne(
+        { _id: req.body.userId },
+        { $set: { password: hash } },
+        { new: true }
+    );
+    const user = await User.findById({ _id: req.body.userId });
+
+    sendRecoverPasswordSuccessfullyEmail(user.firstName, user.email);
+
+    await passwordResetToken.deleteOne();
+
+    return true;
+};
