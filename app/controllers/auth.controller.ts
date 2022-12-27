@@ -181,7 +181,7 @@ export const recover = async (req: Request, res: Response) => {
     sendRecoverPasswordEmail(link, req.body.email);
 
     res.status(200).send({
-        message: 'Message sent',
+        message: 'Link to reset your password has been sent',
     });
 };
 
@@ -221,5 +221,7 @@ export const processRecover = async (req: Request, res: Response) => {
 
     await passwordResetToken.deleteOne();
 
-    return true;
+    res.status(200).send({
+        message: 'Password has been changed!',
+    });
 };
