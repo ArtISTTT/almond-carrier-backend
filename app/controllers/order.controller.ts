@@ -71,3 +71,18 @@ export const createOrderAsCarrier = async (
         },
     });
 };
+
+export const getMyOrders = async (
+    req: IReqCreateOrderAsCarrier,
+    res: Response
+) => {
+    const ordersList = [];
+
+    for await (const order of Order.find({
+        $or: [{ carrierId: req.body.userId }, { recieverId: req.body.userId }],
+    })) {
+        ordersList.push({ order });
+    }
+
+    return res.status(200).send({ orders: ordersList });
+};
