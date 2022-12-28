@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose from 'mongoose';
 
 export const UserModel = mongoose.model(
     'User',
@@ -20,7 +20,10 @@ export const UserModel = mongoose.model(
                 unique: true,
                 trim: true,
             },
-            password: String,
+            password: {
+                type: String,
+                required: true,
+            },
             dateOfBirth: Date,
             roles: [
                 {

@@ -10,9 +10,9 @@ import {
     sendRecoverPasswordSuccessfullyEmail,
 } from '../mailService/recoverPassword';
 
-const User: mongoose.Model<any> = db.user;
-const Role: mongoose.Model<any> = db.role;
-const Token: mongoose.Model<any> = db.token;
+const User = db.user;
+const Role = db.role;
+const Token = db.token;
 
 const BRYPTO_KEY = process.env.BCRYPTO_KEY;
 
@@ -216,6 +216,12 @@ export const processRecover = async (req: Request, res: Response) => {
         { new: true }
     );
     const user = await User.findById({ _id: req.body.userId });
+
+    if (!user) {
+        return res.status(404).send({
+            message: 'User Not found!',
+        });
+    }
 
     sendRecoverPasswordSuccessfullyEmail(user.firstName, user.email);
 

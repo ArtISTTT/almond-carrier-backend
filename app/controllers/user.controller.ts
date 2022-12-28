@@ -6,7 +6,7 @@ export const allAccess = (req: Request, res: Response) => {
     res.status(200).send('Public Content.');
 };
 
-const User: mongoose.Model<any> = db.user;
+const User = db.user;
 
 export const userBoard = (req: Request, res: Response) => {
     User.findById(req.body.userId).exec((err, user) => {

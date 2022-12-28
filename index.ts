@@ -4,10 +4,12 @@ import cookieSession from 'cookie-session';
 import dotenv from 'dotenv';
 import db from './app/models';
 import authRoutes from './app/routes/auth.routes';
+import orderRoutes from './app/routes/order.routes';
 import userRoutes from './app/routes/user.routes';
-import { initializeRoles } from './app/helpers/initilizeRoles';
 import compression from 'compression';
 import helmet from 'helmet';
+import { initializeDB } from './app/helpers/initialize';
+import { ConnectOptions } from 'mongoose';
 
 dotenv.config();
 
@@ -47,10 +49,10 @@ db.mongoose
     .connect(connectionString, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
-    })
+    } as ConnectOptions)
     .then(() => {
         console.log('Successfully connect to MongoDB.');
-        initializeRoles();
+        initializeDB();
     })
     .catch((err: any) => {
         console.error('Connection error', err);
@@ -63,6 +65,7 @@ app.get('/', (req, res) => {
 
 authRoutes(app);
 userRoutes(app);
+orderRoutes(app);
 
 app.listen(port, () => {
     console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
