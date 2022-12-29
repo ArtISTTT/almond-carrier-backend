@@ -102,13 +102,25 @@ export const updateUserPassword = async (
         });
     }
 
-    const isValidOldPassword = await bcrypt.compare(
-        user.password,
-        req.body.oldPassword
+    const oldPasswordHash = bcrypt.hashSync(
+        req.body.oldPassword,
+        Number(BRYPTO_KEY)
+    );
+
+    console.log(
+        req.body.oldPassword,
+        req.body.oldPassword,
+        oldPasswordHash,
+        user.password
+    );
+
+    const isValidOldPassword = bcrypt.compareSync(
+        req.body.oldPassword,
+        user.password
     );
 
     if (!isValidOldPassword) {
-        return res.status(401).send({ message: 'Old password is not valid' });
+        return res.status(404).send({ message: 'Old password is not valid' });
     }
 
     const newPasswordHash = bcrypt.hashSync(
