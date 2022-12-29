@@ -43,18 +43,10 @@ type IReqUpdateUser = Request<
     }
 >;
 
-export const updateUserInfo = (req: IReqUpdateUser, res: Response) => {
-    User.findById(req.body.userId).exec((err, user) => {
-        if (err != null) {
-            res.status(500).send({ message: err });
-            return;
-        }
-
-        if (!user) {
-            return res.status(404).send({ message: 'User Not found.' });
-        }
-
-        user.update({
+export const updateUserInfo = async (req: IReqUpdateUser, res: Response) => {
+    await User.updateOne(
+        { _id: req.body.userId },
+        {
             $set: {
                 firstName: req.body.firstName,
                 lastName: req.body.lastName,
@@ -62,24 +54,11 @@ export const updateUserInfo = (req: IReqUpdateUser, res: Response) => {
                 gender: req.body.gender,
                 phoneNumber: req.body.phoneNumber,
             },
-        });
+        },
+        { new: true }
+    );
 
-        user.save()
-            .then(() => {
-                return res.status(200).send({
-                    id: user._id,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    email: user.email,
-                    dateOfBirth: user.dateOfBirth,
-                });
-            })
-            .catch(() => {
-                return res
-                    .status(401)
-                    .send({ message: 'Error while updating User' });
-            });
-    });
+    return res.status(200).send({ ok: true });
 };
 
 export const adminBoard = (req: Request, res: Response) => {

@@ -24,6 +24,17 @@ export const UserModel = mongoose.model(
                 type: String,
                 required: true,
             },
+            gender: {
+                type: String,
+                required: false,
+                trim: true,
+            },
+            phoneNumber: {
+                type: String,
+                required: true,
+                trim: true,
+            },
+
             dateOfBirth: Date,
             roles: [
                 {
