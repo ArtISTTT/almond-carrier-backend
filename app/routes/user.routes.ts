@@ -3,6 +3,7 @@ import {
     adminBoard,
     allAccess,
     moderatorBoard,
+    updateUserInfo,
     userBoard,
 } from '../controllers/user.controller';
 
@@ -35,5 +36,11 @@ export default (app: Express) => {
         '/api/test/admin',
         [middlewares.authJwt.verifyToken, middlewares.authJwt.isAdmin],
         adminBoard
+    );
+
+    app.post(
+        '/api/update-user-info',
+        [middlewares.authJwt.verifyToken],
+        updateUserInfo
     );
 };
