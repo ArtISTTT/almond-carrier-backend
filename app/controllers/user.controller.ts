@@ -2,10 +2,13 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import db from '../models';
 import * as core from 'express-serve-static-core';
+import bcrypt from 'bcryptjs';
 
 export const allAccess = (req: Request, res: Response) => {
     res.status(200).send('Public Content.');
 };
+
+const BRYPTO_KEY = process.env.BCRYPTO_KEY;
 
 const User = db.user;
 
@@ -25,6 +28,8 @@ export const userBoard = (req: Request, res: Response) => {
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
+            gender: user.gender,
+            phoneNumber: user.phoneNumber,
             dateOfBirth: user.dateOfBirth,
         });
     });
@@ -44,7 +49,7 @@ type IReqUpdateUser = Request<
 >;
 
 export const updateUserInfo = async (req: IReqUpdateUser, res: Response) => {
-    await User.updateOne(
+    const user = await User.findByIdAndUpdate(
         { _id: req.body.userId },
         {
             $set: {
@@ -53,6 +58,69 @@ export const updateUserInfo = async (req: IReqUpdateUser, res: Response) => {
                 dateOfBirth: req.body.dateOfBirth,
                 gender: req.body.gender,
                 phoneNumber: req.body.phoneNumber,
+            },
+        },
+        { new: true, lean: true }
+    );
+
+    if (!user) {
+        return res.status(404).send({ message: 'User Not found.' });
+    }
+
+    return res.status(200).send({
+        user: {
+            id: user._id,
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            gender: user.gender,
+            phoneNumber: user.phoneNumber,
+            dateOfBirth: user.dateOfBirth,
+        },
+    });
+};
+
+type IReqUpdateUserPassword = Request<
+    core.ParamsDictionary,
+    {},
+    {
+        oldPassword: string;
+        newPassword: string;
+        userId: string;
+    }
+>;
+
+export const updateUserPassword = async (
+    req: IReqUpdateUserPassword,
+    res: Response
+) => {
+    const user = await User.findById({ _id: req.body.userId });
+
+    if (!user) {
+        return res.status(404).send({
+            message: 'User Not found!',
+        });
+    }
+
+    const isValidOldPassword = await bcrypt.compare(
+        user.password,
+        req.body.oldPassword
+    );
+
+    if (!isValidOldPassword) {
+        return res.status(401).send({ message: 'Old password is not valid' });
+    }
+
+    const newPasswordHash = bcrypt.hashSync(
+        req.body.newPassword,
+        Number(BRYPTO_KEY)
+    );
+
+    await User.updateOne(
+        { _id: req.body.userId },
+        {
+            $set: {
+                password: newPasswordHash,
             },
         },
         { new: true }

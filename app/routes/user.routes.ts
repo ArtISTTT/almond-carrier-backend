@@ -4,6 +4,7 @@ import {
     allAccess,
     moderatorBoard,
     updateUserInfo,
+    updateUserPassword,
     userBoard,
 } from '../controllers/user.controller';
 
@@ -42,5 +43,11 @@ export default (app: Express) => {
         '/api/update-user-info',
         [middlewares.authJwt.verifyToken],
         updateUserInfo
+    );
+
+    app.post(
+        '/api/update-user-password',
+        [middlewares.authJwt.verifyToken],
+        updateUserPassword
     );
 };
