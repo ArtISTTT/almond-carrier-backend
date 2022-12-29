@@ -17,6 +17,8 @@ type IReqCreateOrderAsCarrier = Request<
         userId: string;
         fromLocation: string;
         toLocation: string;
+        maxWeight: number;
+        arrivalDate: Date;
     }
 >;
 
@@ -49,6 +51,8 @@ export const createOrderAsCarrier = async (
         paymentId: payment._id,
         fromLocation: req.body.fromLocation,
         toLocation: req.body.toLocation,
+        carrierMaxWeight: req.body.maxWeight,
+        arrivalDate: req.body.arrivalDate,
     });
 
     order.save(err => {
@@ -66,16 +70,15 @@ export const createOrderAsCarrier = async (
             status: status.name,
             rewardAmount: payment.rewardAmount,
             currency: payment.currency,
-            fromLocation: req.body.fromLocation,
-            toLocation: req.body.toLocation,
+            fromLocation: order.fromLocation,
+            toLocation: order.toLocation,
+            carrierMaxWeight: order.carrierMaxWeight,
+            arrivalDate: order.arrivalDate,
         },
     });
 };
 
-export const getMyOrders = async (
-    req: IReqCreateOrderAsCarrier,
-    res: Response
-) => {
+export const getMyOrders = async (req: Request, res: Response) => {
     const ordersList = [];
 
     for await (const order of Order.find({

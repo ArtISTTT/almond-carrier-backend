@@ -23,6 +23,14 @@ export const OrderModel = mongoose.model(
             ref: 'payment',
             require: true,
         },
+        arrivalDate: {
+            type: Date,
+            required: false,
+        },
+        carrierMaxWeight: {
+            type: Number,
+            required: false,
+        },
         fromLocation: {
             type: String,
             require: true,
