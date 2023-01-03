@@ -3,6 +3,7 @@ import mongoose from 'mongoose';
 import db from '../models';
 import * as core from 'express-serve-static-core';
 import bcrypt from 'bcryptjs';
+import { getFullUri } from '../services/getFullUri';
 
 export const allAccess = (req: Request, res: Response) => {
     res.status(200).send('Public Content.');
@@ -11,9 +12,10 @@ export const allAccess = (req: Request, res: Response) => {
 const BRYPTO_KEY = process.env.BCRYPTO_KEY;
 
 const User = db.user;
+const Image = db.image;
 
 export const userBoard = (req: Request, res: Response) => {
-    User.findById(req.body.userId).exec((err, user) => {
+    User.findById(req.body.userId).exec(async (err, user) => {
         if (err != null) {
             res.status(500).send({ message: err });
             return;
@@ -31,6 +33,7 @@ export const userBoard = (req: Request, res: Response) => {
             gender: user.gender,
             phoneNumber: user.phoneNumber,
             dateOfBirth: user.dateOfBirth,
+            avatar: user.avatarImage,
         });
     });
 };
@@ -147,4 +150,25 @@ export const adminBoard = (req: Request, res: Response) => {
 
 export const moderatorBoard = (req: Request, res: Response) => {
     res.status(200).send('Moderator Content.');
+};
+
+export const updateAvatar = async (req: Request, res: Response) => {
+    if (req.file === undefined) return res.send('you must select a file.');
+
+    const imageUri = `${getFullUri(req)}/${req.file.path}`;
+
+    await User.updateOne(
+        { _id: req.body.userId },
+        {
+            $set: {
+                avatarImage: imageUri,
+            },
+        },
+        { new: true }
+    );
+
+    res.status(200).send({
+        message: 'Avatar successfully updated',
+        avatar: imageUri,
+    });
 };

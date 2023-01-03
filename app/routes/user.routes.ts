@@ -1,14 +1,17 @@
+import { getImage } from './../controllers/user.controller';
 import { Express } from 'express';
 import {
     adminBoard,
     allAccess,
     moderatorBoard,
+    updateAvatar,
     updateUserInfo,
     updateUserPassword,
     userBoard,
 } from '../controllers/user.controller';
 
 import middlewares from '../middlewares';
+import { upload } from '../services/storage';
 
 export default (app: Express) => {
     app.use((req, res, next) => {
@@ -49,5 +52,11 @@ export default (app: Express) => {
         '/api/update-user-password',
         [middlewares.authJwt.verifyToken],
         updateUserPassword
+    );
+
+    app.post(
+        '/api/update-avatar',
+        [upload.single('image'), middlewares.authJwt.verifyToken],
+        updateAvatar
     );
 };

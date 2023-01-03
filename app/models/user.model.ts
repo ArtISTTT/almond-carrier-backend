@@ -42,6 +42,10 @@ export const UserModel = mongoose.model(
                     ref: 'Role',
                 },
             ],
+            avatarImage: {
+                type: String,
+                required: false,
+            },
         },
         {
             timestamps: true,

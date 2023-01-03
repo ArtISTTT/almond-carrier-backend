@@ -43,6 +43,13 @@ app.use(
     })
 );
 
+app.use(
+    '/uploads',
+    helmet.crossOriginResourcePolicy({ policy: 'cross-origin' })
+);
+
+app.use('/uploads', express.static('uploads'));
+
 app.use(cors(corsOptions));
 
 db.mongoose

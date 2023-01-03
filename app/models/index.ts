@@ -6,6 +6,7 @@ import { OrderModel } from './order.model';
 import { OrderStatusModel } from './orderStatus.model';
 import { PaymentModel } from './payment.model';
 import { ReviewModel } from './review.model';
+import { ImageModel } from './image.model';
 
 mongoose.Promise = global.Promise;
 
@@ -18,6 +19,7 @@ type IDB = {
     orderStatus: typeof OrderStatusModel;
     payment: typeof PaymentModel;
     review: typeof ReviewModel;
+    image: typeof ImageModel;
     ROLES: ['user', 'admin', 'moderator'];
 };
 
@@ -35,6 +37,7 @@ db.order = OrderModel;
 db.orderStatus = OrderStatusModel;
 db.payment = PaymentModel;
 db.review = ReviewModel;
+db.image = ImageModel;
 
 db.ROLES = ['user', 'admin', 'moderator'];
 
