@@ -1,4 +1,3 @@
-import { getImage } from './../controllers/user.controller';
 import { Express } from 'express';
 import {
     adminBoard,

@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import mongoose from 'mongoose';
 import db from '../models';
 import * as core from 'express-serve-static-core';
 import bcrypt from 'bcryptjs';
@@ -79,6 +78,7 @@ export const updateUserInfo = async (req: IReqUpdateUser, res: Response) => {
             gender: user.gender,
             phoneNumber: user.phoneNumber,
             dateOfBirth: user.dateOfBirth,
+            avatar: user.avatarImage,
         },
     });
 };
@@ -104,18 +104,6 @@ export const updateUserPassword = async (
             message: 'User Not found!',
         });
     }
-
-    const oldPasswordHash = bcrypt.hashSync(
-        req.body.oldPassword,
-        Number(BRYPTO_KEY)
-    );
-
-    console.log(
-        req.body.oldPassword,
-        req.body.oldPassword,
-        oldPasswordHash,
-        user.password
-    );
 
     const isValidOldPassword = bcrypt.compareSync(
         req.body.oldPassword,
