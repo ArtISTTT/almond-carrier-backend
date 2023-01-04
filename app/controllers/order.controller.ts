@@ -17,7 +17,7 @@ type IReqCreateOrderAsCarrier = Request<
         userId: string;
         fromLocation: string;
         toLocation: string;
-        maxWeight: number;
+        carrierMaxWeight: number;
         arrivalDate: Date;
     }
 >;
@@ -51,7 +51,7 @@ export const createOrderAsCarrier = async (
         paymentId: payment._id,
         fromLocation: req.body.fromLocation,
         toLocation: req.body.toLocation,
-        carrierMaxWeight: req.body.maxWeight,
+        carrierMaxWeight: req.body.carrierMaxWeight,
         arrivalDate: req.body.arrivalDate,
     });
 

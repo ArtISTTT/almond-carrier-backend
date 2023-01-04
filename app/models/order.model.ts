@@ -16,14 +16,18 @@ export const OrderModel = mongoose.model(
         statusId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'orderStatus',
-            require: true,
+            required: true,
         },
         paymentId: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'payment',
-            require: true,
+            required: true,
         },
         arrivalDate: {
+            type: Date,
+            required: false,
+        },
+        orderDate: {
             type: Date,
             required: false,
         },
@@ -33,19 +37,27 @@ export const OrderModel = mongoose.model(
         },
         fromLocation: {
             type: String,
-            require: true,
+            required: true,
         },
         toLocation: {
             type: String,
-            require: true,
+            required: true,
         },
         completedDate: {
             type: Date,
-            require: false,
+            required: false,
+        },
+        productName: {
+            type: String,
+            required: false,
         },
         productDescription: {
             type: String,
-            require: false,
+            required: false,
+        },
+        productWeight: {
+            type: Number,
+            required: false,
         },
     })
 );
