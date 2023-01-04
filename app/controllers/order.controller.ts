@@ -84,7 +84,33 @@ export const getMyOrders = async (req: Request, res: Response) => {
     for await (const order of Order.find({
         $or: [{ carrierId: req.body.userId }, { recieverId: req.body.userId }],
     })) {
-        ordersList.push({ order });
+        const status = await OrderStatus.findById(order.statusId);
+
+        if (!status) {
+            return res.status(404).send({ message: 'Status not found!' });
+        }
+
+        const payment = await Payment.findById(order.paymentId);
+
+        if (!payment) {
+            return res.status(404).send({ message: 'Payment not found!' });
+        }
+
+        const item = {
+            status: status.name,
+            toLocation: order.toLocation,
+            fromLocation: order.fromLocation,
+            productName: order.productName,
+            rewardAmount: payment.rewardAmount,
+            productAmount: payment.productAmount,
+            productWeight: order.productWeight,
+            productDescription: order.productDescription,
+            carrierMaxWeight: order.carrierMaxWeight,
+            arrivalDate: order.arrivalDate,
+            isPayed: payment.isPayed,
+            id: order._id,
+        };
+        ordersList.push(item);
     }
 
     return res.status(200).send({ orders: ordersList });

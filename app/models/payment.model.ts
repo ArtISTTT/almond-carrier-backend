@@ -4,11 +4,11 @@ export const PaymentModel = mongoose.model(
     'Payment',
     new mongoose.Schema({
         rewardAmount: {
-            type: mongoose.Types.Decimal128,
+            type: Number,
             require: true,
         },
         productAmount: {
-            type: mongoose.Types.Decimal128,
+            type: Number,
             require: false,
         },
         isPayed: {
