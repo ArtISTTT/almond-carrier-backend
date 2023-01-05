@@ -45,7 +45,7 @@ export const createOrderAsCarrier = async (
         }
     });
 
-    const order = new Order({
+    await Order.create({
         carrierId: req.body.userId,
         statusId: status?._id,
         paymentId: payment._id,
@@ -55,26 +55,57 @@ export const createOrderAsCarrier = async (
         arrivalDate: req.body.arrivalDate,
     });
 
-    order.save(err => {
-        if (err) {
-            res.status(500).send({ message: err });
-            return;
-        }
+    return res.status(200).send({
+        message: 'Order successfully created!',
+    });
+};
+
+type IReqCreateOrderAsReceiver = Request<
+    core.ParamsDictionary,
+    {},
+    {
+        currency: string;
+        userId: string;
+        toLocation: string;
+        fromLocation?: string;
+        productName: string;
+        rewardAmount: number;
+        productAmount: number;
+        productWeight: number;
+        productDescription: string;
+    }
+>;
+
+export const createOrderAsReceiver = async (
+    req: IReqCreateOrderAsReceiver,
+    res: Response
+) => {
+    const status = await OrderStatus.findOne({ name: 'waitingCarrier' });
+
+    if (!status) {
+        res.status(404).send({ message: 'Status not found' });
+        return;
+    }
+
+    const payment = await Payment.create({
+        rewardAmount: req.body.rewardAmount,
+        productAmount: req.body.productAmount,
+        currency: req.body.currency,
     });
 
-    res.status(200).send({
+    await Order.create({
+        recieverId: req.body.userId,
+        statusId: status?._id,
+        paymentId: payment._id,
+        fromLocation: req.body.fromLocation,
+        toLocation: req.body.toLocation,
+        productName: req.body.productName,
+        productWeight: req.body.productWeight,
+        productDescription: req.body.productDescription,
+    });
+
+    return res.status(200).send({
         message: 'Order successfully created!',
-        order: {
-            id: order._id,
-            carrierId: order.carrierId,
-            status: status.name,
-            rewardAmount: payment.rewardAmount,
-            currency: payment.currency,
-            fromLocation: order.fromLocation,
-            toLocation: order.toLocation,
-            carrierMaxWeight: order.carrierMaxWeight,
-            arrivalDate: order.arrivalDate,
-        },
     });
 };
 

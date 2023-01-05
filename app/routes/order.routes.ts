@@ -1,6 +1,7 @@
 import { Express } from 'express';
 import {
     createOrderAsCarrier,
+    createOrderAsReceiver,
     getMyOrders,
 } from '../controllers/order.controller';
 
@@ -19,6 +20,12 @@ export default (app: Express) => {
         '/api/order/create-order-as-carrier',
         [middlewares.authJwt.verifyToken],
         createOrderAsCarrier
+    );
+
+    app.post(
+        '/api/order/create-order-as-receiver',
+        [middlewares.authJwt.verifyToken],
+        createOrderAsReceiver
     );
 
     app.get(

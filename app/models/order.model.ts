@@ -37,7 +37,7 @@ export const OrderModel = mongoose.model(
         },
         fromLocation: {
             type: String,
-            required: true,
+            required: false,
         },
         toLocation: {
             type: String,
