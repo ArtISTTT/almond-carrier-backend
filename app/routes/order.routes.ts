@@ -3,6 +3,7 @@ import {
     createOrderAsCarrier,
     createOrderAsReceiver,
     getMyOrders,
+    searchOrders,
 } from '../controllers/order.controller';
 
 import middlewares from '../middlewares';
@@ -32,5 +33,11 @@ export default (app: Express) => {
         '/api/order/get-my-orders',
         [middlewares.authJwt.verifyToken],
         getMyOrders
+    );
+
+    app.post(
+        '/api/order/search-orders',
+        [middlewares.authJwt.verifyToken],
+        searchOrders
     );
 };

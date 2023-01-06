@@ -109,6 +109,175 @@ export const createOrderAsReceiver = async (
     });
 };
 
+enum OrderSeachType {
+    receivers = 'receivers',
+    carriers = 'carriers',
+}
+
+type Filter = {
+    fromLocation?: string;
+    toLocation?: string;
+    maxBenefit?: number;
+    minBenefit?: number;
+    maxWeight?: number;
+    maxPrice?: number;
+};
+
+type IReqSearchOrders = Request<
+    core.ParamsDictionary,
+    {},
+    {
+        userId: string;
+        type: OrderSeachType;
+        filters: Filter;
+    }
+>;
+
+export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
+    const ordersList = [];
+
+    if (req.body.type === OrderSeachType.carriers) {
+        const andFiltersArray = [
+            { carrierId: { $exists: true, $ne: req.body.userId } },
+        ]
+            .concat(
+                req.body.filters.fromLocation
+                    ? ([{ fromLocation: req.body.filters.fromLocation }] as any)
+                    : []
+            )
+            .concat(
+                req.body.filters.toLocation
+                    ? ([{ toLocation: req.body.filters.toLocation }] as any)
+                    : []
+            )
+            .concat(
+                req.body.filters.maxWeight
+                    ? ([
+                          {
+                              carrierMaxWeight: {
+                                  $lt: req.body.filters.maxWeight,
+                              },
+                          },
+                      ] as any)
+                    : []
+            );
+
+        for await (const order of Order.find({
+            recieverId: { $exists: false },
+            $and: andFiltersArray,
+        })) {
+            const status = await OrderStatus.findById(order.statusId);
+
+            if (!status) {
+                return res.status(404).send({ message: 'Status not found!' });
+            }
+
+            const payment = await Payment.findById(order.paymentId);
+
+            if (!payment) {
+                return res.status(404).send({ message: 'Payment not found!' });
+            }
+
+            if (
+                req.body.filters.maxBenefit &&
+                req.body.filters.maxBenefit > (payment.rewardAmount as number)
+            ) {
+                continue;
+            }
+
+            const item = {
+                status: status.name,
+                toLocation: order.toLocation,
+                fromLocation: order.fromLocation,
+                productName: order.productName,
+                rewardAmount: payment.rewardAmount,
+                productAmount: payment.productAmount,
+                productWeight: order.productWeight,
+                productDescription: order.productDescription,
+                carrierMaxWeight: order.carrierMaxWeight,
+                arrivalDate: order.arrivalDate,
+                isPayed: payment.isPayed,
+                id: order._id,
+            };
+            ordersList.push(item);
+        }
+    } else {
+        const andFiltersArray = [
+            { recieverId: { $exists: true, $ne: req.body.userId } },
+        ]
+            .concat(
+                req.body.filters.fromLocation
+                    ? ([{ fromLocation: req.body.filters.fromLocation }] as any)
+                    : []
+            )
+            .concat(
+                req.body.filters.toLocation
+                    ? ([{ toLocation: req.body.filters.toLocation }] as any)
+                    : []
+            )
+            .concat(
+                req.body.filters.maxWeight
+                    ? ([
+                          {
+                              productWeight: {
+                                  $lt: req.body.filters.maxWeight,
+                              },
+                          },
+                      ] as any)
+                    : []
+            );
+
+        for await (const order of Order.find({
+            carrierId: { $exists: false },
+            $and: andFiltersArray,
+        })) {
+            const status = await OrderStatus.findById(order.statusId);
+
+            if (!status) {
+                return res.status(404).send({ message: 'Status not found!' });
+            }
+
+            const payment = await Payment.findById(order.paymentId);
+
+            if (!payment) {
+                return res.status(404).send({ message: 'Payment not found!' });
+            }
+
+            if (
+                req.body.filters.minBenefit &&
+                req.body.filters.minBenefit < (payment.rewardAmount as number)
+            ) {
+                continue;
+            }
+
+            if (
+                req.body.filters.maxPrice &&
+                req.body.filters.maxPrice < (payment.productAmount as number)
+            ) {
+                continue;
+            }
+
+            const item = {
+                status: status.name,
+                toLocation: order.toLocation,
+                fromLocation: order.fromLocation,
+                productName: order.productName,
+                rewardAmount: payment.rewardAmount,
+                productAmount: payment.productAmount,
+                productWeight: order.productWeight,
+                productDescription: order.productDescription,
+                carrierMaxWeight: order.carrierMaxWeight,
+                arrivalDate: order.arrivalDate,
+                isPayed: payment.isPayed,
+                id: order._id,
+            };
+            ordersList.push(item);
+        }
+    }
+
+    return res.status(200).send({ orders: ordersList });
+};
+
 export const getMyOrders = async (req: Request, res: Response) => {
     const ordersList = [];
 
