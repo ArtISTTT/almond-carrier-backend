@@ -141,9 +141,23 @@ export const moderatorBoard = (req: Request, res: Response) => {
 };
 
 export const updateAvatar = async (req: Request, res: Response) => {
-    if (req.file === undefined) return res.send('you must select a file.');
+    if (req.file === undefined)
+        return res.status(403).send('you must select a file.');
 
-    const imageUri = `${getFullUri(req)}/${req.file.path}`;
+    const imageName = `${new Date().toISOString()}_${
+        req.body.userId
+    }_${req.file.originalname.replace(' ', '')}`;
+
+    const imageUri = `${getFullUri(req)}/api/image/${imageName}`;
+
+    await Image.create({
+        name: imageName,
+        uri: imageUri,
+        img: {
+            data: req.file.buffer,
+            contentType: 'image/png',
+        },
+    });
 
     await User.updateOne(
         { _id: req.body.userId },
@@ -159,4 +173,21 @@ export const updateAvatar = async (req: Request, res: Response) => {
         message: 'Avatar successfully updated',
         avatar: imageUri,
     });
+};
+
+export const getImage = async (req: Request, res: Response) => {
+    const image = await Image.findOne({ name: req.params.name });
+
+    console.log(req.params.name);
+
+    if (!image) {
+        return res.status(404).send({ massage: 'Image not found!' });
+    }
+
+    res.writeHead(200, {
+        'Content-Type': 'image/png',
+        'Content-Length': image.img.data.length,
+    });
+
+    res.end(image.img.data);
 };

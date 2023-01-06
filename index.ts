@@ -26,6 +26,20 @@ const corsOptions = {
 const app: Express = express();
 const port = process.env.PORT;
 
+db.mongoose
+    .connect(connectionString, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true,
+    } as ConnectOptions)
+    .then(() => {
+        console.log('Successfully connect to MongoDB.');
+        initializeDB();
+    })
+    .catch((err: any) => {
+        console.error('Connection error', err);
+        process.exit();
+    });
+
 app.use(compression());
 app.use(helmet());
 
@@ -51,20 +65,6 @@ app.use(
 app.use('/uploads', express.static('uploads'));
 
 app.use(cors(corsOptions));
-
-db.mongoose
-    .connect(connectionString, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    } as ConnectOptions)
-    .then(() => {
-        console.log('Successfully connect to MongoDB.');
-        initializeDB();
-    })
-    .catch((err: any) => {
-        console.error('Connection error', err);
-        process.exit();
-    });
 
 app.get('/', (req, res) => {
     res.json({ message: 'Welcome to Friendly Carrier back-end application.' });

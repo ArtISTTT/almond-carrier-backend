@@ -2,6 +2,7 @@ import { Express } from 'express';
 import {
     adminBoard,
     allAccess,
+    getImage,
     moderatorBoard,
     updateAvatar,
     updateUserInfo,
@@ -58,4 +59,6 @@ export default (app: Express) => {
         [upload.single('image'), middlewares.authJwt.verifyToken],
         updateAvatar
     );
+
+    app.get('/api/image/:name', getImage);
 };
