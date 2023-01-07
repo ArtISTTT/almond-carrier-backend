@@ -22,6 +22,43 @@ type IReqCreateOrderAsCarrier = Request<
     }
 >;
 
+const getOrderOutput = (
+    status: any,
+    order: any,
+    payment: any,
+    receiver: any,
+    carrier: any
+) => {
+    return {
+        status: status.name,
+        toLocation: order.toLocation,
+        fromLocation: order.fromLocation,
+        productName: order.productName,
+        productWeight: order.productWeight,
+        productDescription: order.productDescription,
+        carrierMaxWeight: order.carrierMaxWeight,
+        arrivalDate: order.arrivalDate,
+        receiver: receiver
+            ? {
+                  id: receiver._id,
+                  firstName: receiver.firstName,
+                  lastName: receiver.lastName,
+              }
+            : undefined,
+        carrier: carrier
+            ? {
+                  id: carrier._id,
+                  firstName: carrier.firstName,
+                  lastName: carrier.lastName,
+              }
+            : undefined,
+        isPayed: payment.isPayed,
+        rewardAmount: payment.rewardAmount,
+        productAmount: payment.productAmount,
+        id: order._id,
+    };
+};
+
 export const createOrderAsCarrier = async (
     req: IReqCreateOrderAsCarrier,
     res: Response
@@ -185,20 +222,16 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
                 continue;
             }
 
-            const item = {
-                status: status.name,
-                toLocation: order.toLocation,
-                fromLocation: order.fromLocation,
-                productName: order.productName,
-                rewardAmount: payment.rewardAmount,
-                productAmount: payment.productAmount,
-                productWeight: order.productWeight,
-                productDescription: order.productDescription,
-                carrierMaxWeight: order.carrierMaxWeight,
-                arrivalDate: order.arrivalDate,
-                isPayed: payment.isPayed,
-                id: order._id,
-            };
+            const carrier = await User.findById(order.carrierId);
+            const receiver = await User.findById(order.recieverId);
+
+            const item = getOrderOutput(
+                status,
+                order,
+                payment,
+                receiver,
+                carrier
+            );
             ordersList.push(item);
         }
     } else {
@@ -257,20 +290,16 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
                 continue;
             }
 
-            const item = {
-                status: status.name,
-                toLocation: order.toLocation,
-                fromLocation: order.fromLocation,
-                productName: order.productName,
-                rewardAmount: payment.rewardAmount,
-                productAmount: payment.productAmount,
-                productWeight: order.productWeight,
-                productDescription: order.productDescription,
-                carrierMaxWeight: order.carrierMaxWeight,
-                arrivalDate: order.arrivalDate,
-                isPayed: payment.isPayed,
-                id: order._id,
-            };
+            const carrier = await User.findById(order.carrierId);
+            const receiver = await User.findById(order.recieverId);
+
+            const item = getOrderOutput(
+                status,
+                order,
+                payment,
+                receiver,
+                carrier
+            );
             ordersList.push(item);
         }
     }
@@ -296,20 +325,11 @@ export const getMyOrders = async (req: Request, res: Response) => {
             return res.status(404).send({ message: 'Payment not found!' });
         }
 
-        const item = {
-            status: status.name,
-            toLocation: order.toLocation,
-            fromLocation: order.fromLocation,
-            productName: order.productName,
-            rewardAmount: payment.rewardAmount,
-            productAmount: payment.productAmount,
-            productWeight: order.productWeight,
-            productDescription: order.productDescription,
-            carrierMaxWeight: order.carrierMaxWeight,
-            arrivalDate: order.arrivalDate,
-            isPayed: payment.isPayed,
-            id: order._id,
-        };
+        const carrier = await User.findById(order.carrierId);
+        const receiver = await User.findById(order.recieverId);
+
+        const item = getOrderOutput(status, order, payment, receiver, carrier);
+
         ordersList.push(item);
     }
 
