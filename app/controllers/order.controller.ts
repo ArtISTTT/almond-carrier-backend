@@ -16,7 +16,9 @@ type IReqCreateOrderAsCarrier = Request<
         currency: string;
         userId: string;
         fromLocation: string;
+        fromLocation_placeId: string;
         toLocation: string;
+        toLocation_placeId: string;
         carrierMaxWeight: number;
         arrivalDate: Date;
     }
@@ -33,6 +35,8 @@ const getOrderOutput = (
         status: status.name,
         toLocation: order.toLocation,
         fromLocation: order.fromLocation,
+        fromLocation_placeId: order.fromLocation_placeId,
+        toLocation_placeId: order.toLocation_placeId,
         productName: order.productName,
         productWeight: order.productWeight,
         productDescription: order.productDescription,
@@ -88,6 +92,8 @@ export const createOrderAsCarrier = async (
         paymentId: payment._id,
         fromLocation: req.body.fromLocation,
         toLocation: req.body.toLocation,
+        fromLocation_placeId: req.body.fromLocation_placeId,
+        toLocation_placeId: req.body.toLocation_placeId,
         carrierMaxWeight: req.body.carrierMaxWeight,
         arrivalDate: req.body.arrivalDate,
     });
@@ -104,7 +110,9 @@ type IReqCreateOrderAsReceiver = Request<
         currency: string;
         userId: string;
         toLocation: string;
+        toLocation_placeId: string;
         fromLocation?: string;
+        fromLocation_placeId?: string;
         productName: string;
         rewardAmount: number;
         productAmount: number;
@@ -136,6 +144,8 @@ export const createOrderAsReceiver = async (
         paymentId: payment._id,
         fromLocation: req.body.fromLocation,
         toLocation: req.body.toLocation,
+        fromLocation_placeId: req.body.fromLocation_placeId,
+        toLocation_placeId: req.body.toLocation_placeId,
         productName: req.body.productName,
         productWeight: req.body.productWeight,
         productDescription: req.body.productDescription,

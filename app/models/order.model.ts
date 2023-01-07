@@ -43,6 +43,14 @@ export const OrderModel = mongoose.model(
             type: String,
             required: true,
         },
+        fromLocation_placeId: {
+            type: String,
+            required: false,
+        },
+        toLocation_placeId: {
+            type: String,
+            required: true,
+        },
         completedDate: {
             type: Date,
             required: false,
