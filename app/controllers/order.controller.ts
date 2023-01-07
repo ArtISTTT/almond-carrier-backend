@@ -155,7 +155,7 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
                     ? ([
                           {
                               carrierMaxWeight: {
-                                  $lt: req.body.filters.maxWeight,
+                                  $lte: req.body.filters.maxWeight,
                               },
                           },
                       ] as any)
@@ -220,7 +220,7 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
                     ? ([
                           {
                               productWeight: {
-                                  $lt: req.body.filters.maxWeight,
+                                  $lte: req.body.filters.maxWeight,
                               },
                           },
                       ] as any)
