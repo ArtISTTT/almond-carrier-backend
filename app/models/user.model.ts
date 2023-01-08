@@ -31,10 +31,9 @@ export const UserModel = mongoose.model(
             },
             phoneNumber: {
                 type: String,
-                required: true,
+                required: false,
                 trim: true,
             },
-
             dateOfBirth: Date,
             roles: [
                 {
