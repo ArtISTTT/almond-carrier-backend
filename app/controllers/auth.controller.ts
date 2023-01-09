@@ -53,7 +53,7 @@ export const signup = (req: Request, res: Response) => {
                             { id: user.id },
                             authConfig.secret,
                             {
-                                expiresIn: 86400, // 24 hours
+                                expiresIn: 2592000, // 24 hours
                             }
                         );
 
@@ -86,7 +86,7 @@ export const signup = (req: Request, res: Response) => {
                     }
 
                     const token = jwt.sign({ id: user.id }, authConfig.secret, {
-                        expiresIn: 86400, // 24 hours
+                        expiresIn: 2592000, // 24 hours
                     });
 
                     (
@@ -131,7 +131,7 @@ export const signin = (req: Request, res: Response) => {
             }
 
             const token = jwt.sign({ id: user.id }, authConfig.secret, {
-                expiresIn: 86400, // 24 hours
+                expiresIn: 2592000, // 24 hours
             });
 
             (req.session as CookieSessionInterfaces.CookieSessionObject).token =
