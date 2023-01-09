@@ -24,15 +24,9 @@ type IReqCreateOrderAsCarrier = Request<
     }
 >;
 
-const getOrderOutput = (
-    status: any,
-    order: any,
-    payment: any,
-    receiver: any,
-    carrier: any
-) => {
-    return {
-        status: status.name,
+const getOrdersOutput = (orders: any[]) => {
+    return orders.map(order => ({
+        status: order.status.name,
         toLocation: order.toLocation,
         fromLocation: order.fromLocation,
         fromLocation_placeId: order.fromLocation_placeId,
@@ -42,25 +36,25 @@ const getOrderOutput = (
         productDescription: order.productDescription,
         carrierMaxWeight: order.carrierMaxWeight,
         arrivalDate: order.arrivalDate,
-        receiver: receiver
+        receiver: order.receiver
             ? {
-                  id: receiver._id,
-                  firstName: receiver.firstName,
-                  lastName: receiver.lastName,
+                  id: order.receiver._id,
+                  firstName: order.receiver.firstName,
+                  lastName: order.receiver.lastName,
               }
             : undefined,
-        carrier: carrier
+        carrier: order.carrier
             ? {
-                  id: carrier._id,
-                  firstName: carrier.firstName,
-                  lastName: carrier.lastName,
+                  id: order.carrier._id,
+                  firstName: order.carrier.firstName,
+                  lastName: order.carrier.lastName,
               }
             : undefined,
-        isPayed: payment.isPayed,
-        rewardAmount: payment.rewardAmount,
-        productAmount: payment.productAmount,
+        isPayed: order.payment.isPayed,
+        rewardAmount: order.payment.rewardAmount,
+        productAmount: order.payment.productAmount,
         id: order._id,
-    };
+    }));
 };
 
 export const createOrderAsCarrier = async (
@@ -183,9 +177,17 @@ type IReqSearchOrders = Request<
 export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
     const ordersList = [];
 
+    // GETTING CARRIERS LIST BY FILTERS
+
     if (req.body.type === OrderSeachType.carriers) {
-        const andFiltersArray = [
-            { carrierId: { $exists: true, $ne: req.body.userId } },
+        const matchOrderFilters = [
+            {
+                carrierId: {
+                    $exists: true,
+                    $ne: new mongoose.Types.ObjectId(req.body.userId),
+                },
+                recieverId: { $exists: false },
+            },
         ]
             .concat(
                 req.body.filters.fromLocation
@@ -209,139 +211,228 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
                     : []
             );
 
-        for await (const order of Order.find({
-            recieverId: { $exists: false },
-            $and: andFiltersArray,
-        })) {
-            const status = await OrderStatus.findById(order.statusId);
+        const matchPayment: mongoose.FilterQuery<any> = {
+            $expr: { $eq: ['$$paymentId', '$_id'] },
+        };
 
-            if (!status) {
-                return res.status(404).send({ message: 'Status not found!' });
-            }
-
-            const payment = await Payment.findById(order.paymentId);
-
-            if (!payment) {
-                return res.status(404).send({ message: 'Payment not found!' });
-            }
-
-            if (
-                req.body.filters.maxBenefit &&
-                req.body.filters.maxBenefit > (payment.rewardAmount as number)
-            ) {
-                continue;
-            }
-
-            const carrier = await User.findById(order.carrierId);
-            const receiver = await User.findById(order.recieverId);
-
-            const item = getOrderOutput(
-                status,
-                order,
-                payment,
-                receiver,
-                carrier
-            );
-            ordersList.push(item);
+        if (req.body.filters.maxBenefit) {
+            matchPayment.rewardAmount = {
+                $lte: req.body.filters.maxBenefit,
+            };
         }
-    } else {
-        const andFiltersArray = [
-            { recieverId: { $exists: true, $ne: req.body.userId } },
-        ]
-            .concat(
-                req.body.filters.fromLocation
-                    ? ([{ fromLocation: req.body.filters.fromLocation }] as any)
-                    : []
-            )
-            .concat(
-                req.body.filters.toLocation
-                    ? ([{ toLocation: req.body.filters.toLocation }] as any)
-                    : []
-            )
-            .concat(
-                req.body.filters.maxWeight
-                    ? ([
-                          {
-                              productWeight: {
-                                  $lte: req.body.filters.maxWeight,
-                              },
-                          },
-                      ] as any)
-                    : []
-            );
 
-        for await (const order of Order.find({
-            carrierId: { $exists: false },
-            $and: andFiltersArray,
-        })) {
-            const status = await OrderStatus.findById(order.statusId);
+        const orders = await Order.aggregate([
+            {
+                $match: { $and: matchOrderFilters },
+            },
+            {
+                $lookup: {
+                    from: Payment.collection.name,
+                    let: { paymentId: '$paymentId' },
+                    pipeline: [
+                        {
+                            $match: matchPayment,
+                        },
+                    ],
+                    as: 'payment',
+                },
+            },
+            {
+                $unwind: '$payment',
+            },
+            {
+                $lookup: {
+                    from: User.collection.name,
+                    localField: 'carrierId',
+                    foreignField: '_id',
+                    as: 'carrier',
+                },
+            },
+            {
+                $unwind: '$carrier',
+            },
+            {
+                $lookup: {
+                    from: OrderStatus.collection.name,
+                    localField: 'statusId',
+                    foreignField: '_id',
+                    as: 'status',
+                },
+            },
+            {
+                $unwind: '$status',
+            },
+        ]);
 
-            if (!status) {
-                return res.status(404).send({ message: 'Status not found!' });
-            }
-
-            const payment = await Payment.findById(order.paymentId);
-
-            if (!payment) {
-                return res.status(404).send({ message: 'Payment not found!' });
-            }
-
-            if (
-                req.body.filters.minBenefit &&
-                req.body.filters.minBenefit < (payment.rewardAmount as number)
-            ) {
-                continue;
-            }
-
-            if (
-                req.body.filters.maxPrice &&
-                req.body.filters.maxPrice < (payment.productAmount as number)
-            ) {
-                continue;
-            }
-
-            const carrier = await User.findById(order.carrierId);
-            const receiver = await User.findById(order.recieverId);
-
-            const item = getOrderOutput(
-                status,
-                order,
-                payment,
-                receiver,
-                carrier
-            );
-            ordersList.push(item);
-        }
+        return res.status(200).send({ orders: getOrdersOutput(orders) });
     }
 
-    return res.status(200).send({ orders: ordersList });
+    // GETTING RECEIVERS LIST BY FILTERS
+
+    const matchOrderFilters = [
+        {
+            recieverId: {
+                $exists: true,
+                $ne: new mongoose.Types.ObjectId(req.body.userId),
+            },
+            carrierId: { $exists: false },
+        },
+    ]
+        .concat(
+            req.body.filters.fromLocation
+                ? ([{ fromLocation: req.body.filters.fromLocation }] as any)
+                : []
+        )
+        .concat(
+            req.body.filters.toLocation
+                ? ([{ toLocation: req.body.filters.toLocation }] as any)
+                : []
+        )
+        .concat(
+            req.body.filters.maxWeight
+                ? ([
+                      {
+                          productWeight: {
+                              $lte: req.body.filters.maxWeight,
+                          },
+                      },
+                  ] as any)
+                : []
+        );
+
+    const matchPayment: mongoose.FilterQuery<any> = {
+        $expr: { $eq: ['$$paymentId', '$_id'] },
+    };
+
+    if (req.body.filters.minBenefit) {
+        matchPayment.rewardAmount = {
+            $gte: req.body.filters.minBenefit,
+        };
+    }
+
+    if (req.body.filters.maxPrice) {
+        matchPayment.productAmount = {
+            $lte: req.body.filters.maxPrice,
+        };
+    }
+
+    const orders = await Order.aggregate([
+        {
+            $match: { $and: matchOrderFilters },
+        },
+        {
+            $lookup: {
+                from: Payment.collection.name,
+                let: { paymentId: '$paymentId' },
+                pipeline: [
+                    {
+                        $match: matchPayment,
+                    },
+                ],
+                as: 'payment',
+            },
+        },
+        {
+            $unwind: '$payment',
+        },
+        {
+            $lookup: {
+                from: User.collection.name,
+                localField: 'recieverId',
+                foreignField: '_id',
+                as: 'receiver',
+            },
+        },
+        {
+            $unwind: '$receiver',
+        },
+        {
+            $lookup: {
+                from: OrderStatus.collection.name,
+                localField: 'statusId',
+                foreignField: '_id',
+                as: 'status',
+            },
+        },
+        {
+            $unwind: '$status',
+        },
+    ]);
+
+    return res.status(200).send({ orders: getOrdersOutput(orders) });
 };
 
 export const getMyOrders = async (req: Request, res: Response) => {
-    const ordersList = [];
+    const orders = await Order.aggregate([
+        {
+            $match: {
+                $or: [
+                    {
+                        carrierId: {
+                            $eq: new mongoose.Types.ObjectId(req.body.userId),
+                        },
+                    },
+                    {
+                        recieverId: {
+                            $eq: new mongoose.Types.ObjectId(req.body.userId),
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: Payment.collection.name,
+                localField: 'paymentId',
+                foreignField: '_id',
+                as: 'payment',
+            },
+        },
+        {
+            $unwind: '$payment',
+        },
+        {
+            $lookup: {
+                from: User.collection.name,
+                localField: 'recieverId',
+                foreignField: '_id',
+                as: 'receiver',
+            },
+        },
+        {
+            $unwind: {
+                path: '$receiver',
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $lookup: {
+                from: User.collection.name,
+                localField: 'carrierId',
+                foreignField: '_id',
+                as: 'carrier',
+            },
+        },
+        {
+            $unwind: {
+                path: '$carrier',
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $lookup: {
+                from: OrderStatus.collection.name,
+                localField: 'statusId',
+                foreignField: '_id',
+                as: 'status',
+            },
+        },
+        {
+            $unwind: '$status',
+        },
+    ]);
 
-    for await (const order of Order.find({
-        $or: [{ carrierId: req.body.userId }, { recieverId: req.body.userId }],
-    })) {
-        const status = await OrderStatus.findById(order.statusId);
+    console.log(orders);
 
-        if (!status) {
-            return res.status(404).send({ message: 'Status not found!' });
-        }
-
-        const payment = await Payment.findById(order.paymentId);
-
-        if (!payment) {
-            return res.status(404).send({ message: 'Payment not found!' });
-        }
-
-        const carrier = await User.findById(order.carrierId);
-        const receiver = await User.findById(order.recieverId);
-
-        const item = getOrderOutput(status, order, payment, receiver, carrier);
-
-        ordersList.push(item);
-    }
-
-    return res.status(200).send({ orders: ordersList });
+    return res.status(200).send({ orders: getOrdersOutput(orders) });
 };
