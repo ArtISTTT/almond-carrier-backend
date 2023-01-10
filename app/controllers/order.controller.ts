@@ -432,7 +432,5 @@ export const getMyOrders = async (req: Request, res: Response) => {
         },
     ]);
 
-    console.log(orders);
-
     return res.status(200).send({ orders: getOrdersOutput(orders) });
 };
