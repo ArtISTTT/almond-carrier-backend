@@ -434,3 +434,106 @@ export const getMyOrders = async (req: Request, res: Response) => {
 
     return res.status(200).send({ orders: getOrdersOutput(orders) });
 };
+
+type IReqSApplyAsCarrier = Request<
+    core.ParamsDictionary,
+    {},
+    {
+        userId: string;
+        orderId: string;
+        fromLocation?: string;
+        fromLocation_placeId?: string;
+        arrivalDate: Date;
+    }
+>;
+
+export const applyOrderAsCarrier = async (
+    req: IReqSApplyAsCarrier,
+    res: Response
+) => {
+    const status = await OrderStatus.findOne({ name: 'inDiscussion' });
+
+    if (!status) {
+        return res.status(404).send({ message: 'Status not found!' });
+    }
+
+    let fromLocationData = req.body.fromLocation
+        ? {
+              fromLocation: req.body.fromLocation,
+              fromLocation_placeId: req.body.fromLocation_placeId,
+          }
+        : {};
+
+    const order = await Order.findByIdAndUpdate(
+        { _id: req.body.orderId },
+        {
+            $set: {
+                carrierId: req.body.userId,
+                ...fromLocationData,
+                arrivalDate: req.body.arrivalDate,
+                statusId: status._id,
+            },
+        },
+        { new: true, lean: true }
+    );
+
+    if (!order) {
+        return res.status(404).send({ message: 'Order to apply not found!' });
+    }
+
+    return res.status(200).send({ orderId: order._id });
+};
+
+type IReqSApplyAsReceiver = Request<
+    core.ParamsDictionary,
+    {},
+    {
+        userId: string;
+        orderId: string;
+        productName: string;
+        productAmount: number;
+        productWeight: number;
+        productDescription: string;
+    }
+>;
+
+export const applyOrderAsReceiver = async (
+    req: IReqSApplyAsReceiver,
+    res: Response
+) => {
+    const status = await OrderStatus.findOne({ name: 'inDiscussion' });
+
+    if (!status) {
+        return res.status(404).send({ message: 'Status not found!' });
+    }
+
+    const order = await Order.findByIdAndUpdate(
+        { _id: req.body.orderId },
+        {
+            $set: {
+                recieverId: req.body.userId,
+                productName: req.body.productName,
+                productWeight: req.body.productWeight,
+                productDescription: req.body.productDescription,
+                statusId: status._id,
+            },
+        },
+        { new: true, lean: true }
+    );
+
+    if (!order) {
+        return res.status(404).send({ message: 'Order to apply not found!' });
+    }
+
+    await Payment.findByIdAndUpdate(
+        { _id: order.paymentId },
+        {
+            $set: {
+                productAmount: req.body.productAmount,
+            },
+        },
+        { new: true, lean: true }
+    );
+
+    return res.status(200).send({ orderId: order._id });
+};

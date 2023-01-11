@@ -1,5 +1,7 @@
 import { Express } from 'express';
 import {
+    applyOrderAsCarrier,
+    applyOrderAsReceiver,
     createOrderAsCarrier,
     createOrderAsReceiver,
     getMyOrders,
@@ -39,5 +41,17 @@ export default (app: Express) => {
         '/api/order/search-orders',
         [middlewares.authJwt.verifyToken],
         searchOrders
+    );
+
+    app.post(
+        '/api/order/apply-as-carrier',
+        [middlewares.authJwt.verifyToken],
+        applyOrderAsCarrier
+    );
+
+    app.post(
+        '/api/order/apply-as-receiver',
+        [middlewares.authJwt.verifyToken],
+        applyOrderAsReceiver
     );
 };
