@@ -17,7 +17,7 @@ export const initializeOrderStatuses = () => {
         if (!err && count === 0) {
             new Status({
                 name: 'waitingReciever',
-            }).save(handleSave('waitingReviewer'));
+            }).save(handleSave('waitingReviever'));
 
             new Status({
                 name: 'waitingCarrier',

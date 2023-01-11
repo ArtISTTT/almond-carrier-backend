@@ -26,6 +26,28 @@ const corsOptions = {
 const app: Express = express();
 const port = process.env.PORT;
 
+const start = async () => {
+    await db.mongoose
+        .connect(connectionString, {
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        } as ConnectOptions)
+        .then(() => {
+            console.log('Successfully connect to MongoDB.');
+            initializeDB();
+        })
+        .catch((err: any) => {
+            console.error('Connection error', err);
+            process.exit();
+        });
+
+    app.listen(port, () => {
+        console.log(
+            `⚡️[server]: Server is running at http://localhost:${port}`
+        );
+    });
+};
+
 app.use(compression());
 app.use(helmet());
 
@@ -52,20 +74,6 @@ app.use('/uploads', express.static('uploads'));
 
 app.use(cors(corsOptions));
 
-db.mongoose
-    .connect(connectionString, {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-    } as ConnectOptions)
-    .then(() => {
-        console.log('Successfully connect to MongoDB.');
-        initializeDB();
-    })
-    .catch((err: any) => {
-        console.error('Connection error', err);
-        process.exit();
-    });
-
 app.get('/', (req, res) => {
     res.json({ message: 'Welcome to Friendly Carrier back-end application.' });
 });
@@ -74,6 +82,4 @@ authRoutes(app);
 userRoutes(app);
 orderRoutes(app);
 
-app.listen(port, () => {
-    console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
-});
+start();

@@ -3,6 +3,7 @@ import db from '../models';
 import * as core from 'express-serve-static-core';
 import bcrypt from 'bcryptjs';
 import { getFullUri } from '../services/getFullUri';
+import mongoose from 'mongoose';
 
 export const allAccess = (req: Request, res: Response) => {
     res.status(200).send('Public Content.');
@@ -12,28 +13,97 @@ const BRYPTO_KEY = process.env.BCRYPTO_KEY;
 
 const User = db.user;
 const Image = db.image;
+const Order = db.order;
+const OrderStatus = db.orderStatus;
 
-export const userBoard = (req: Request, res: Response) => {
-    User.findById(req.body.userId).exec(async (err, user) => {
-        if (err != null) {
-            res.status(500).send({ message: err });
-            return;
-        }
+export const userBoard = async (req: Request, res: Response) => {
+    const user = (
+        await User.aggregate([
+            {
+                $match: {
+                    _id: { $eq: new mongoose.Types.ObjectId(req.body.userId) },
+                },
+            },
+            {
+                $lookup: {
+                    from: OrderStatus.collection.name,
+                    let: {},
+                    pipeline: [
+                        {
+                            $match: {
+                                name: 'success',
+                            },
+                        },
+                    ],
+                    as: 'successStatus',
+                },
+            },
+            {
+                $unwind: '$successStatus',
+            },
+            {
+                $lookup: {
+                    from: Order.collection.name,
+                    let: {
+                        userId: '$_id',
+                        successStatus: '$successStatus',
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $and: [
+                                    {
+                                        $or: [
+                                            {
+                                                $expr: {
+                                                    $eq: [
+                                                        '$$userId',
+                                                        '$carrierId',
+                                                    ],
+                                                },
+                                            },
+                                            {
+                                                $expr: {
+                                                    $eq: [
+                                                        '$$userId',
+                                                        '$recieverId',
+                                                    ],
+                                                },
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        $expr: {
+                                            $eq: [
+                                                '$$successStatus._id',
+                                                '$statusId',
+                                            ],
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    ],
+                    as: 'successOrders',
+                },
+            },
+        ])
+    )[0];
 
-        if (!user) {
-            return res.status(404).send({ message: 'User Not found.' });
-        }
+    if (!user) {
+        return res.status(404).send({ message: 'User Not found.' });
+    }
 
-        res.status(200).send({
-            id: user._id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            email: user.email,
-            gender: user.gender,
-            phoneNumber: user.phoneNumber,
-            dateOfBirth: user.dateOfBirth,
-            avatar: user.avatarImage,
-        });
+    res.status(200).send({
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        gender: user.gender,
+        phoneNumber: user.phoneNumber,
+        dateOfBirth: user.dateOfBirth,
+        avatar: user.avatarImage,
+        completedOrders: user.successOrders.length,
     });
 };
 
