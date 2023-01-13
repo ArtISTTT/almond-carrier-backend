@@ -5,6 +5,7 @@ import {
     createOrderAsCarrier,
     createOrderAsReceiver,
     getMyOrders,
+    getOrderById,
     searchOrders,
 } from '../controllers/order.controller';
 
@@ -53,5 +54,11 @@ export default (app: Express) => {
         '/api/order/apply-as-receiver',
         [middlewares.authJwt.verifyToken],
         applyOrderAsReceiver
+    );
+
+    app.get(
+        '/api/order/get-order-by-id',
+        [middlewares.authJwt.verifyToken],
+        getOrderById
     );
 };

@@ -435,6 +435,99 @@ export const getMyOrders = async (req: Request, res: Response) => {
     return res.status(200).send({ orders: getOrdersOutput(orders) });
 };
 
+export const getOrderById = async (req: Request, res: Response) => {
+    console.log(req.query);
+    const orders = await Order.aggregate([
+        {
+            $match: {
+                $and: [
+                    {
+                        $or: [
+                            {
+                                carrierId: {
+                                    $eq: new mongoose.Types.ObjectId(
+                                        req.body.userId
+                                    ),
+                                },
+                            },
+                            {
+                                recieverId: {
+                                    $eq: new mongoose.Types.ObjectId(
+                                        req.body.userId
+                                    ),
+                                },
+                            },
+                        ],
+                    },
+                    {
+                        _id: {
+                            $eq: new mongoose.Types.ObjectId(
+                                req.query.orderId as string
+                            ),
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: Payment.collection.name,
+                localField: 'paymentId',
+                foreignField: '_id',
+                as: 'payment',
+            },
+        },
+        {
+            $unwind: '$payment',
+        },
+        {
+            $lookup: {
+                from: User.collection.name,
+                localField: 'recieverId',
+                foreignField: '_id',
+                as: 'receiver',
+            },
+        },
+        {
+            $unwind: {
+                path: '$receiver',
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $lookup: {
+                from: User.collection.name,
+                localField: 'carrierId',
+                foreignField: '_id',
+                as: 'carrier',
+            },
+        },
+        {
+            $unwind: {
+                path: '$carrier',
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $lookup: {
+                from: OrderStatus.collection.name,
+                localField: 'statusId',
+                foreignField: '_id',
+                as: 'status',
+            },
+        },
+        {
+            $unwind: '$status',
+        },
+    ]);
+
+    if (orders.length === 0) {
+        res.status(404).send({ message: 'Order not found!' });
+    }
+
+    return res.status(200).send({ order: getOrdersOutput(orders)[0] });
+};
+
 type IReqSApplyAsCarrier = Request<
     core.ParamsDictionary,
     {},
