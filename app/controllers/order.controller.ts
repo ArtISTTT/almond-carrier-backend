@@ -737,18 +737,78 @@ export const agreeWithChanges = async (req: Request, res: Response) => {
         return res.status(404).send({ message: 'Order not found!' });
     }
 
-    await Order.findByIdAndUpdate(
-        { _id: req.body.orderId },
+    const payment = await Payment.findById(order.paymentId);
+
+    if (!payment) {
+        return res.status(404).send({ message: 'Payment not found!' });
+    }
+
+    await payment.updateOne(
         {
             $set: {
-                ...order.byReceiverSuggestedChanges,
-                ...order.byCarrierSuggestedChanges,
+                productAmount:
+                    order.byCarrierSuggestedChanges?.productAmount ??
+                    order.byReceiverSuggestedChanges?.productAmount ??
+                    payment.productAmount,
+                rewardAmount:
+                    order.byCarrierSuggestedChanges?.rewardAmount ??
+                    order.byReceiverSuggestedChanges?.rewardAmount ??
+                    payment.rewardAmount,
+            },
+        },
+        { new: true, lean: true }
+    );
+
+    await order.updateOne(
+        {
+            $set: {
+                arrivalDate:
+                    order.byCarrierSuggestedChanges?.arrivalDate ??
+                    order.byReceiverSuggestedChanges?.arrivalDate ??
+                    order.arrivalDate,
+                carrierMaxWeight:
+                    order.byCarrierSuggestedChanges?.carrierMaxWeight ??
+                    order.byReceiverSuggestedChanges?.carrierMaxWeight ??
+                    order.carrierMaxWeight,
+                fromLocation:
+                    order.byCarrierSuggestedChanges?.fromLocation ??
+                    order.byReceiverSuggestedChanges?.fromLocation ??
+                    order.fromLocation,
+                toLocation:
+                    order.byCarrierSuggestedChanges?.toLocation ??
+                    order.byReceiverSuggestedChanges?.fromLocation ??
+                    order.toLocation,
+                fromLocation_placeId:
+                    order.byCarrierSuggestedChanges?.fromLocation_placeId ??
+                    order.byReceiverSuggestedChanges?.fromLocation_placeId ??
+                    order.fromLocation_placeId,
+                toLocation_placeId:
+                    order.byCarrierSuggestedChanges?.toLocation_placeId ??
+                    order.byReceiverSuggestedChanges?.toLocation_placeId ??
+                    order.toLocation_placeId,
+                productName:
+                    order.byCarrierSuggestedChanges?.productName ??
+                    order.byReceiverSuggestedChanges?.productName ??
+                    order.productName,
+                productDescription:
+                    order.byCarrierSuggestedChanges?.productDescription ??
+                    order.byReceiverSuggestedChanges?.productDescription ??
+                    order.productDescription,
+                productWeight:
+                    order.byCarrierSuggestedChanges?.productWeight ??
+                    order.byReceiverSuggestedChanges?.productWeight ??
+                    order.productWeight,
                 byReceiverSuggestedChanges: undefined,
                 byCarrierSuggestedChanges: undefined,
             },
         },
         { new: true, lean: true }
     );
+
+    order.byReceiverSuggestedChanges = undefined;
+    order.byCarrierSuggestedChanges = undefined;
+
+    await order.save();
 
     return res.status(200).send({ ok: true });
 };
