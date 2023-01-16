@@ -24,37 +24,47 @@ type IReqCreateOrderAsCarrier = Request<
     }
 >;
 
-const getOrdersOutput = (orders: any[]) => {
-    return orders.map(order => ({
-        status: order.status.name,
-        toLocation: order.toLocation,
-        fromLocation: order.fromLocation,
-        fromLocation_placeId: order.fromLocation_placeId,
-        toLocation_placeId: order.toLocation_placeId,
-        productName: order.productName,
-        productWeight: order.productWeight,
-        productDescription: order.productDescription,
-        carrierMaxWeight: order.carrierMaxWeight,
-        arrivalDate: order.arrivalDate,
-        receiver: order.receiver
+const getOrdersOutput = (orders: any[], addFullInfo?: true) => {
+    return orders.map(order => {
+        const fullInfo = addFullInfo
             ? {
-                  id: order.receiver._id,
-                  firstName: order.receiver.firstName,
-                  lastName: order.receiver.lastName,
+                  byCarrierSuggestedChanges: order.byCarrierSuggestedChanges,
+                  byReceiverSuggestedChanges: order.byReceiverSuggestedChanges,
               }
-            : undefined,
-        carrier: order.carrier
-            ? {
-                  id: order.carrier._id,
-                  firstName: order.carrier.firstName,
-                  lastName: order.carrier.lastName,
-              }
-            : undefined,
-        isPayed: order.payment.isPayed,
-        rewardAmount: order.payment.rewardAmount,
-        productAmount: order.payment.productAmount,
-        id: order._id,
-    }));
+            : {};
+
+        return {
+            ...fullInfo,
+            status: order.status.name,
+            toLocation: order.toLocation,
+            fromLocation: order.fromLocation,
+            fromLocation_placeId: order.fromLocation_placeId,
+            toLocation_placeId: order.toLocation_placeId,
+            productName: order.productName,
+            productWeight: order.productWeight,
+            productDescription: order.productDescription,
+            carrierMaxWeight: order.carrierMaxWeight,
+            arrivalDate: order.arrivalDate,
+            receiver: order.receiver
+                ? {
+                      id: order.receiver._id,
+                      firstName: order.receiver.firstName,
+                      lastName: order.receiver.lastName,
+                  }
+                : undefined,
+            carrier: order.carrier
+                ? {
+                      id: order.carrier._id,
+                      firstName: order.carrier.firstName,
+                      lastName: order.carrier.lastName,
+                  }
+                : undefined,
+            isPayed: order.payment.isPayed,
+            rewardAmount: order.payment.rewardAmount,
+            productAmount: order.payment.productAmount,
+            id: order._id,
+        };
+    });
 };
 
 export const createOrderAsCarrier = async (
@@ -436,7 +446,6 @@ export const getMyOrders = async (req: Request, res: Response) => {
 };
 
 export const getOrderById = async (req: Request, res: Response) => {
-    console.log(req.query);
     const orders = await Order.aggregate([
         {
             $match: {
@@ -525,7 +534,7 @@ export const getOrderById = async (req: Request, res: Response) => {
         res.status(404).send({ message: 'Order not found!' });
     }
 
-    return res.status(200).send({ order: getOrdersOutput(orders)[0] });
+    return res.status(200).send({ order: getOrdersOutput(orders, true)[0] });
 };
 
 type IReqSApplyAsCarrier = Request<
@@ -629,4 +638,117 @@ export const applyOrderAsReceiver = async (
     );
 
     return res.status(200).send({ orderId: order._id });
+};
+
+export const suggestChangesByCarrier = async (req: Request, res: Response) => {
+    const orders = await Order.aggregate([
+        {
+            $match: {
+                $and: [
+                    { _id: new mongoose.Types.ObjectId(req.body.orderId) },
+                    { byReceiverSuggestedChanges: undefined },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: OrderStatus.collection.name,
+                localField: 'statusId',
+                foreignField: '_id',
+                as: 'status',
+            },
+        },
+        {
+            $unwind: '$status',
+        },
+        {
+            $match: {
+                'status.name': 'inDiscussion',
+            },
+        },
+    ]);
+
+    if (orders.length > 0) {
+        await Order.findByIdAndUpdate(
+            { _id: orders[0]._id },
+            {
+                $set: {
+                    byCarrierSuggestedChanges: req.body.changes,
+                },
+            },
+            { new: true, lean: true }
+        );
+
+        return res.status(200).send({ ok: true });
+    }
+
+    return res.status(401).send({ message: 'Error while updating order!' });
+};
+
+export const suggestChangesByReceiver = async (req: Request, res: Response) => {
+    const orders = await Order.aggregate([
+        {
+            $match: {
+                $and: [
+                    { _id: new mongoose.Types.ObjectId(req.body.orderId) },
+                    { byCarrierSuggestedChanges: undefined },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: OrderStatus.collection.name,
+                localField: 'statusId',
+                foreignField: '_id',
+                as: 'status',
+            },
+        },
+        {
+            $unwind: '$status',
+        },
+        {
+            $match: {
+                'status.name': 'inDiscussion',
+            },
+        },
+    ]);
+
+    if (orders.length > 0) {
+        await Order.findByIdAndUpdate(
+            { _id: orders[0]._id },
+            {
+                $set: {
+                    byReceiverSuggestedChanges: req.body.changes,
+                },
+            },
+            { new: true, lean: true }
+        );
+
+        return res.status(200).send({ ok: true });
+    }
+
+    return res.status(401).send({ message: 'Error while updating order!' });
+};
+
+export const agreeWithChanges = async (req: Request, res: Response) => {
+    const order = await Order.findById(req.body.orderId);
+
+    if (!order) {
+        return res.status(404).send({ message: 'Order not found!' });
+    }
+
+    await Order.findByIdAndUpdate(
+        { _id: req.body.orderId },
+        {
+            $set: {
+                ...order.byReceiverSuggestedChanges,
+                ...order.byCarrierSuggestedChanges,
+                byReceiverSuggestedChanges: undefined,
+                byCarrierSuggestedChanges: undefined,
+            },
+        },
+        { new: true, lean: true }
+    );
+
+    return res.status(200).send({ ok: true });
 };

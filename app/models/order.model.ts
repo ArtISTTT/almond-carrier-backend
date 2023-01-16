@@ -67,5 +67,13 @@ export const OrderModel = mongoose.model(
             type: Number,
             required: false,
         },
+        byCarrierSuggestedChanges: {
+            type: Object,
+            required: false,
+        },
+        byReceiverSuggestedChanges: {
+            type: Object,
+            required: false,
+        },
     })
 );

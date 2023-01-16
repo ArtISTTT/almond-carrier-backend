@@ -1,5 +1,6 @@
 import { Express } from 'express';
 import {
+    agreeWithChanges,
     applyOrderAsCarrier,
     applyOrderAsReceiver,
     createOrderAsCarrier,
@@ -7,6 +8,8 @@ import {
     getMyOrders,
     getOrderById,
     searchOrders,
+    suggestChangesByCarrier,
+    suggestChangesByReceiver,
 } from '../controllers/order.controller';
 
 import middlewares from '../middlewares';
@@ -60,5 +63,23 @@ export default (app: Express) => {
         '/api/order/get-order-by-id',
         [middlewares.authJwt.verifyToken],
         getOrderById
+    );
+
+    app.post(
+        '/api/order/suggest-changes-by-carrier',
+        [middlewares.authJwt.verifyToken],
+        suggestChangesByCarrier
+    );
+
+    app.post(
+        '/api/order/suggest-changes-by-receiver',
+        [middlewares.authJwt.verifyToken],
+        suggestChangesByReceiver
+    );
+
+    app.post(
+        '/api/order/agree-with-changes',
+        [middlewares.authJwt.verifyToken],
+        agreeWithChanges
     );
 };
