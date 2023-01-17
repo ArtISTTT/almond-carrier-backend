@@ -812,3 +812,18 @@ export const agreeWithChanges = async (req: Request, res: Response) => {
 
     return res.status(200).send({ ok: true });
 };
+
+export const disagreeWithChanges = async (req: Request, res: Response) => {
+    const order = await Order.findById(req.body.orderId);
+
+    if (!order) {
+        return res.status(404).send({ message: 'Order not found!' });
+    }
+
+    order.byReceiverSuggestedChanges = undefined;
+    order.byCarrierSuggestedChanges = undefined;
+
+    await order.save();
+
+    return res.status(200).send({ ok: true });
+};
