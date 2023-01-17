@@ -30,6 +30,8 @@ const getOrdersOutput = (orders: any[], addFullInfo?: true) => {
             ? {
                   byCarrierSuggestedChanges: order.byCarrierSuggestedChanges,
                   byReceiverSuggestedChanges: order.byReceiverSuggestedChanges,
+                  dealConfirmedByCarrier: order.dealConfirmedByCarrier,
+                  dealConfirmedByReceiver: order.dealConfirmedByReceiver,
               }
             : {};
 
@@ -668,12 +670,67 @@ export const suggestChangesByCarrier = async (req: Request, res: Response) => {
         },
     ]);
 
-    if (orders.length > 0) {
-        await Order.findByIdAndUpdate(
-            { _id: orders[0]._id },
+    const order = orders[0];
+
+    if (order) {
+        if (order.status.name === 'inDiscussion') {
+            await Order.findByIdAndUpdate(
+                { _id: order._id },
+                {
+                    $set: {
+                        byCarrierSuggestedChanges: req.body.changes,
+                    },
+                },
+                { new: true, lean: true }
+            );
+
+            return res.status(200).send({ ok: true });
+        }
+
+        const payment = await Payment.findById(order.paymentId);
+
+        if (!payment) {
+            return res.status(404).send({ message: 'Payment not found!' });
+        }
+
+        await payment.updateOne(
             {
                 $set: {
-                    byCarrierSuggestedChanges: req.body.changes,
+                    productAmount:
+                        req.body.changes.productAmount ?? payment.productAmount,
+                    rewardAmount:
+                        req.body.changes.rewardAmount ?? payment.rewardAmount,
+                },
+            },
+            { new: true, lean: true }
+        );
+
+        await Order.findByIdAndUpdate(
+            { _id: order._id },
+            {
+                $set: {
+                    arrivalDate:
+                        req.body.changes.arrivalDate ?? order.arrivalDate,
+                    carrierMaxWeight:
+                        req.body.changes.carrierMaxWeight ??
+                        order.carrierMaxWeight,
+                    fromLocation:
+                        req.body.changes.fromLocation ?? order.fromLocation,
+                    toLocation:
+                        req.body.changes.fromLocation ?? order.toLocation,
+                    fromLocation_placeId:
+                        req.body.changes.fromLocation_placeId ??
+                        order.fromLocation_placeId,
+                    toLocation_placeId:
+                        req.body.changes.toLocation_placeId ??
+                        order.toLocation_placeId,
+                    productName:
+                        req.body.changes.productName ?? order.productName,
+                    productDescription:
+                        req.body.changes.productDescription ??
+                        order.productDescription,
+                    productWeight:
+                        req.body.changes.productWeight ?? order.productWeight,
                 },
             },
             { new: true, lean: true }
@@ -708,17 +765,86 @@ export const suggestChangesByReceiver = async (req: Request, res: Response) => {
         },
         {
             $match: {
-                'status.name': 'inDiscussion',
+                $or: [
+                    {
+                        'status.name': 'inDiscussion',
+                    },
+                    {
+                        'status.name': 'waitingCarrier',
+                    },
+                    {
+                        'status.name': 'waitingReviever',
+                    },
+                ],
             },
         },
     ]);
 
-    if (orders.length > 0) {
-        await Order.findByIdAndUpdate(
-            { _id: orders[0]._id },
+    const order = orders[0];
+
+    if (order) {
+        if (order.status.name === 'inDiscussion') {
+            await Order.findByIdAndUpdate(
+                { _id: order._id },
+                {
+                    $set: {
+                        byReceiverSuggestedChanges: req.body.changes,
+                        dealConfirmedByCarrier: false,
+                        dealConfirmedByReceiver: false,
+                    },
+                },
+                { new: true, lean: true }
+            );
+
+            return res.status(200).send({ ok: true });
+        }
+
+        const payment = await Payment.findById(order.paymentId);
+
+        if (!payment) {
+            return res.status(404).send({ message: 'Payment not found!' });
+        }
+
+        await payment.updateOne(
             {
                 $set: {
-                    byReceiverSuggestedChanges: req.body.changes,
+                    productAmount:
+                        req.body.changes.productAmount ?? payment.productAmount,
+                    rewardAmount:
+                        req.body.changes.rewardAmount ?? payment.rewardAmount,
+                },
+            },
+            { new: true, lean: true }
+        );
+
+        await Order.findByIdAndUpdate(
+            { _id: order._id },
+            {
+                $set: {
+                    arrivalDate:
+                        req.body.changes.arrivalDate ?? order.arrivalDate,
+                    carrierMaxWeight:
+                        req.body.changes.carrierMaxWeight ??
+                        order.carrierMaxWeight,
+                    fromLocation:
+                        req.body.changes.fromLocation ?? order.fromLocation,
+                    toLocation:
+                        req.body.changes.fromLocation ?? order.toLocation,
+                    fromLocation_placeId:
+                        req.body.changes.fromLocation_placeId ??
+                        order.fromLocation_placeId,
+                    toLocation_placeId:
+                        req.body.changes.toLocation_placeId ??
+                        order.toLocation_placeId,
+                    productName:
+                        req.body.changes.productName ?? order.productName,
+                    productDescription:
+                        req.body.changes.productDescription ??
+                        order.productDescription,
+                    productWeight:
+                        req.body.changes.productWeight ?? order.productWeight,
+                    dealConfirmedByCarrier: false,
+                    dealConfirmedByReceiver: false,
                 },
             },
             { new: true, lean: true }
@@ -743,6 +869,7 @@ export const agreeWithChanges = async (req: Request, res: Response) => {
         return res.status(404).send({ message: 'Payment not found!' });
     }
 
+    // Inserting changes from suggested to root of Document
     await payment.updateOne(
         {
             $set: {
@@ -822,6 +949,36 @@ export const disagreeWithChanges = async (req: Request, res: Response) => {
 
     order.byReceiverSuggestedChanges = undefined;
     order.byCarrierSuggestedChanges = undefined;
+
+    await order.save();
+
+    return res.status(200).send({ ok: true });
+};
+
+export const confirmDeal = async (req: Request, res: Response) => {
+    const order = await Order.findById(req.body.orderId);
+
+    if (!order) {
+        return res.status(404).send({ message: 'Order not found!' });
+    }
+
+    const userId = new mongoose.Types.ObjectId(req.body.userId);
+
+    if (order.recieverId && userId.equals(order.recieverId)) {
+        order.dealConfirmedByReceiver = true;
+    } else if (order.carrierId && userId.equals(order.carrierId)) {
+        order.dealConfirmedByCarrier = true;
+    }
+
+    if (order.dealConfirmedByCarrier && order.dealConfirmedByReceiver) {
+        const status = await OrderStatus.findOne({ name: 'waitingForPayment' });
+
+        if (!status) {
+            return res.status(404).send({ message: 'Status not found!' });
+        }
+
+        order.statusId = status._id;
+    }
 
     await order.save();
 

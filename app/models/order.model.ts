@@ -75,5 +75,13 @@ export const OrderModel = mongoose.model(
             type: Object,
             required: false,
         },
+        dealConfirmedByCarrier: {
+            type: Boolean,
+            required: false,
+        },
+        dealConfirmedByReceiver: {
+            type: Boolean,
+            required: false,
+        },
     })
 );

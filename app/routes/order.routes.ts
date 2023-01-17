@@ -3,6 +3,7 @@ import {
     agreeWithChanges,
     applyOrderAsCarrier,
     applyOrderAsReceiver,
+    confirmDeal,
     createOrderAsCarrier,
     createOrderAsReceiver,
     disagreeWithChanges,
@@ -88,5 +89,11 @@ export default (app: Express) => {
         '/api/order/disagree-with-changes',
         [middlewares.authJwt.verifyToken],
         disagreeWithChanges
+    );
+
+    app.post(
+        '/api/order/confirm-deal',
+        [middlewares.authJwt.verifyToken],
+        confirmDeal
     );
 };
