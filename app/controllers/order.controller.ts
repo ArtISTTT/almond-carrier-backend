@@ -984,3 +984,25 @@ export const confirmDeal = async (req: Request, res: Response) => {
 
     return res.status(200).send({ ok: true });
 };
+
+export const confirmPayment = async (req: Request, res: Response) => {
+    const status = await OrderStatus.findOne({
+        name: 'waitingForPaymentVerification',
+    });
+
+    if (!status) {
+        return res.status(404).send({ message: 'Status not found' });
+    }
+
+    await Order.findByIdAndUpdate(
+        { _id: req.body.orderId },
+        {
+            $set: {
+                statusId: status._id,
+            },
+        },
+        { new: true, lean: true }
+    );
+
+    return res.status(200).send({ ok: true });
+};
