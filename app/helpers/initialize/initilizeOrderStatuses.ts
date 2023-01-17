@@ -30,6 +30,9 @@ export const initializeOrderStatuses = () => {
                 name: 'waitingForPayment',
             }).save(handleSave('waitingForPayment'));
             new Status({
+                name: 'waitingForPaymentVerification',
+            }).save(handleSave('waitingForPaymentVerification'));
+            new Status({
                 name: 'awaitingDelivery',
             }).save(handleSave('awaitingDelivery'));
             new Status({
