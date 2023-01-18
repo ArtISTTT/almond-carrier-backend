@@ -10,7 +10,7 @@ const Message = db.chatMessage;
 
 export const getConversationByOrderId = async (req: Request, res: Response) => {
     try {
-        const { orderId } = req.body;
+        const { orderId } = req.params;
 
         const messages = await Message.aggregate([
             {
@@ -33,7 +33,7 @@ export const getConversationByOrderId = async (req: Request, res: Response) => {
 
 export const postMessage = async (req: Request, res: Response) => {
     try {
-        const { orderId, userId, messageText } = req.body;
+        const { userId, messageText, orderId } = req.body;
 
         const message = await Message.create({
             orderId,

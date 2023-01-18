@@ -6,6 +6,7 @@ import {
     getConversationByOrderId,
     postMessage,
 } from '../controllers/chat.controller';
+import middlewares from '../middlewares';
 
 export default (app: Express) => {
     app.use((req, res, next) => {
@@ -20,7 +21,15 @@ export default (app: Express) => {
         next();
     });
 
-    app.get('/api/chat/:orderId', getConversationByOrderId);
+    app.get(
+        '/api/chat/:orderId',
+        [middlewares.authJwt.verifyToken],
+        getConversationByOrderId
+    );
 
-    app.post('/api/chat/:orderId', postMessage);
+    app.post(
+        '/api/chat/post-message',
+        [middlewares.authJwt.verifyToken],
+        postMessage
+    );
 };
