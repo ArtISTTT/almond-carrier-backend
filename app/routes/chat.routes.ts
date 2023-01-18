@@ -20,7 +20,7 @@ export default (app: Express) => {
         next();
     });
 
-    app.get('/chat/:orderId', getConversationByOrderId);
+    app.get('/api/chat/:orderId', getConversationByOrderId);
 
-    app.post('/:orderId/message', postMessage);
+    app.post('/api/chat/:orderId', postMessage);
 };
