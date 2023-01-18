@@ -6,10 +6,20 @@ import db from './app/models';
 import authRoutes from './app/routes/auth.routes';
 import orderRoutes from './app/routes/order.routes';
 import userRoutes from './app/routes/user.routes';
+import chatRoutes from './app/routes/chat.routes';
 import compression from 'compression';
 import helmet from 'helmet';
 import { initializeDB } from './app/helpers/initialize';
 import { ConnectOptions } from 'mongoose';
+import * as http from 'http';
+import * as socketio from 'socket.io';
+import WebSockets from './app/socketio/index';
+
+const initializeSocketIo = () => {
+    io.on('connection', () => {
+        console.log('‘a user is connected’');
+    });
+};
 
 dotenv.config();
 
@@ -78,8 +88,13 @@ app.get('/', (req, res) => {
     res.json({ message: 'Welcome to Friendly Carrier back-end application.' });
 });
 
+const server = http.createServer(app);
+global.io = new socketio.Server(server);
+global.io.on('connection', WebSockets.connection);
+
 authRoutes(app);
 userRoutes(app);
+chatRoutes(app);
 orderRoutes(app);
 
 start();
