@@ -25,7 +25,7 @@ export const getConversationByOrderId = async (req: Request, res: Response) => {
 
         console.log(messages);
 
-        return res.status(200).json({ ok: true, messages: [] });
+        return res.status(200).json({ ok: true, messages });
     } catch (error) {
         return res.status(500).json({ ok: false, error: error });
     }
