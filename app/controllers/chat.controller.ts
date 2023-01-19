@@ -22,7 +22,15 @@ export const getConversationByOrderId = async (req: Request, res: Response) => {
         { $sort: { createdAt: 1 } },
     ]);
 
-    return res.status(200).json({ ok: true, messages });
+    return res.status(200).json({
+        ok: true,
+        messages: messages.map(message => ({
+            createdAt: message.createdAt,
+            messageText: message.messageText,
+            postedUserId: message.postedUserId,
+            readByRecipients: message.readByRecipients,
+        })),
+    });
 };
 
 export const postMessage = async (req: Request, res: Response) => {
@@ -38,8 +46,17 @@ export const postMessage = async (req: Request, res: Response) => {
 
         await message.save();
 
-        global.io.sockets.in(orderId).emit('new-message', { message });
-        return res.status(200).json({ ok: true, message });
+        const parsedMessage = {
+            createdAt: message.createdAt,
+            messageText: message.messageText,
+            postedUserId: message.postedUserId,
+            readByRecipients: message.readByRecipients,
+        };
+
+        global.io.sockets
+            .in(orderId)
+            .emit('new-message', { message: parsedMessage });
+        return res.status(200).json({ ok: true, message: parsedMessage });
     } catch (error) {
         return res.status(500).json({ ok: false, error: error });
     }
