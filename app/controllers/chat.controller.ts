@@ -22,8 +22,6 @@ export const getConversationByOrderId = async (req: Request, res: Response) => {
         { $sort: { createdAt: 1 } },
     ]);
 
-    console.log(messages);
-
     return res.status(200).json({ ok: true, messages });
 };
 

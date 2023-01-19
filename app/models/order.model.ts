@@ -83,10 +83,5 @@ export const OrderModel = mongoose.model(
             type: Boolean,
             required: false,
         },
-        chatId: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'chat',
-            required: true,
-        },
     })
 );
