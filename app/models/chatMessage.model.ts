@@ -4,9 +4,20 @@ export const ChatMessageModel = mongoose.model(
     'ChatMessage',
     new mongoose.Schema(
         {
-            orderId: mongoose.Schema.Types.ObjectId,
-            messageText: mongoose.Schema.Types.String,
-            postedUserId: mongoose.Schema.Types.ObjectId,
+            orderId: {
+                type: mongoose.Schema.Types.ObjectId,
+                required: false,
+                ref: 'order',
+            },
+            postedUserId: {
+                type: mongoose.Schema.Types.ObjectId,
+                required: false,
+                ref: 'user',
+            },
+            messageText: {
+                type: String,
+                required: true,
+            },
             readByRecipients: Boolean,
         },
         {

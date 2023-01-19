@@ -9,26 +9,22 @@ const Token = db.token;
 const Message = db.chatMessage;
 
 export const getConversationByOrderId = async (req: Request, res: Response) => {
-    try {
-        const { orderId } = req.params;
+    const { orderId } = req.query;
 
-        const messages = await Message.aggregate([
-            {
-                $match: {
-                    $eq: {
-                        orderId: new mongoose.Types.ObjectId(orderId),
-                    },
+    const messages = await Message.aggregate([
+        {
+            $match: {
+                orderId: {
+                    $eq: new mongoose.Types.ObjectId(orderId as string),
                 },
             },
-            { $sort: { createdAt: 1 } },
-        ]);
+        },
+        { $sort: { createdAt: 1 } },
+    ]);
 
-        console.log(messages);
+    console.log(messages);
 
-        return res.status(200).json({ ok: true, messages });
-    } catch (error) {
-        return res.status(500).json({ ok: false, error: error });
-    }
+    return res.status(200).json({ ok: true, messages });
 };
 
 export const postMessage = async (req: Request, res: Response) => {
@@ -41,6 +37,8 @@ export const postMessage = async (req: Request, res: Response) => {
             postedUserId: userId,
             readByRecipients: false,
         });
+
+        await message.save();
 
         global.io.sockets.in(orderId).emit('new-message', { message });
         return res.status(200).json({ ok: true, message });
