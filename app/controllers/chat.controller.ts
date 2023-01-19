@@ -42,7 +42,7 @@ export const postMessage = async (req: Request, res: Response) => {
             readByRecipients: false,
         });
 
-        // global.io.sockets.in(orderId).emit('new-message', { message });
+        global.io.sockets.in(orderId).emit('new-message', { message });
         return res.status(200).json({ ok: true, message });
     } catch (error) {
         return res.status(500).json({ ok: false, error: error });

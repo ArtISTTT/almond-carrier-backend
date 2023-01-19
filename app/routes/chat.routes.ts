@@ -22,7 +22,7 @@ export default (app: Express) => {
     });
 
     app.get(
-        '/api/chat/:orderId',
+        '/api/chat/',
         [middlewares.authJwt.verifyToken],
         getConversationByOrderId
     );
