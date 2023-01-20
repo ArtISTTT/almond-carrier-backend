@@ -2,6 +2,7 @@ import { Express } from 'express';
 import {
     adminBoard,
     allAccess,
+    getUserProfile,
     moderatorBoard,
     updateAvatar,
     updateUserInfo,
@@ -28,6 +29,8 @@ export default (app: Express) => {
     app.get('/api/test/all', allAccess);
 
     app.get('/api/user', [middlewares.authJwt.verifyToken], userBoard);
+
+    app.get('/api/get-user', [middlewares.authJwt.verifyToken], getUserProfile);
 
     app.get(
         '/api/test/mod',

@@ -4,6 +4,7 @@ import * as core from 'express-serve-static-core';
 import bcrypt from 'bcryptjs';
 import { getFullUri } from '../services/getFullUri';
 import mongoose from 'mongoose';
+import { getOrdersOutput } from '../services/getOrdersOutput';
 
 export const allAccess = (req: Request, res: Response) => {
     res.status(200).send('Public Content.');
@@ -15,6 +16,105 @@ const User = db.user;
 const Image = db.image;
 const Order = db.order;
 const OrderStatus = db.orderStatus;
+
+export const getUserProfile = async (req: Request, res: Response) => {
+    const { userId } = req.query;
+
+    const user = (
+        await User.aggregate([
+            {
+                $match: {
+                    _id: { $eq: new mongoose.Types.ObjectId(userId as string) },
+                },
+            },
+            {
+                $lookup: {
+                    from: OrderStatus.collection.name,
+                    let: {},
+                    pipeline: [
+                        {
+                            $match: {
+                                name: 'success',
+                            },
+                        },
+                    ],
+                    as: 'successStatus',
+                },
+            },
+            {
+                $unwind: '$successStatus',
+            },
+            {
+                $lookup: {
+                    from: Order.collection.name,
+                    let: {
+                        userId: '$_id',
+                        successStatus: '$successStatus',
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                $and: [
+                                    {
+                                        $or: [
+                                            {
+                                                $expr: {
+                                                    $eq: [
+                                                        '$$userId',
+                                                        '$carrierId',
+                                                    ],
+                                                },
+                                            },
+                                            {
+                                                $expr: {
+                                                    $eq: [
+                                                        '$$userId',
+                                                        '$recieverId',
+                                                    ],
+                                                },
+                                            },
+                                        ],
+                                    },
+                                    {
+                                        $expr: {
+                                            $eq: [
+                                                '$$successStatus._id',
+                                                '$statusId',
+                                            ],
+                                        },
+                                    },
+                                ],
+                            },
+                        },
+                    ],
+                    as: 'successOrders',
+                },
+            },
+        ])
+    )[0];
+
+    if (!user) {
+        return res.status(404).send({ message: 'User Not found.' });
+    }
+
+    res.status(200).send({
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        gender: user.gender,
+        dateOfBirth: user.dateOfBirth,
+        avatar: user.avatarImage,
+        completedOrders: user.successOrders.length,
+        completedOrdersAsReceiver: 12,
+        completedOrdersAsCarrier: 4,
+        successOrders: getOrdersOutput(user.successOrders),
+        ordersInLastMonth: 3,
+        completionRate: 77,
+        verifiedByEmail: true,
+        verifiedByPhone: true,
+        fromLocation: 'Moscow',
+    });
+};
 
 export const userBoard = async (req: Request, res: Response) => {
     const user = (
