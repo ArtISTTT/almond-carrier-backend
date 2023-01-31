@@ -541,6 +541,8 @@ export const applyOrderAsCarrier = async (
         return res.status(404).send({ message: 'Order to apply not found!' });
     }
 
+    global.io.sockets.in(order._id.toString()).emit('new-status');
+
     return res.status(200).send({ orderId: order._id });
 };
 
@@ -584,6 +586,8 @@ export const applyOrderAsReceiver = async (
     if (!order) {
         return res.status(404).send({ message: 'Order to apply not found!' });
     }
+
+    global.io.sockets.in(order._id.toString()).emit('new-status');
 
     await Payment.findByIdAndUpdate(
         { _id: order.paymentId },
@@ -691,6 +695,8 @@ export const suggestChangesByCarrier = async (req: Request, res: Response) => {
             },
             { new: true, lean: true }
         );
+
+        global.io.sockets.in(order._id.toString()).emit('new-status');
 
         return res.status(200).send({ ok: true });
     }
@@ -806,6 +812,8 @@ export const suggestChangesByReceiver = async (req: Request, res: Response) => {
             { new: true, lean: true }
         );
 
+        global.io.sockets.in(order._id.toString()).emit('new-status');
+
         return res.status(200).send({ ok: true });
     }
 
@@ -893,6 +901,8 @@ export const agreeWithChanges = async (req: Request, res: Response) => {
 
     await order.save();
 
+    global.io.sockets.in(order._id.toString()).emit('new-status');
+
     return res.status(200).send({ ok: true });
 };
 
@@ -907,6 +917,8 @@ export const disagreeWithChanges = async (req: Request, res: Response) => {
     order.byCarrierSuggestedChanges = undefined;
 
     await order.save();
+
+    global.io.sockets.in(order._id.toString()).emit('new-status');
 
     return res.status(200).send({ ok: true });
 };
@@ -969,6 +981,40 @@ export const confirmPayment = async (req: Request, res: Response) => {
         },
         { new: true, lean: true }
     );
+
+    if (!order) {
+        return res.status(404).send({ message: 'Order not found!' });
+    }
+
+    global.io.sockets.in(order._id.toString()).emit('new-status');
+
+    return res.status(200).send({ ok: true });
+};
+
+export const completeOrder = async (req: Request, res: Response) => {
+    const status = await OrderStatus.findOne({
+        name: 'success',
+    });
+
+    if (!status) {
+        return res.status(404).send({ message: 'Status not found' });
+    }
+
+    const order = await Order.findByIdAndUpdate(
+        { _id: req.body.orderId },
+        {
+            $set: {
+                statusId: status._id,
+            },
+        },
+        { new: true, lean: true }
+    );
+
+    if (!order) {
+        return res.status(404).send({ message: 'Order not found!' });
+    }
+
+    global.io.sockets.in(order._id.toString()).emit('new-status');
 
     return res.status(200).send({ ok: true });
 };
