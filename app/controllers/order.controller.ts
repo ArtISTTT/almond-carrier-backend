@@ -943,18 +943,28 @@ export const confirmDeal = async (req: Request, res: Response) => {
 
 export const confirmPayment = async (req: Request, res: Response) => {
     const status = await OrderStatus.findOne({
-        name: 'waitingForPaymentVerification',
+        name: 'awaitingDelivery',
     });
 
     if (!status) {
         return res.status(404).send({ message: 'Status not found' });
     }
 
-    await Order.findByIdAndUpdate(
+    const order = await Order.findByIdAndUpdate(
         { _id: req.body.orderId },
         {
             $set: {
                 statusId: status._id,
+            },
+        },
+        { new: true, lean: true }
+    );
+
+    await Order.findByIdAndUpdate(
+        { _id: order?.paymentId },
+        {
+            $set: {
+                isPayed: true,
             },
         },
         { new: true, lean: true }
