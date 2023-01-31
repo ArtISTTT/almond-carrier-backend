@@ -978,7 +978,7 @@ export const confirmPayment = async (req: Request, res: Response) => {
         { new: true, lean: true }
     );
 
-    await Order.findByIdAndUpdate(
+    await Payment.findByIdAndUpdate(
         { _id: order?.paymentId },
         {
             $set: {
