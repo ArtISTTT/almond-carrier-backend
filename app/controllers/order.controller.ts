@@ -954,6 +954,8 @@ export const confirmDeal = async (req: Request, res: Response) => {
 
     await order.save();
 
+    global.io.sockets.in(order._id.toString()).emit('new-status');
+
     return res.status(200).send({ ok: true });
 };
 
