@@ -644,6 +644,8 @@ export const suggestChangesByCarrier = async (req: Request, res: Response) => {
                 { new: true, lean: true }
             );
 
+            global.io.sockets.in(order._id.toString()).emit('new-status');
+
             return res.status(200).send({ ok: true });
         }
 
@@ -757,6 +759,8 @@ export const suggestChangesByReceiver = async (req: Request, res: Response) => {
                 },
                 { new: true, lean: true }
             );
+
+            global.io.sockets.in(order._id.toString()).emit('new-status');
 
             return res.status(200).send({ ok: true });
         }
