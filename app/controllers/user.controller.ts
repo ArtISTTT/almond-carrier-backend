@@ -16,6 +16,7 @@ const User = db.user;
 const Image = db.image;
 const Order = db.order;
 const OrderStatus = db.orderStatus;
+const Payment = db.payment;
 
 export const getUserProfile = async (req: Request, res: Response) => {
     const { userId } = req.query;
@@ -86,6 +87,22 @@ export const getUserProfile = async (req: Request, res: Response) => {
                                 ],
                             },
                         },
+                        {
+                            $lookup: {
+                                from: OrderStatus.collection.name,
+                                localField: 'statusId',
+                                foreignField: '_id',
+                                as: 'status',
+                            },
+                        },
+                        {
+                            $lookup: {
+                                from: Payment.collection.name,
+                                localField: 'paymentId',
+                                foreignField: '_id',
+                                as: 'payment',
+                            },
+                        },
                     ],
                     as: 'successOrders',
                 },
@@ -96,6 +113,12 @@ export const getUserProfile = async (req: Request, res: Response) => {
     if (!user) {
         return res.status(404).send({ message: 'User Not found.' });
     }
+
+    user.successOrders = user.successOrders.map((order: any) => ({
+        ...order,
+        status: order.status[0],
+        payment: order.payment[0],
+    }));
 
     res.status(200).send({
         id: user._id,
