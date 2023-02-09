@@ -45,68 +45,6 @@ export const getUserProfile = async (req: Request, res: Response) => {
             {
                 $unwind: '$successStatus',
             },
-            {
-                $lookup: {
-                    from: Order.collection.name,
-                    let: {
-                        userId: '$_id',
-                        successStatus: '$successStatus',
-                    },
-                    pipeline: [
-                        {
-                            $match: {
-                                $and: [
-                                    {
-                                        $or: [
-                                            {
-                                                $expr: {
-                                                    $eq: [
-                                                        '$$userId',
-                                                        '$carrierId',
-                                                    ],
-                                                },
-                                            },
-                                            {
-                                                $expr: {
-                                                    $eq: [
-                                                        '$$userId',
-                                                        '$recieverId',
-                                                    ],
-                                                },
-                                            },
-                                        ],
-                                    },
-                                    {
-                                        $expr: {
-                                            $eq: [
-                                                '$$successStatus._id',
-                                                '$statusId',
-                                            ],
-                                        },
-                                    },
-                                ],
-                            },
-                        },
-                        {
-                            $lookup: {
-                                from: OrderStatus.collection.name,
-                                localField: 'statusId',
-                                foreignField: '_id',
-                                as: 'status',
-                            },
-                        },
-                        {
-                            $lookup: {
-                                from: Payment.collection.name,
-                                localField: 'paymentId',
-                                foreignField: '_id',
-                                as: 'payment',
-                            },
-                        },
-                    ],
-                    as: 'successOrders',
-                },
-            },
         ])
     )[0];
 
@@ -114,11 +52,87 @@ export const getUserProfile = async (req: Request, res: Response) => {
         return res.status(404).send({ message: 'User Not found.' });
     }
 
-    user.successOrders = user.successOrders.map((order: any) => ({
-        ...order,
-        status: order.status[0],
-        payment: order.payment[0],
-    }));
+    const orders = await Order.aggregate([
+        {
+            $match: {
+                $and: [
+                    {
+                        $or: [
+                            {
+                                carrierId: {
+                                    $eq: new mongoose.Types.ObjectId(
+                                        req.body.userId
+                                    ),
+                                },
+                            },
+                            {
+                                recieverId: {
+                                    $eq: new mongoose.Types.ObjectId(
+                                        req.body.userId
+                                    ),
+                                },
+                            },
+                        ],
+                    },
+                    {
+                        $expr: {
+                            $eq: [user.successStatus._id, '$statusId'],
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: Payment.collection.name,
+                localField: 'paymentId',
+                foreignField: '_id',
+                as: 'payment',
+            },
+        },
+        {
+            $unwind: '$payment',
+        },
+        {
+            $lookup: {
+                from: User.collection.name,
+                localField: 'recieverId',
+                foreignField: '_id',
+                as: 'receiver',
+            },
+        },
+        {
+            $unwind: {
+                path: '$receiver',
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $lookup: {
+                from: User.collection.name,
+                localField: 'carrierId',
+                foreignField: '_id',
+                as: 'carrier',
+            },
+        },
+        {
+            $unwind: {
+                path: '$carrier',
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $lookup: {
+                from: OrderStatus.collection.name,
+                localField: 'statusId',
+                foreignField: '_id',
+                as: 'status',
+            },
+        },
+        {
+            $unwind: '$status',
+        },
+    ]);
 
     res.status(200).send({
         id: user._id,
@@ -130,7 +144,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
         completedOrders: user.successOrders.length,
         completedOrdersAsReceiver: 12,
         completedOrdersAsCarrier: 4,
-        successOrders: getOrdersOutput(user.successOrders),
+        successOrders: getOrdersOutput(orders),
         ordersInLastMonth: 3,
         completionRate: 77,
         verifiedByEmail: true,
