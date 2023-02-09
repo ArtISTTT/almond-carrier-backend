@@ -141,7 +141,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
         gender: user.gender,
         dateOfBirth: user.dateOfBirth,
         avatar: user.avatarImage,
-        completedOrders: user.successOrders.length,
+        completedOrders: orders.length,
         completedOrdersAsReceiver: 12,
         completedOrdersAsCarrier: 4,
         successOrders: getOrdersOutput(orders),
