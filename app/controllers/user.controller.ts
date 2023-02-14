@@ -61,14 +61,14 @@ export const getUserProfile = async (req: Request, res: Response) => {
                             {
                                 carrierId: {
                                     $eq: new mongoose.Types.ObjectId(
-                                        req.body.userId
+                                        userId as string
                                     ),
                                 },
                             },
                             {
                                 recieverId: {
                                     $eq: new mongoose.Types.ObjectId(
-                                        req.body.userId
+                                        userId as string
                                     ),
                                 },
                             },
