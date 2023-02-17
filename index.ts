@@ -7,6 +7,7 @@ import authRoutes from './app/routes/auth.routes';
 import orderRoutes from './app/routes/order.routes';
 import userRoutes from './app/routes/user.routes';
 import chatRoutes from './app/routes/chat.routes';
+import reviewRoutes from './app/routes/review.routes';
 import compression from 'compression';
 import helmet from 'helmet';
 import { initializeDB } from './app/helpers/initialize';
@@ -74,6 +75,7 @@ authRoutes(app);
 userRoutes(app);
 chatRoutes(app);
 orderRoutes(app);
+reviewRoutes(app);
 
 const start = async () => {
     await db.mongoose

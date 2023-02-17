@@ -1011,6 +1011,7 @@ export const completeOrder = async (req: Request, res: Response) => {
         {
             $set: {
                 statusId: status._id,
+                completedDate: new Date(),
             },
         },
         { new: true, lean: true }

@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { ReviewerType } from '../types/review';
 
 export const ReviewModel = mongoose.model(
     'Review',
@@ -18,11 +19,15 @@ export const ReviewModel = mongoose.model(
             required: true,
             ref: 'user',
         },
+        reviewerType: {
+            type: String,
+            required: true,
+        },
         text: {
             type: String,
             require: true,
         },
-        raiting: {
+        rating: {
             type: String,
             require: true,
         },
