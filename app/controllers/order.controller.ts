@@ -8,6 +8,7 @@ const User = db.user;
 const Order = db.order;
 const OrderStatus = db.orderStatus;
 const Payment = db.payment;
+const Review = db.review;
 
 type IReqCreateOrderAsCarrier = Request<
     core.ParamsDictionary,
@@ -473,6 +474,31 @@ export const getOrderById = async (req: Request, res: Response) => {
             $unwind: {
                 path: '$carrier',
                 preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $lookup: {
+                from: Review.collection.name,
+                let: { carrierId: '$carrierId', recieverId: '$recieverId' },
+                pipeline: [
+                    {
+                        $match: {
+                            $or: [
+                                {
+                                    $expr: {
+                                        $eq: ['$$carrierId', '$userForId'],
+                                    },
+                                },
+                                {
+                                    $expr: {
+                                        $eq: ['$$recieverId', '$userForId'],
+                                    },
+                                },
+                            ],
+                        },
+                    },
+                ],
+                as: 'reviews',
             },
         },
         {
