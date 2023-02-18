@@ -1,4 +1,4 @@
-import { sendReview } from '../controllers/review.controller';
+import { getUserReviews, sendReview } from '../controllers/review.controller';
 import { Express } from 'express';
 import middlewares from '../middlewares';
 
@@ -12,4 +12,5 @@ export default (app: Express) => {
     });
 
     app.post('/api/review/send', [middlewares.authJwt.verifyToken], sendReview);
+    app.get('/api/review/user', getUserReviews);
 };
