@@ -6,7 +6,6 @@ export const getOrdersOutput = (orders: any[], addFullInfo?: true) => {
                   byReceiverSuggestedChanges: order.byReceiverSuggestedChanges,
                   dealConfirmedByCarrier: order.dealConfirmedByCarrier,
                   dealConfirmedByReceiver: order.dealConfirmedByReceiver,
-                  reviews: order.reviews,
               }
             : {};
 

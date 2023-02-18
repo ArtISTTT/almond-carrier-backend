@@ -518,7 +518,20 @@ export const getOrderById = async (req: Request, res: Response) => {
         res.status(404).send({ message: 'Order not found!' });
     }
 
-    return res.status(200).send({ order: getOrdersOutput(orders, true)[0] });
+    const outputOrder = getOrdersOutput(orders, true)[0];
+
+    return res.status(200).send({
+        order: {
+            ...outputOrder,
+            myReview: orders[0].reviews?.find(
+                (review: any) =>
+                    String(review.userReviewerId) === req.body.userId
+            ),
+            partnerReview: orders[0].reviews?.find(
+                (review: any) => String(review.userForId) === req.body.userId
+            ),
+        },
+    });
 };
 
 type IReqSApplyAsCarrier = Request<
