@@ -247,6 +247,26 @@ export const userBoard = async (req: Request, res: Response) => {
         ])
     )[0];
 
+    const rating = (
+        await Review.aggregate([
+            {
+                $match: {
+                    userForId: new mongoose.Types.ObjectId(
+                        req.body.userId as string
+                    ),
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    averageRating: {
+                        $avg: '$rating',
+                    },
+                },
+            },
+        ])
+    )[0];
+
     if (!user) {
         return res.status(404).send({ message: 'User Not found.' });
     }
@@ -261,6 +281,7 @@ export const userBoard = async (req: Request, res: Response) => {
         dateOfBirth: user.dateOfBirth,
         avatar: user.avatarImage,
         completedOrders: user.successOrders.length,
+        rating: rating?.averageRating,
     });
 };
 
