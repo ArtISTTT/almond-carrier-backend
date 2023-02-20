@@ -17,6 +17,7 @@ const Image = db.image;
 const Order = db.order;
 const OrderStatus = db.orderStatus;
 const Payment = db.payment;
+const Review = db.review;
 
 export const getUserProfile = async (req: Request, res: Response) => {
     const { userId } = req.query;
@@ -44,6 +45,24 @@ export const getUserProfile = async (req: Request, res: Response) => {
             },
             {
                 $unwind: '$successStatus',
+            },
+        ])
+    )[0];
+
+    const rating = (
+        await Review.aggregate([
+            {
+                $match: {
+                    userForId: new mongoose.Types.ObjectId(userId as string),
+                },
+            },
+            {
+                $group: {
+                    _id: null,
+                    averageRating: {
+                        $avg: '$rating',
+                    },
+                },
             },
         ])
     )[0];
@@ -144,6 +163,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
         completedOrders: orders.length,
         completedOrdersAsReceiver: 12,
         completedOrdersAsCarrier: 4,
+        rating: rating.averageRating,
         successOrders: getOrdersOutput(orders),
         ordersInLastMonth: 3,
         completionRate: 77,

@@ -28,7 +28,7 @@ export const ReviewModel = mongoose.model(
             require: true,
         },
         rating: {
-            type: String,
+            type: Number,
             require: true,
         },
     })
