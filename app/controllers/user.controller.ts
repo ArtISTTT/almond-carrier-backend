@@ -213,6 +213,109 @@ export const getUserProfile = async (req: Request, res: Response) => {
         },
     ]);
 
+    const completedAsReceiver = await Order.aggregate([
+        {
+            $match: {
+                $and: [
+                    {
+                        $or: [
+                            {
+                                recieverId: {
+                                    $eq: new mongoose.Types.ObjectId(
+                                        userId as string
+                                    ),
+                                },
+                            },
+                        ],
+                    },
+                    {
+                        $expr: {
+                            $eq: [user.successStatus._id, '$statusId'],
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $count: 'count',
+        },
+    ]);
+
+    const completedAsCarrier = await Order.aggregate([
+        {
+            $match: {
+                $and: [
+                    {
+                        $or: [
+                            {
+                                carrierId: {
+                                    $eq: new mongoose.Types.ObjectId(
+                                        userId as string
+                                    ),
+                                },
+                            },
+                        ],
+                    },
+                    {
+                        $expr: {
+                            $eq: [user.successStatus._id, '$statusId'],
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $count: 'count',
+        },
+    ]);
+
+    const date = new Date();
+    date.setMonth(date.getMonth() - 3);
+
+    const ordersInLastThreeMonths = await Order.aggregate([
+        {
+            $match: {
+                $and: [
+                    {
+                        $and: [
+                            {
+                                $or: [
+                                    {
+                                        carrierId: {
+                                            $eq: new mongoose.Types.ObjectId(
+                                                userId as string
+                                            ),
+                                        },
+                                    },
+                                    {
+                                        recieverId: {
+                                            $eq: new mongoose.Types.ObjectId(
+                                                userId as string
+                                            ),
+                                        },
+                                    },
+                                ],
+                            },
+                            {
+                                completedDate: {
+                                    $gte: date,
+                                },
+                            },
+                        ],
+                    },
+                    {
+                        $expr: {
+                            $eq: [user.successStatus._id, '$statusId'],
+                        },
+                    },
+                ],
+            },
+        },
+        {
+            $count: 'count',
+        },
+    ]);
+
     res.status(200).send({
         id: user._id,
         firstName: user.firstName,
@@ -221,11 +324,11 @@ export const getUserProfile = async (req: Request, res: Response) => {
         dateOfBirth: user.dateOfBirth,
         avatar: user.avatarImage,
         completedOrders: orders.length,
-        completedOrdersAsReceiver: 12,
-        completedOrdersAsCarrier: 4,
+        completedOrdersAsReceiver: completedAsReceiver[0]?.count ?? 0,
+        completedOrdersAsCarrier: completedAsCarrier[0]?.count ?? 0,
         rating: rating.averageRating,
         successOrders: getOrdersOutput(orders),
-        ordersInLastMonth: 3,
+        ordersInLastMonth: ordersInLastThreeMonths[0]?.count ?? 0,
         completionRate: 77,
         verifiedByEmail: true,
         verifiedByPhone: true,
