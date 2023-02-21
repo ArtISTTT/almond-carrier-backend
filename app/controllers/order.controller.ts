@@ -231,6 +231,33 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
             {
                 $unwind: '$status',
             },
+            {
+                $lookup: {
+                    from: Review.collection.name,
+                    let: {
+                        carrier: '$carrier',
+                    },
+                    pipeline: [
+                        {
+                            $match: {
+                                userForId: '$$carrier._id',
+                            },
+                        },
+                        {
+                            $group: {
+                                _id: null,
+                                averageRating: {
+                                    $avg: '$rating',
+                                },
+                            },
+                        },
+                    ],
+                    as: 'rating',
+                },
+            },
+            {
+                $unwind: { path: '$rating', preserveNullAndEmptyArrays: true },
+            },
         ]);
 
         return res.status(200).send({ orders: getOrdersOutput(orders) });
@@ -483,15 +510,32 @@ export const getOrderById = async (req: Request, res: Response) => {
                 pipeline: [
                     {
                         $match: {
-                            $or: [
+                            $and: [
                                 {
-                                    $expr: {
-                                        $eq: ['$$carrierId', '$userForId'],
-                                    },
+                                    $or: [
+                                        {
+                                            $expr: {
+                                                $eq: [
+                                                    '$$carrierId',
+                                                    '$userForId',
+                                                ],
+                                            },
+                                        },
+                                        {
+                                            $expr: {
+                                                $eq: [
+                                                    '$$recieverId',
+                                                    '$userForId',
+                                                ],
+                                            },
+                                        },
+                                    ],
                                 },
                                 {
-                                    $expr: {
-                                        $eq: ['$$recieverId', '$userForId'],
+                                    orderId: {
+                                        $eq: new mongoose.Types.ObjectId(
+                                            req.query.orderId as string
+                                        ),
                                     },
                                 },
                             ],
