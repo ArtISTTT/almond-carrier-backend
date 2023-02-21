@@ -151,6 +151,66 @@ export const getUserProfile = async (req: Request, res: Response) => {
         {
             $unwind: '$status',
         },
+        {
+            $lookup: {
+                from: Review.collection.name,
+                let: { carrierId: '$carrierId' },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $eq: ['$$carrierId', '$userForId'],
+                            },
+                        },
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            averageRating: {
+                                $avg: '$rating',
+                            },
+                        },
+                    },
+                ],
+                as: 'carrierRating',
+            },
+        },
+        {
+            $unwind: {
+                path: '$carrierRating',
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $lookup: {
+                from: Review.collection.name,
+                let: { recieverId: '$recieverId' },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $eq: ['$$recieverId', '$userForId'],
+                            },
+                        },
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            averageRating: {
+                                $avg: '$rating',
+                            },
+                        },
+                    },
+                ],
+                as: 'recieverRating',
+            },
+        },
+        {
+            $unwind: {
+                path: '$recieverRating',
+                preserveNullAndEmptyArrays: true,
+            },
+        },
     ]);
 
     res.status(200).send({
