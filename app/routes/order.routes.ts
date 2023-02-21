@@ -45,7 +45,11 @@ export default (app: Express) => {
         getMyOrders
     );
 
-    app.post('/api/order/search-orders', searchOrders);
+    app.post(
+        '/api/order/search-orders',
+        [middlewares.authJwt.addUserIdToBodyIfTokenExists],
+        searchOrders
+    );
 
     app.post(
         '/api/order/apply-as-carrier',

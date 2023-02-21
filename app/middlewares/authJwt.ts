@@ -25,6 +25,27 @@ const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     });
 };
 
+const addUserIdToBodyIfTokenExists = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+) => {
+    const { token } =
+        req.session as CookieSessionInterfaces.CookieSessionObject;
+
+    if (!token) {
+        return next();
+    }
+
+    jwt.verify(token, authConfig.secret, (err: any, decoded: any) => {
+        if (err) {
+            return next();
+        }
+        req.body.userId = decoded.id;
+        next();
+    });
+};
+
 const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     User.findById(req.body.userId).exec((err: any, user: any) => {
         if (err) {
@@ -89,4 +110,5 @@ export const authJwt = {
     verifyToken,
     isAdmin,
     isModerator,
+    addUserIdToBodyIfTokenExists,
 };

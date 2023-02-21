@@ -235,12 +235,12 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
                 $lookup: {
                     from: Review.collection.name,
                     let: {
-                        carrier: '$carrier',
+                        carrierId: '$carrierId',
                     },
                     pipeline: [
                         {
                             $match: {
-                                userForId: '$$carrier._id',
+                                $expr: { $eq: ['$$carrierId', '$userForId'] },
                             },
                         },
                         {
@@ -252,11 +252,14 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
                             },
                         },
                     ],
-                    as: 'rating',
+                    as: 'carrierRating',
                 },
             },
             {
-                $unwind: { path: '$rating', preserveNullAndEmptyArrays: true },
+                $unwind: {
+                    path: '$carrierRating',
+                    preserveNullAndEmptyArrays: true,
+                },
             },
         ]);
 
@@ -353,6 +356,36 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
         {
             $unwind: '$status',
         },
+        {
+            $lookup: {
+                from: Review.collection.name,
+                let: {
+                    recieverId: '$recieverId',
+                },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: { $eq: ['$$recieverId', '$userForId'] },
+                        },
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            averageRating: {
+                                $avg: '$rating',
+                            },
+                        },
+                    },
+                ],
+                as: 'recieverRating',
+            },
+        },
+        {
+            $unwind: {
+                path: '$recieverRating',
+                preserveNullAndEmptyArrays: true,
+            },
+        },
     ]);
 
     return res.status(200).send({ orders: getOrdersOutput(orders) });
@@ -425,6 +458,66 @@ export const getMyOrders = async (req: Request, res: Response) => {
         },
         {
             $unwind: '$status',
+        },
+        {
+            $lookup: {
+                from: Review.collection.name,
+                let: { carrierId: '$carrierId' },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $eq: ['$$carrierId', '$userForId'],
+                            },
+                        },
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            averageRating: {
+                                $avg: '$rating',
+                            },
+                        },
+                    },
+                ],
+                as: 'carrierRating',
+            },
+        },
+        {
+            $unwind: {
+                path: '$carrierRating',
+                preserveNullAndEmptyArrays: true,
+            },
+        },
+        {
+            $lookup: {
+                from: Review.collection.name,
+                let: { recieverId: '$recieverId' },
+                pipeline: [
+                    {
+                        $match: {
+                            $expr: {
+                                $eq: ['$$recieverId', '$userForId'],
+                            },
+                        },
+                    },
+                    {
+                        $group: {
+                            _id: null,
+                            averageRating: {
+                                $avg: '$rating',
+                            },
+                        },
+                    },
+                ],
+                as: 'recieverRating',
+            },
+        },
+        {
+            $unwind: {
+                path: '$recieverRating',
+                preserveNullAndEmptyArrays: true,
+            },
         },
     ]);
 

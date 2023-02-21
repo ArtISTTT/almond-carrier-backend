@@ -26,6 +26,7 @@ export const getOrdersOutput = (orders: any[], addFullInfo?: true) => {
                       id: order.receiver._id,
                       firstName: order.receiver.firstName,
                       lastName: order.receiver.lastName,
+                      rating: order.recieverRating?.averageRating,
                   }
                 : undefined,
             carrier: order.carrier
@@ -33,6 +34,7 @@ export const getOrdersOutput = (orders: any[], addFullInfo?: true) => {
                       id: order.carrier._id,
                       firstName: order.carrier.firstName,
                       lastName: order.carrier.lastName,
+                      rating: order.carrierRating?.averageRating,
                   }
                 : undefined,
             isPayed: order.payment.isPayed,
