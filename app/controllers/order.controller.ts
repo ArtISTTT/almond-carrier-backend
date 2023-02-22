@@ -140,6 +140,8 @@ type IReqSearchOrders = Request<
         userId: string;
         type: OrderSeachType;
         filters: Filter;
+        start: number;
+        limit: number;
     }
 >;
 
@@ -193,6 +195,12 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
         const orders = await Order.aggregate([
             {
                 $match: { $and: matchOrderFilters },
+            },
+            {
+                $skip: req.body.start,
+            },
+            {
+                $limit: req.body.limit,
             },
             {
                 $lookup: {
@@ -263,7 +271,19 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
             },
         ]);
 
-        return res.status(200).send({ orders: getOrdersOutput(orders) });
+        const ordersCount = (
+            await Order.aggregate([
+                {
+                    $match: { $and: matchOrderFilters },
+                },
+                { $count: 'count' },
+            ])
+        )[0];
+
+        return res.status(200).send({
+            orders: getOrdersOutput(orders),
+            count: ordersCount?.count,
+        });
     }
 
     // GETTING RECEIVERS LIST BY FILTERS
@@ -318,6 +338,17 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
     const orders = await Order.aggregate([
         {
             $match: { $and: matchOrderFilters },
+        },
+        {
+            $sort: {
+                update_at: -1,
+            },
+        },
+        {
+            $skip: req.body.start,
+        },
+        {
+            $limit: req.body.limit,
         },
         {
             $lookup: {
@@ -388,7 +419,18 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
         },
     ]);
 
-    return res.status(200).send({ orders: getOrdersOutput(orders) });
+    const ordersCount = (
+        await Order.aggregate([
+            {
+                $match: { $and: matchOrderFilters },
+            },
+            { $count: 'count' },
+        ])
+    )[0];
+
+    return res
+        .status(200)
+        .send({ orders: getOrdersOutput(orders), count: ordersCount?.count });
 };
 
 export const getMyOrders = async (req: Request, res: Response) => {
