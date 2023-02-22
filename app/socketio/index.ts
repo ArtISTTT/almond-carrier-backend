@@ -9,6 +9,10 @@ class WebSockets {
             socket.join(orderId);
         });
 
+        socket.on('disconnect-from-order', (orderId: string) => {
+            socket.leave(orderId);
+        });
+
         socket.on('connect-to-client', (userId: string) => {
             socket.join(userId);
         });
