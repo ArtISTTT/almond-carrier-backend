@@ -16,6 +16,7 @@ export enum NotificationType {
 const getNotificationsOutput = (notifications: any[]) => {
     return notifications.map(notification => {
         return {
+            id: notification._id,
             type: notification.notificationType,
             text: notification.text,
             read: notification.read,
