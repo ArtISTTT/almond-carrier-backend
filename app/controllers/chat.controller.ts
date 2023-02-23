@@ -2,10 +2,15 @@ import mongoose from 'mongoose';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import db from '../models';
+import {
+    addNewNotification,
+    NotificationType,
+} from './notification.controller';
+import { notificationText } from '../frontendTexts/notifications';
 
 const User = db.user;
 const Role = db.role;
-const Token = db.token;
+const Order = db.order;
 const Message = db.chatMessage;
 
 export const getConversationByOrderId = async (req: Request, res: Response) => {
@@ -56,6 +61,20 @@ export const postMessage = async (req: Request, res: Response) => {
         global.io.sockets
             .in(orderId)
             .emit('new-message', { message: parsedMessage });
+
+        const order = await Order.findById(orderId);
+
+        await addNewNotification({
+            text: notificationText.newMessage,
+            orderId: orderId,
+            userForId: String(
+                String(order?.carrierId) === userId
+                    ? order?.recieverId
+                    : order?.carrierId
+            ),
+            notificationType: NotificationType.newMessage,
+        });
+
         return res.status(200).json({ ok: true, message: parsedMessage });
     } catch (error) {
         return res.status(500).json({ ok: false, error: error });

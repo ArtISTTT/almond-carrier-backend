@@ -8,6 +8,7 @@ import { PaymentModel } from './payment.model';
 import { ReviewModel } from './review.model';
 import { ImageModel } from './image.model';
 import { ChatMessageModel } from './chatMessage.model';
+import { NotificationModel } from './notification.model';
 
 mongoose.Promise = global.Promise;
 
@@ -21,6 +22,7 @@ type IDB = {
     payment: typeof PaymentModel;
     review: typeof ReviewModel;
     image: typeof ImageModel;
+    notification: typeof NotificationModel;
     chatMessage: typeof ChatMessageModel;
     ROLES: ['user', 'admin', 'moderator'];
 };
@@ -41,6 +43,7 @@ db.payment = PaymentModel;
 db.review = ReviewModel;
 db.image = ImageModel;
 db.chatMessage = ChatMessageModel;
+db.notification = NotificationModel;
 
 db.ROLES = ['user', 'admin', 'moderator'];
 
