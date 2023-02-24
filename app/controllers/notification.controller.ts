@@ -95,3 +95,9 @@ export const getNotifications = async (req: Request, res: Response) => {
         .status(200)
         .send({ notifications: getNotificationsOutput(notifications) });
 };
+
+export const removeNotification = async (req: Request, res: Response) => {
+    await Notification.deleteOne({ _id: req.body.notificationId });
+
+    return res.status(200).send();
+};
