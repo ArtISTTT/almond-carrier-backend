@@ -101,3 +101,9 @@ export const removeNotification = async (req: Request, res: Response) => {
 
     return res.status(200).send();
 };
+
+export const removeAllNotifications = async (req: Request, res: Response) => {
+    await Notification.deleteMany({ userForId: req.body.userId });
+
+    return res.status(200).send();
+};

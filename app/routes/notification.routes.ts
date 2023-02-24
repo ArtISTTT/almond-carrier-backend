@@ -1,4 +1,7 @@
-import { removeNotification } from './../controllers/notification.controller';
+import {
+    removeAllNotifications,
+    removeNotification,
+} from './../controllers/notification.controller';
 import { Express } from 'express';
 import middlewares from '../middlewares';
 import { getNotifications } from '../controllers/notification.controller';
@@ -22,5 +25,11 @@ export default (app: Express) => {
         '/api/notifications/',
         [middlewares.authJwt.verifyToken],
         removeNotification
+    );
+
+    app.delete(
+        '/api/notifications/all',
+        [middlewares.authJwt.verifyToken],
+        removeAllNotifications
     );
 };
