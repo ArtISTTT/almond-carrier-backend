@@ -11,6 +11,7 @@ export const getOrdersOutput = (orders: any[], addFullInfo?: true) => {
 
         return {
             ...fullInfo,
+            createdDate: order.createdAt,
             status: order.status.name,
             toLocation: order.toLocation,
             fromLocation: order.fromLocation,
