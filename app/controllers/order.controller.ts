@@ -82,6 +82,7 @@ type IReqCreateOrderAsReceiver = Request<
         fromLocation?: string;
         fromLocation_placeId?: string;
         productName: string;
+        productUri?: string;
         rewardAmount: number;
         productAmount: number;
         productWeight: number;
@@ -115,6 +116,7 @@ export const createOrderAsReceiver = async (
         fromLocation_placeId: req.body.fromLocation_placeId,
         toLocation_placeId: req.body.toLocation_placeId,
         productName: req.body.productName,
+        productUri: req.body.productUri,
         productWeight: req.body.productWeight,
         productDescription: req.body.productDescription,
     });
@@ -799,6 +801,7 @@ type IReqSApplyAsReceiver = Request<
         userId: string;
         orderId: string;
         productName: string;
+        productUri?: string;
         productAmount: number;
         productWeight: number;
         productDescription: string;
@@ -821,6 +824,7 @@ export const applyOrderAsReceiver = async (
             $set: {
                 recieverId: req.body.userId,
                 productName: req.body.productName,
+                productUri: req.body.productUri,
                 productWeight: req.body.productWeight,
                 productDescription: req.body.productDescription,
                 statusId: status._id,
@@ -941,6 +945,7 @@ export const suggestChangesByCarrier = async (req: Request, res: Response) => {
                         order.toLocation_placeId,
                     productName:
                         req.body.changes.productName ?? order.productName,
+                    productUri: req.body.changes.productUri ?? order.productUri,
                     productDescription:
                         req.body.changes.productDescription ??
                         order.productDescription,
@@ -1064,6 +1069,7 @@ export const suggestChangesByReceiver = async (req: Request, res: Response) => {
                         order.toLocation_placeId,
                     productName:
                         req.body.changes.productName ?? order.productName,
+                    productUri: req.body.changes.productUri ?? order.productUri,
                     productDescription:
                         req.body.changes.productDescription ??
                         order.productDescription,
@@ -1156,6 +1162,10 @@ export const agreeWithChanges = async (req: Request, res: Response) => {
                     order.byCarrierSuggestedChanges?.productName ??
                     order.byReceiverSuggestedChanges?.productName ??
                     order.productName,
+                productUri:
+                    order.byCarrierSuggestedChanges?.productUri ??
+                    order.byReceiverSuggestedChanges?.productUri ??
+                    order.productUri,
                 productDescription:
                     order.byCarrierSuggestedChanges?.productDescription ??
                     order.byReceiverSuggestedChanges?.productDescription ??

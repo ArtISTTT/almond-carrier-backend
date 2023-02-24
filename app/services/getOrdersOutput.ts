@@ -18,6 +18,7 @@ export const getOrdersOutput = (orders: any[], addFullInfo?: true) => {
             fromLocation_placeId: order.fromLocation_placeId,
             toLocation_placeId: order.toLocation_placeId,
             productName: order.productName,
+            productUri: order.productUri,
             productWeight: order.productWeight,
             productDescription: order.productDescription,
             carrierMaxWeight: order.carrierMaxWeight,

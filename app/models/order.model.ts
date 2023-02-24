@@ -60,6 +60,10 @@ export const OrderModel = mongoose.model(
                 type: String,
                 required: false,
             },
+            productUri: {
+                type: String,
+                required: false,
+            },
             productDescription: {
                 type: String,
                 required: false,
