@@ -3,6 +3,11 @@ import mongoose from 'mongoose';
 import db from '../models';
 import * as core from 'express-serve-static-core';
 import { getOrdersOutput } from '../services/getOrdersOutput';
+import {
+    NotificationType,
+    addNewNotification,
+} from './notification.controller';
+import { notificationText } from '../frontendTexts/notifications';
 
 const User = db.user;
 const Order = db.order;
@@ -761,6 +766,13 @@ export const applyOrderAsCarrier = async (
 
     global.io.sockets.in(order._id.toString()).emit('new-status');
 
+    await addNewNotification({
+        text: notificationText.carrierFound,
+        orderId: req.body.orderId,
+        userForId: String(order.recieverId),
+        notificationType: NotificationType.orderUpdate,
+    });
+
     return res.status(200).send({ orderId: order._id });
 };
 
@@ -805,8 +817,6 @@ export const applyOrderAsReceiver = async (
         return res.status(404).send({ message: 'Order to apply not found!' });
     }
 
-    global.io.sockets.in(order._id.toString()).emit('new-status');
-
     await Payment.findByIdAndUpdate(
         { _id: order.paymentId },
         {
@@ -816,6 +826,15 @@ export const applyOrderAsReceiver = async (
         },
         { new: true, lean: true }
     );
+
+    global.io.sockets.in(order._id.toString()).emit('new-status');
+
+    await addNewNotification({
+        text: notificationText.recieverFound,
+        orderId: req.body.orderId,
+        userForId: String(order.carrierId),
+        notificationType: NotificationType.orderUpdate,
+    });
 
     return res.status(200).send({ orderId: order._id });
 };
@@ -916,7 +935,14 @@ export const suggestChangesByCarrier = async (req: Request, res: Response) => {
             { new: true, lean: true }
         );
 
-        global.io.sockets.in(order._id.toString()).emit('new-status');
+        global.io.sockets.in(req.body.orderId).emit('new-status');
+
+        await addNewNotification({
+            text: notificationText.newChangesForReview,
+            orderId: req.body.orderId,
+            userForId: String(order.recieverId),
+            notificationType: NotificationType.orderUpdate,
+        });
 
         return res.status(200).send({ ok: true });
     }
@@ -1034,7 +1060,14 @@ export const suggestChangesByReceiver = async (req: Request, res: Response) => {
             { new: true, lean: true }
         );
 
-        global.io.sockets.in(order._id.toString()).emit('new-status');
+        global.io.sockets.in(req.body.orderId).emit('new-status');
+
+        await addNewNotification({
+            text: notificationText.newChangesForReview,
+            orderId: req.body.orderId,
+            userForId: String(order.carrierId),
+            notificationType: NotificationType.orderUpdate,
+        });
 
         return res.status(200).send({ ok: true });
     }
@@ -1048,6 +1081,10 @@ export const agreeWithChanges = async (req: Request, res: Response) => {
     if (!order) {
         return res.status(404).send({ message: 'Order not found!' });
     }
+
+    const notificationUserForId = order.byReceiverSuggestedChanges
+        ? order.recieverId
+        : order.carrierId;
 
     const payment = await Payment.findById(order.paymentId);
 
@@ -1123,7 +1160,14 @@ export const agreeWithChanges = async (req: Request, res: Response) => {
 
     await order.save();
 
-    global.io.sockets.in(order._id.toString()).emit('new-status');
+    global.io.sockets.in(req.body.orderId).emit('new-status');
+
+    await addNewNotification({
+        text: notificationText.changesHasBeenReviewed,
+        orderId: req.body.orderId,
+        userForId: String(notificationUserForId),
+        notificationType: NotificationType.orderUpdate,
+    });
 
     return res.status(200).send({ ok: true });
 };
@@ -1211,6 +1255,13 @@ export const confirmPayment = async (req: Request, res: Response) => {
     }
 
     global.io.sockets.in(order._id.toString()).emit('new-status');
+
+    await addNewNotification({
+        text: notificationText.paymentSuccess,
+        orderId: req.body.orderId,
+        userForId: String(order.carrierId),
+        notificationType: NotificationType.orderUpdate,
+    });
 
     return res.status(200).send({ ok: true });
 };
