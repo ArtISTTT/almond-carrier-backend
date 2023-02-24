@@ -202,6 +202,33 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
                 $match: { $and: matchOrderFilters },
             },
             {
+                $lookup: {
+                    from: OrderStatus.collection.name,
+                    localField: 'statusId',
+                    foreignField: '_id',
+                    as: 'status',
+                },
+            },
+            {
+                $unwind: '$status',
+            },
+            {
+                $match: {
+                    $and: [
+                        {
+                            'status.name': {
+                                $ne: 'success',
+                            },
+                        },
+                        {
+                            'status.name': {
+                                $ne: 'cancelled',
+                            },
+                        },
+                    ],
+                },
+            },
+            {
                 $skip: req.body.start,
             },
             {
@@ -232,17 +259,6 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
             },
             {
                 $unwind: '$carrier',
-            },
-            {
-                $lookup: {
-                    from: OrderStatus.collection.name,
-                    localField: 'statusId',
-                    foreignField: '_id',
-                    as: 'status',
-                },
-            },
-            {
-                $unwind: '$status',
             },
             {
                 $lookup: {
@@ -1281,6 +1297,34 @@ export const completeOrder = async (req: Request, res: Response) => {
             $set: {
                 statusId: status._id,
                 completedDate: new Date(),
+            },
+        },
+        { new: true, lean: true }
+    );
+
+    if (!order) {
+        return res.status(404).send({ message: 'Order not found!' });
+    }
+
+    global.io.sockets.in(order._id.toString()).emit('new-status');
+
+    return res.status(200).send({ ok: true });
+};
+
+export const cancelOrder = async (req: Request, res: Response) => {
+    const status = await OrderStatus.findOne({
+        name: 'cancelled',
+    });
+
+    if (!status) {
+        return res.status(404).send({ message: 'Status not found' });
+    }
+
+    const order = await Order.findByIdAndUpdate(
+        { _id: req.body.orderId },
+        {
+            $set: {
+                statusId: status._id,
             },
         },
         { new: true, lean: true }

@@ -3,6 +3,7 @@ import {
     agreeWithChanges,
     applyOrderAsCarrier,
     applyOrderAsReceiver,
+    cancelOrder,
     completeOrder,
     confirmDeal,
     confirmPayment,
@@ -109,5 +110,11 @@ export default (app: Express) => {
         '/api/order/complete-order',
         [middlewares.authJwt.verifyToken],
         completeOrder
+    );
+
+    app.post(
+        '/api/order/cancel-order',
+        [middlewares.authJwt.verifyToken],
+        cancelOrder
     );
 };
