@@ -12,7 +12,7 @@
     "author": "",
     "license": "ISC",
     "engines": {
-        "node": "16.16.0"
+        "node": "16.18.1"
     },
     "dependencies": {
         "@adminjs/express": "^5.1.0",
