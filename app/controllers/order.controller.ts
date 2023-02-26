@@ -1249,7 +1249,7 @@ export const confirmDeal = async (req: Request, res: Response) => {
 
 export const confirmPayment = async (req: Request, res: Response) => {
     const status = await OrderStatus.findOne({
-        name: 'awaitingDelivery',
+        name: 'waitingForPaymentVerification',
     });
 
     if (!status) {
