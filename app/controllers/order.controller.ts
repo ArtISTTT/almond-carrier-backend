@@ -1294,7 +1294,7 @@ export const confirmPayment = async (req: Request, res: Response) => {
 
 export const completeOrder = async (req: Request, res: Response) => {
     const status = await OrderStatus.findOne({
-        name: 'success',
+        name: 'itemRecieved',
     });
 
     if (!status) {

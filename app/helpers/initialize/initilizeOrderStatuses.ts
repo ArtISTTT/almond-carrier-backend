@@ -36,11 +36,8 @@ export const initializeOrderStatuses = () => {
                 name: 'awaitingDelivery',
             }).save(handleSave('awaitingDelivery'));
             new Status({
-                name: 'confirmedByCarrier',
-            }).save(handleSave('confirmedByCarrier'));
-            new Status({
-                name: 'confirmedByReciever',
-            }).save(handleSave('confirmedByReciever'));
+                name: 'itemRecieved',
+            }).save(handleSave('itemRecieved'));
             new Status({
                 name: 'awaitingPayout',
             }).save(handleSave('awaitingPayout'));
