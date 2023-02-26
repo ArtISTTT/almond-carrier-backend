@@ -15,6 +15,8 @@
         "node": "16.16.0"
     },
     "dependencies": {
+        "@adminjs/express": "^5.1.0",
+        "@adminjs/mongoose": "^3.0.1",
         "@types/body-parser": "^1.19.2",
         "@types/compression": "^1.7.2",
         "@types/helmet": "^4.0.0",
@@ -22,6 +24,7 @@
         "@types/nodemailer": "^6.4.7",
         "@types/socket.io": "^3.0.2",
         "@typescript-eslint/parser": "^5.47.0",
+        "adminjs": "^6.8.6",
         "bcryptjs": "^2.4.3",
         "body-parser": "^1.20.1",
         "compression": "^1.7.4",

@@ -8,7 +8,7 @@ export const TokenModel = mongoose.model(
         userId: {
             type: Schema.Types.ObjectId,
             required: true,
-            ref: 'user',
+            ref: 'User',
         },
         token: {
             type: String,

@@ -7,21 +7,21 @@ export const OrderModel = mongoose.model(
             carrierId: {
                 type: mongoose.Schema.Types.ObjectId,
                 required: false,
-                ref: 'user',
+                ref: 'User',
             },
             recieverId: {
                 type: mongoose.Schema.Types.ObjectId,
                 required: false,
-                ref: 'user',
+                ref: 'User',
             },
             statusId: {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: 'orderStatus',
+                ref: 'OrderStatus',
                 required: true,
             },
             paymentId: {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: 'payment',
+                ref: 'Payment',
                 required: true,
             },
             arrivalDate: {

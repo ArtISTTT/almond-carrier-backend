@@ -1,3 +1,4 @@
+import { getAdminJs } from './app/adminjs/index';
 import express, { Express, Request, Response } from 'express';
 import cors from 'cors';
 import cookieSession from 'cookie-session';
@@ -16,16 +17,11 @@ import { ConnectOptions } from 'mongoose';
 import * as http from 'http';
 import * as socketio from 'socket.io';
 import WebSockets from './app/socketio/index';
-
-const initializeSocketIo = () => {
-    io.on('connection', () => {
-        console.log('‘a user is connected’');
-    });
-};
-
 dotenv.config();
 
 const connectionString = process.env.MONGO_URL as string;
+
+const env = process.env.NODE_ENV || 'development';
 
 const corsOptions = {
     origin: function (_: any, callback: any) {
@@ -39,7 +35,24 @@ const app: Express = express();
 const port = process.env.PORT;
 
 app.use(compression());
-app.use(helmet());
+
+if (env === 'development') {
+    app.use(
+        helmet({
+            contentSecurityPolicy: {
+                directives: {
+                    defaultSrc: ["'self'"],
+                    scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+                    styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
+                    baseUri: ["'self'"],
+                    fontSrc: ["'self'", 'https:', 'data:'],
+                },
+            },
+        })
+    );
+} else {
+    app.use(helmet());
+}
 
 // parse requests of content-type - application/json
 app.use(express.json());
@@ -63,6 +76,10 @@ app.use(
 app.use('/uploads', express.static('uploads'));
 
 app.use(cors(corsOptions));
+
+const { adminRouter, rootPath } = getAdminJs();
+
+app.use(rootPath, adminRouter);
 
 app.get('/', (req, res) => {
     res.json({ message: 'Welcome to Friendly Carrier back-end application.' });

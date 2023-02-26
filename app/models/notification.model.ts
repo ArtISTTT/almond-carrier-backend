@@ -7,12 +7,12 @@ export const NotificationModel = mongoose.model(
             orderId: {
                 type: mongoose.Schema.Types.ObjectId,
                 required: true,
-                ref: 'order',
+                ref: 'Order',
             },
             userForId: {
                 type: mongoose.Schema.Types.ObjectId,
                 required: true,
-                ref: 'user',
+                ref: 'User',
             },
             notificationType: {
                 type: String,

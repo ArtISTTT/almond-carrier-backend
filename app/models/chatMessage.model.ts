@@ -7,12 +7,12 @@ export const ChatMessageModel = mongoose.model(
             orderId: {
                 type: mongoose.Schema.Types.ObjectId,
                 required: false,
-                ref: 'order',
+                ref: 'Order',
             },
             postedUserId: {
                 type: mongoose.Schema.Types.ObjectId,
                 required: false,
-                ref: 'user',
+                ref: 'User',
             },
             messageText: {
                 type: String,
