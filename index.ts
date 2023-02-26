@@ -36,23 +36,19 @@ const port = process.env.PORT;
 
 app.use(compression());
 
-if (env === 'development') {
-    app.use(
-        helmet({
-            contentSecurityPolicy: {
-                directives: {
-                    defaultSrc: ["'self'"],
-                    scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
-                    styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
-                    baseUri: ["'self'"],
-                    fontSrc: ["'self'", 'https:', 'data:'],
-                },
+app.use(
+    helmet({
+        contentSecurityPolicy: {
+            directives: {
+                defaultSrc: ["'self'"],
+                scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+                styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
+                baseUri: ["'self'"],
+                fontSrc: ["'self'", 'https:', 'data:'],
             },
-        })
-    );
-} else {
-    app.use(helmet());
-}
+        },
+    })
+);
 
 // parse requests of content-type - application/json
 app.use(express.json());
