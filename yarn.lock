@@ -4141,7 +4141,7 @@
   dependencies:
     "formidable" "^1.0.17"
 
-"express-session@>=1.15.6":
+"express-session@^1.17.3", "express-session@>=1.15.6":
   "integrity" "sha512-4+otWXlShYlG1Ma+2Jnn+xgKUZTMJ5QD3YvfilX3AcocOAbIkVylSWEklzALe/+Pu4qV6TYBj5GwOBFfdKqLBw=="
   "resolved" "https://registry.npmjs.org/express-session/-/express-session-1.17.3.tgz"
   "version" "1.17.3"
