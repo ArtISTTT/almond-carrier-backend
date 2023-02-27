@@ -149,10 +149,7 @@ export const signin = (req: Request, res: Response) => {
 
 export function signout(req: Request, res: Response) {
     try {
-        if (req.session) {
-            req.session.destroy(() => {});
-            req.session = null;
-        }
+        (req.session as any) = null;
         return res.status(200).send({ message: "You've been signed out!" });
     } catch (err) {
         console.log(err);
