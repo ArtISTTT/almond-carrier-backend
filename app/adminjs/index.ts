@@ -1,7 +1,9 @@
 import AdminJSExpress from '@adminjs/express';
 import AdminJSMongoose from '@adminjs/mongoose';
-import AdminJS from 'adminjs';
+import AdminJS, { ActionContext, ActionRequest, ActionResponse } from 'adminjs';
 import db from '../models';
+import { Request, Response } from 'express';
+import { confirmPaymentByAdmin } from '../controllers/order.controller.admin';
 
 const order = db.order;
 const user = db.user;
@@ -22,7 +24,33 @@ export const getAdminJs = () => {
 
     const admin = new AdminJS({
         resources: [
-            { resource: order },
+            {
+                resource: order,
+                options: {
+                    actions: {
+                        confirmPayment: {
+                            actionType: 'record',
+                            component: false,
+                            handler: (
+                                request: ActionRequest,
+                                response: ActionResponse,
+                                context: ActionContext
+                            ) => {
+                                const { record, currentAdmin } = context;
+
+                                if (record) {
+                                    confirmPaymentByAdmin(record);
+                                }
+
+                                return {
+                                    record: record?.toJSON(currentAdmin),
+                                    msg: 'Confirmed payment',
+                                };
+                            },
+                        },
+                    },
+                },
+            },
             { resource: user },
             { resource: orderStatus },
             { resource: payment },

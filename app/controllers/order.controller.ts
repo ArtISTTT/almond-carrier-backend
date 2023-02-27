@@ -1266,16 +1266,6 @@ export const confirmPayment = async (req: Request, res: Response) => {
         { new: true, lean: true }
     );
 
-    await Payment.findByIdAndUpdate(
-        { _id: order?.paymentId },
-        {
-            $set: {
-                isPayed: true,
-            },
-        },
-        { new: true, lean: true }
-    );
-
     if (!order) {
         return res.status(404).send({ message: 'Order not found!' });
     }
@@ -1283,7 +1273,7 @@ export const confirmPayment = async (req: Request, res: Response) => {
     global.io.sockets.in(order._id.toString()).emit('new-status');
 
     await addNewNotification({
-        text: notificationText.paymentSuccess,
+        text: notificationText.paymentVerification,
         orderId: req.body.orderId,
         userForId: String(order.carrierId),
         notificationType: NotificationType.orderUpdate,
