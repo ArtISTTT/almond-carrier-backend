@@ -3,7 +3,10 @@ import AdminJSMongoose from '@adminjs/mongoose';
 import AdminJS, { ActionContext, ActionRequest, ActionResponse } from 'adminjs';
 import db from '../models';
 import { Request, Response } from 'express';
-import { confirmPaymentByAdmin } from '../controllers/order.controller.admin';
+import {
+    confirmPaymentByAdmin,
+    confirmPayoutByAdmin,
+} from '../controllers/order.controller.admin';
 
 const order = db.order;
 const user = db.user;
@@ -31,6 +34,7 @@ export const getAdminJs = () => {
                         confirmPayment: {
                             actionType: 'record',
                             component: false,
+                            guard: 'doYouWantToConfirmPayment?',
                             handler: (
                                 request: ActionRequest,
                                 response: ActionResponse,
@@ -40,6 +44,27 @@ export const getAdminJs = () => {
 
                                 if (record) {
                                     confirmPaymentByAdmin(record);
+                                }
+
+                                return {
+                                    record: record?.toJSON(currentAdmin),
+                                    msg: 'Confirmed payment',
+                                };
+                            },
+                        },
+                        confirmPayout: {
+                            actionType: 'record',
+                            component: false,
+                            guard: 'doYouWantToConfirmPayout?',
+                            handler: (
+                                request: ActionRequest,
+                                response: ActionResponse,
+                                context: ActionContext
+                            ) => {
+                                const { record, currentAdmin } = context;
+
+                                if (record) {
+                                    confirmPayoutByAdmin(record);
                                 }
 
                                 return {
