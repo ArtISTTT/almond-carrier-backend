@@ -1377,10 +1377,10 @@ export const declineOrder = async (req: Request, res: Response) => {
                     statusId: status._id,
                 },
                 $unset: {
-                    recieverId: undefined,
+                    recieverId: 1,
                 },
             },
-            { new: true, lean: true, omitUndefined: true }
+            { new: true, lean: true }
         );
     } else {
         await order.updateOne(
@@ -1389,10 +1389,10 @@ export const declineOrder = async (req: Request, res: Response) => {
                     statusId: status._id,
                 },
                 $unset: {
-                    carrierId: undefined,
+                    carrierId: 1,
                 },
             },
-            { new: true, lean: true, omitUndefined: true }
+            { new: true, lean: true }
         );
     }
 
