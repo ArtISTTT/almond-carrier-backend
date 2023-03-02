@@ -96,11 +96,11 @@ export const OrderModel = mongoose.model(
             payoutInfo: {
                 phoneNumber: {
                     type: String,
-                    required: true,
+                    required: false,
                 },
                 bank: {
                     type: String,
-                    required: true,
+                    required: false,
                 },
             },
         },
