@@ -64,7 +64,9 @@ export const addNewNotification = async ({
         const order = await Order.findById(orderId);
 
         global.io.sockets.in(userForId).emit('new-notification', {
-            notification: getNotificationsOutput([{ ...notification, order }]),
+            notification: getNotificationsOutput([
+                { ...notification, order },
+            ])[0],
         });
     }
 };
