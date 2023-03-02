@@ -1225,9 +1225,11 @@ export const confirmDeal = async (req: Request, res: Response) => {
     }
 
     const userId = new mongoose.Types.ObjectId(req.body.userId);
+    let forUserIdNotification = order.recieverId;
 
     if (order.recieverId && userId.equals(order.recieverId)) {
         order.dealConfirmedByReceiver = true;
+        forUserIdNotification = order.carrierId;
     } else if (order.carrierId && userId.equals(order.carrierId)) {
         order.dealConfirmedByCarrier = true;
     }
@@ -1243,6 +1245,13 @@ export const confirmDeal = async (req: Request, res: Response) => {
     }
 
     await order.save();
+
+    await addNewNotification({
+        text: notificationText.dealConfirmedByPartner,
+        orderId: req.body.orderId,
+        userForId: String(forUserIdNotification),
+        notificationType: NotificationType.orderUpdate,
+    });
 
     global.io.sockets.in(order._id.toString()).emit('new-status');
 

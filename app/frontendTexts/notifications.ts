@@ -9,4 +9,5 @@ export const notificationText = {
     recieverFound: 'recieverFound',
     searchingForANewPartner: 'searchingForANewPartner',
     newReview: 'newReview',
+    dealConfirmedByPartner: 'dealConfirmedByPartner',
 };
