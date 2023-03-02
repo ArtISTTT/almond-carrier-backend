@@ -11,7 +11,7 @@ import {
 } from '../controllers/user.controller';
 
 import middlewares from '../middlewares';
-import { upload } from '../services/storage';
+import { upload } from '../aws-s3';
 
 export default (app: Express) => {
     app.use((req, res, next) => {
