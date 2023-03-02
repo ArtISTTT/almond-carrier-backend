@@ -39,6 +39,7 @@ export const getOrdersOutput = (orders: any[], addFullInfo?: true) => {
                       rating: order.carrierRating?.averageRating,
                   }
                 : undefined,
+            creatorId: order.creatorId,
             isPayed: order.payment.isPayed,
             rewardAmount: order.payment.rewardAmount,
             productAmount: order.payment.productAmount,

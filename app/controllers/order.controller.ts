@@ -55,6 +55,7 @@ export const createOrderAsCarrier = async (
     });
 
     await Order.create({
+        creatorId: req.body.userId,
         carrierId: req.body.userId,
         statusId: status?._id,
         paymentId: payment._id,
@@ -108,6 +109,7 @@ export const createOrderAsReceiver = async (
     });
 
     await Order.create({
+        creatorId: req.body.userId,
         recieverId: req.body.userId,
         statusId: status?._id,
         paymentId: payment._id,
