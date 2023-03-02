@@ -1375,6 +1375,8 @@ export const declineOrder = async (req: Request, res: Response) => {
             {
                 $set: {
                     statusId: status._id,
+                },
+                $unset: {
                     recieverId: undefined,
                 },
             },
@@ -1385,6 +1387,8 @@ export const declineOrder = async (req: Request, res: Response) => {
             {
                 $set: {
                     statusId: status._id,
+                },
+                $unset: {
                     carrierId: undefined,
                 },
             },
