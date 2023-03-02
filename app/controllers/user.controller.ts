@@ -553,5 +553,5 @@ export const moderatorBoard = (req: Request, res: Response) => {
 };
 
 export const updateAvatar = async (req: Request, res: Response) => {
-    uploadFile(req.file.path, req.file.filename, res);
+    uploadFile(req.file.path, req.file.filename, req, res);
 };
