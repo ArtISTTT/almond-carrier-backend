@@ -4,6 +4,11 @@ import db from '../models';
 import * as core from 'express-serve-static-core';
 import { getOrdersOutput } from '../services/getOrdersOutput';
 import { ReviewerType } from '../types/review';
+import {
+    NotificationType,
+    addNewNotification,
+} from './notification.controller';
+import { notificationText } from '../frontendTexts/notifications';
 
 const User = db.user;
 const Order = db.order;
@@ -38,6 +43,13 @@ export const sendReview = async (
             reviewerType: req.body.reviewerType,
             text: req.body.text,
             rating: req.body.rating,
+        });
+
+        await addNewNotification({
+            text: notificationText.newReview,
+            orderId: req.body.orderId,
+            userForId: req.body.userForId,
+            notificationType: NotificationType.orderUpdate,
         });
 
         return res.status(200).send({
