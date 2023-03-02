@@ -1380,7 +1380,7 @@ export const declineOrder = async (req: Request, res: Response) => {
                     recieverId: undefined,
                 },
             },
-            { new: true, lean: true }
+            { new: true, lean: true, omitUndefined: true }
         );
     } else {
         await order.updateOne(
@@ -1392,7 +1392,7 @@ export const declineOrder = async (req: Request, res: Response) => {
                     carrierId: undefined,
                 },
             },
-            { new: true, lean: true }
+            { new: true, lean: true, omitUndefined: true }
         );
     }
 
