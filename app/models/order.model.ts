@@ -16,7 +16,7 @@ export const OrderModel = mongoose.model(
             },
             creatorId: {
                 type: mongoose.Schema.Types.ObjectId,
-                required: false,
+                required: true,
                 ref: 'User',
             },
             statusId: {

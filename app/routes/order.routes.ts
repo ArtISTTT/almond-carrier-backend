@@ -9,6 +9,7 @@ import {
     confirmPayment,
     createOrderAsCarrier,
     createOrderAsReceiver,
+    declineOrder,
     disagreeWithChanges,
     getMyOrders,
     getOrderById,
@@ -123,5 +124,11 @@ export default (app: Express) => {
         '/api/order/start-payout',
         [middlewares.authJwt.verifyToken],
         startPayout
+    );
+
+    app.post(
+        '/api/order/decline-order',
+        [middlewares.authJwt.verifyToken],
+        declineOrder
     );
 };

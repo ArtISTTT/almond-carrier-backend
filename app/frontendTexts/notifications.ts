@@ -7,4 +7,5 @@ export const notificationText = {
     changesHasBeenReviewed: 'changesHasBeenReviewed',
     carrierFound: 'carrierFound',
     recieverFound: 'recieverFound',
+    searchingForANewPartner: 'searchingForANewPartner',
 };
