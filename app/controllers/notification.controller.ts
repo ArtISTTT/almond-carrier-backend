@@ -65,7 +65,17 @@ export const addNewNotification = async ({
 
         global.io.sockets.in(userForId).emit('new-notification', {
             notification: getNotificationsOutput([
-                { ...notification, order },
+                {
+                    _id: notification._id,
+                    notificationType: notification.notificationType,
+                    text: notification.text,
+                    read: notification.read,
+                    order: {
+                        productName: order?.productName,
+                    },
+                    orderId: notification.orderId,
+                    createdDate: notification.createdAt,
+                },
             ])[0],
         });
     }
