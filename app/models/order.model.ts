@@ -88,6 +88,16 @@ export const OrderModel = mongoose.model(
                 type: Boolean,
                 required: false,
             },
+            payoutInfo: {
+                phoneNumber: {
+                    type: String,
+                    required: true,
+                },
+                bank: {
+                    type: String,
+                    required: true,
+                },
+            },
         },
         {
             timestamps: true,

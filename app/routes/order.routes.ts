@@ -13,6 +13,7 @@ import {
     getMyOrders,
     getOrderById,
     searchOrders,
+    startPayout,
     suggestChangesByCarrier,
     suggestChangesByReceiver,
 } from '../controllers/order.controller';
@@ -116,5 +117,11 @@ export default (app: Express) => {
         '/api/order/cancel-order',
         [middlewares.authJwt.verifyToken],
         cancelOrder
+    );
+
+    app.post(
+        '/api/order/start-payout',
+        [middlewares.authJwt.verifyToken],
+        startPayout
     );
 };
