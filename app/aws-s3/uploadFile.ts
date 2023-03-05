@@ -9,49 +9,38 @@ export const uploadFile = async (
     source: Express.Multer.File['path'],
     targetName: Express.Multer.File['filename'],
     req: Request,
-    res: Response
+    res: Response,
+    data: Buffer
 ) => {
-    fs.readFile(source, async (err, filedata) => {
-        if (!err) {
-            const putParams = {
-                Bucket: 'img-bucket-friendly-carrier',
-                Key: targetName,
-                Body: filedata,
-                ACL: 'public-read-write',
-                ContentType: 'image/jpeg',
-            };
+    const putParams = {
+        Bucket: 'img-bucket-friendly-carrier',
+        Key: targetName,
+        Body: data,
+        ACL: 'public-read-write',
+        ContentType: 'image/jpeg',
+    };
 
-            let url = '';
-
-            s3.upload(putParams, undefined, async (err, data) => {
-                if (err) {
-                    return res.status(500).send({
-                        message: err,
-                    });
-                } else {
-                    url = data.Location;
-
-                    await User.updateOne(
-                        { _id: req.body.userId },
-                        {
-                            $set: {
-                                avatarImage: data.Location,
-                            },
-                        },
-                        { new: true }
-                    );
-
-                    fs.unlink(source, () => {});
-
-                    return res.status(200).send({
-                        message: 'Avatar successfully updated',
-                        avatar: url,
-                    });
-                }
+    s3.upload(putParams, undefined, async (err, data) => {
+        if (err) {
+            return res.status(500).send({
+                message: err,
             });
         } else {
-            res.status(500).send({
-                message: err,
+            await User.updateOne(
+                { _id: req.body.userId },
+                {
+                    $set: {
+                        avatarImage: data.Location,
+                    },
+                },
+                { new: true }
+            );
+
+            fs.unlink(source, () => {});
+
+            return res.status(200).send({
+                message: 'Avatar successfully updated',
+                avatar: data.Location,
             });
         }
     });

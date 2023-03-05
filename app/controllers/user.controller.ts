@@ -6,6 +6,7 @@ import { getFullUri } from '../services/getFullUri';
 import mongoose from 'mongoose';
 import { getOrdersOutput } from '../services/getOrdersOutput';
 import { uploadFile } from '../aws-s3/uploadFile';
+import sharp from 'sharp';
 
 export const allAccess = (req: Request, res: Response) => {
     res.status(200).send('Public Content.');
@@ -553,5 +554,33 @@ export const moderatorBoard = (req: Request, res: Response) => {
 };
 
 export const updateAvatar = async (req: Request, res: Response) => {
-    uploadFile(req.file.path, req.file.filename, req, res);
+    let image = sharp(req.file.path);
+
+    return image
+        .metadata()
+        .then(metadata => {
+            if (metadata.width && metadata.width > 280) {
+                image = image.resize({ width: 280 });
+            }
+
+            if (metadata.height && metadata.height > 280) {
+                image = image.resize({ width: 280 });
+            }
+
+            return image.toBuffer();
+        })
+        .then(async data => {
+            return await uploadFile(
+                req.file.path,
+                req.file.filename,
+                req,
+                res,
+                data
+            );
+        })
+        .catch(err => {
+            return res.status(500).send({
+                message: err,
+            });
+        });
 };
