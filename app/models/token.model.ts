@@ -17,7 +17,7 @@ export const TokenModel = mongoose.model(
         createdAt: {
             type: Date,
             default: Date.now,
-            expires: 3600, // this is the expiry time in seconds
+            expires: 1000000, // this is the expiry time in seconds
         },
     })
 );

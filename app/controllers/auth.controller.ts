@@ -9,6 +9,8 @@ import {
     sendRecoverPasswordEmail,
     sendRecoverPasswordSuccessfullyEmail,
 } from '../mailService/recoverPassword';
+import { generateRandomCodeAsString } from '../helpers/initialize/generateRandomCode';
+import { sendVerification } from '../mailService/verificationCode';
 
 const User = db.user;
 const Role = db.role;
@@ -25,84 +27,128 @@ export const signup = (req: Request, res: Response) => {
         dateOfBirth: req.body.dateOfBirth,
     });
 
-    user.save((err: any, user: any) => {
+    user.save((err, user) => {
         if (err) {
             res.status(500).send({ message: err });
             return;
         }
 
-        if (req.body.roles) {
-            Role.find(
-                {
-                    name: { $in: req.body.roles },
-                },
-                (err: any, roles: any) => {
-                    if (err) {
-                        res.status(500).send({ message: err });
-                        return;
-                    }
+        // if (req.body.roles) {
+        //     Role.find(
+        //         {
+        //             name: { $in: req.body.roles },
+        //         },
+        //         (err: any, roles: any) => {
+        //             if (err) {
+        //                 res.status(500).send({ message: err });
+        //                 return;
+        //             }
 
-                    user.roles = roles.map((role: any) => role._id);
-                    user.save((err: any) => {
-                        if (err) {
-                            res.status(500).send({ message: err });
-                            return;
-                        }
+        //             user.roles = roles.map((role: any) => role._id);
 
-                        const token = jwt.sign(
-                            { id: user.id },
-                            authConfig.secret,
-                            {
-                                expiresIn: 2592000, // 24 hours
-                            }
-                        );
+        //             user.save(async (err: any) => {
+        //                 if (err) {
+        //                     res.status(500).send({ message: err });
+        //                     return;
+        //                 }
 
-                        (
-                            req.session as CookieSessionInterfaces.CookieSessionObject
-                        ).token = token;
+        //                 sendVerificationCode(verificationCode, user.email);
 
-                        res.status(200).send({
-                            id: user._id,
-                            firstName: user.firstName,
-                            lastName: user.lastName,
-                            email: user.email,
-                            dateOfBirth: user.dateOfBirth,
-                        });
-                    });
-                }
-            );
-        } else {
-            Role.findOne({ name: 'user' }, (err: any, role: any) => {
+        //                 res.status(200).send({
+        //                     id: user._id,
+        //                     verificationCode,
+        //                 });
+        //             });
+        //         }
+        //     );
+        // } else {
+
+        // }
+
+        Role.findOne({ name: 'user' }, (err: any, role: any) => {
+            if (err) {
+                res.status(500).send({ message: err });
+                return;
+            }
+
+            user.roles = [role._id];
+
+            user.save(async (err: any) => {
                 if (err) {
                     res.status(500).send({ message: err });
                     return;
                 }
 
-                user.roles = [role._id];
-                user.save((err: any) => {
-                    if (err) {
-                        res.status(500).send({ message: err });
-                        return;
-                    }
+                let token = await Token.findOne({ userId: user._id });
+                if (token) await token.deleteOne();
+                let verificationToken = crypto.randomBytes(32).toString('hex');
+                const hash = await bcrypt.hash(
+                    verificationToken,
+                    Number(BRYPTO_KEY)
+                );
 
-                    const token = jwt.sign({ id: user.id }, authConfig.secret, {
-                        expiresIn: 2592000, // 24 hours
-                    });
+                await new Token({
+                    userId: user._id,
+                    token: hash,
+                    createdAt: Date.now(),
+                }).save();
 
-                    (
-                        req.session as CookieSessionInterfaces.CookieSessionObject
-                    ).token = token;
+                const link = `${req.headers.origin}/verification?token=${verificationToken}&id=${user._id}`;
 
-                    res.status(200).send({
-                        id: user._id,
-                        firstName: user.firstName,
-                        lastName: user.lastName,
-                        email: user.email,
-                        dateOfBirth: user.dateOfBirth,
-                    });
+                console.log('LINK TO VERIFY: ', link);
+
+                sendVerification(link, user.email);
+
+                res.status(200).send({
+                    email: user.email,
                 });
             });
-        }
+        });
+    });
+};
+
+export const verify = async (req: Request, res: Response) => {
+    let verificationToken = await Token.findOne({ userId: req.body.userId });
+
+    if (!verificationToken) {
+        return res.status(404).send({ message: 'invalidOrExpiredToken' });
+    }
+
+    const isValid = await bcrypt.compare(
+        req.body.token,
+        verificationToken.token
+    );
+
+    if (!isValid) {
+        return res.status(404).send({ message: 'invalidOrExpiredToken' });
+    }
+
+    const user = await User.findByIdAndUpdate(
+        { _id: req.body.userId },
+        { $set: { verificated: true } },
+        { new: true }
+    );
+
+    if (!user) {
+        return res.status(404).send({
+            ok: false,
+        });
+    }
+
+    await verificationToken.deleteOne();
+
+    const token = jwt.sign({ id: user.id }, authConfig.secret, {
+        expiresIn: 2592000,
+    });
+
+    (req.session as CookieSessionInterfaces.CookieSessionObject).token = token;
+
+    return res.status(200).send({
+        id: user._id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        dateOfBirth: user.dateOfBirth,
     });
 };
 
@@ -119,6 +165,10 @@ export const signin = (req: Request, res: Response) => {
 
             if (!user) {
                 return res.status(404).send({ message: 'User Not found.' });
+            }
+
+            if (!user.verificated) {
+                return res.status(500).send({ notVerified: true });
             }
 
             const passwordIsValid = bcrypt.compareSync(
@@ -163,6 +213,10 @@ export const recover = async (req: Request, res: Response) => {
 
     if (!user) {
         return res.status(404).send({ message: 'User Not found.' });
+    }
+
+    if (!user.verificated) {
+        return res.status(500).send({ notVerified: true });
     }
 
     let token = await Token.findOne({ userId: user._id });

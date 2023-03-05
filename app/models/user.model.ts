@@ -45,6 +45,11 @@ export const UserModel = mongoose.model(
                 type: String,
                 required: false,
             },
+            verificated: {
+                type: Boolean,
+                required: true,
+                default: false,
+            },
         },
         {
             timestamps: true,
