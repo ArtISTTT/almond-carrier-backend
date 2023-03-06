@@ -332,7 +332,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
         successOrders: getOrdersOutput(orders),
         ordersInLastMonth: ordersInLastThreeMonths[0]?.count ?? 0,
         completionRate: 77,
-        verifiedByEmail: user.verified,
+        verifiedByEmail: user.verificated,
         verifiedByPhone: false,
         fromLocation: 'Moscow',
     });
