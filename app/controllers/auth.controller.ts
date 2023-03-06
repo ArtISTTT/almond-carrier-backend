@@ -149,6 +149,7 @@ export const verify = async (req: Request, res: Response) => {
         lastName: user.lastName,
         email: user.email,
         dateOfBirth: user.dateOfBirth,
+        avatar: user.avatarImage,
     });
 };
 
@@ -193,6 +194,7 @@ export const signin = (req: Request, res: Response) => {
                 lastName: user.lastName,
                 email: user.email,
                 dateOfBirth: user.dateOfBirth,
+                avatar: user.avatarImage,
             });
         });
 };
