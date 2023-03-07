@@ -1,5 +1,17 @@
 import mongoose from 'mongoose';
 
+const polygonSchema = new mongoose.Schema({
+    type: {
+        type: String,
+        enum: ['Polygon'],
+        required: true,
+    },
+    coordinates: {
+        type: [[[Number]]],
+        required: true,
+    },
+});
+
 export const OrderModel = mongoose.model(
     'Order',
     new mongoose.Schema(
@@ -45,8 +57,16 @@ export const OrderModel = mongoose.model(
                 type: String,
                 required: false,
             },
+            fromLocationPolygon: {
+                type: polygonSchema,
+                required: false,
+            },
             toLocation: {
                 type: String,
+                required: true,
+            },
+            toLocationPolygon: {
+                type: polygonSchema,
                 required: true,
             },
             fromLocation_placeId: {

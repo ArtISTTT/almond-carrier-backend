@@ -8,6 +8,8 @@ import {
     addNewNotification,
 } from './notification.controller';
 import { notificationText } from '../frontendTexts/notifications';
+import { convertBoundsToPolygon } from '../helpers/initialize/convertBoundsToPolygon';
+import { IBounds } from '../types/geometry';
 
 const User = db.user;
 const Order = db.order;
@@ -24,8 +26,10 @@ type IReqCreateOrderAsCarrier = Request<
         userId: string;
         fromLocation: string;
         fromLocation_placeId: string;
+        fromLocationBounds: IBounds;
         toLocation: string;
         toLocation_placeId: string;
+        toLocationBounds: IBounds;
         carrierMaxWeight: number;
         arrivalDate: Date;
     }
@@ -63,6 +67,14 @@ export const createOrderAsCarrier = async (
         toLocation: req.body.toLocation,
         fromLocation_placeId: req.body.fromLocation_placeId,
         toLocation_placeId: req.body.toLocation_placeId,
+        fromLocationPolygon: {
+            type: 'Polygon',
+            coordinates: convertBoundsToPolygon(req.body.fromLocationBounds),
+        },
+        toLocationPolygon: {
+            type: 'Polygon',
+            coordinates: convertBoundsToPolygon(req.body.toLocationBounds),
+        },
         carrierMaxWeight: req.body.carrierMaxWeight,
         arrivalDate: req.body.arrivalDate,
     });
@@ -80,8 +92,10 @@ type IReqCreateOrderAsReceiver = Request<
         userId: string;
         toLocation: string;
         toLocation_placeId: string;
+        toLocationBounds: IBounds;
         fromLocation?: string;
         fromLocation_placeId?: string;
+        fromLocationBounds?: IBounds;
         productName: string;
         productUri?: string;
         rewardAmount: number;
@@ -116,7 +130,19 @@ export const createOrderAsReceiver = async (
         fromLocation: req.body.fromLocation,
         toLocation: req.body.toLocation,
         fromLocation_placeId: req.body.fromLocation_placeId,
+        fromLocationPolygon: req.body.fromLocationBounds
+            ? {
+                  type: 'Polygon',
+                  coordinates: convertBoundsToPolygon(
+                      req.body.fromLocationBounds
+                  ),
+              }
+            : undefined,
         toLocation_placeId: req.body.toLocation_placeId,
+        toLocationPolygon: {
+            type: 'Polygon',
+            coordinates: convertBoundsToPolygon(req.body.toLocationBounds),
+        },
         productName: req.body.productName,
         productUri: req.body.productUri,
         productWeight: req.body.productWeight,
@@ -134,8 +160,10 @@ enum OrderSeachType {
 }
 
 type Filter = {
-    fromLocation?: string;
-    toLocation?: string;
+    fromLocation_placeId?: string;
+    toLocation_placeId?: string;
+    fromLocationBounds: IBounds;
+    toLocationBounds: IBounds;
     maxBenefit?: number;
     minBenefit?: number;
     maxWeight?: number;
@@ -170,13 +198,59 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
             },
         ]
             .concat(
-                req.body.filters.fromLocation
-                    ? ([{ fromLocation: req.body.filters.fromLocation }] as any)
+                req.body.filters.fromLocation_placeId
+                    ? ([
+                          {
+                              $or: [
+                                  {
+                                      fromLocation_placeId:
+                                          req.body.filters.fromLocation_placeId,
+                                  },
+                                  {
+                                      fromLocationPolygon: {
+                                          $geoWithin: {
+                                              $geometry: {
+                                                  type: 'Polygon',
+                                                  coordinates:
+                                                      convertBoundsToPolygon(
+                                                          req.body.filters
+                                                              .fromLocationBounds
+                                                      ),
+                                              },
+                                          },
+                                      },
+                                  },
+                              ],
+                          },
+                      ] as any)
                     : []
             )
             .concat(
-                req.body.filters.toLocation
-                    ? ([{ toLocation: req.body.filters.toLocation }] as any)
+                req.body.filters.toLocation_placeId
+                    ? ([
+                          {
+                              $or: [
+                                  {
+                                      toLocation_placeId:
+                                          req.body.filters.toLocation_placeId,
+                                  },
+                                  {
+                                      toLocationPolygon: {
+                                          $geoWithin: {
+                                              $geometry: {
+                                                  type: 'Polygon',
+                                                  coordinates:
+                                                      convertBoundsToPolygon(
+                                                          req.body.filters
+                                                              .toLocationBounds
+                                                      ),
+                                              },
+                                          },
+                                      },
+                                  },
+                              ],
+                          },
+                      ] as any)
                     : []
             )
             .concat(
@@ -323,13 +397,18 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
         },
     ]
         .concat(
-            req.body.filters.fromLocation
-                ? ([{ fromLocation: req.body.filters.fromLocation }] as any)
+            req.body.filters.fromLocation_placeId
+                ? ([
+                      {
+                          fromLocation_placeId:
+                              req.body.filters.fromLocation_placeId,
+                      },
+                  ] as any)
                 : []
         )
         .concat(
-            req.body.filters.toLocation
-                ? ([{ toLocation: req.body.filters.toLocation }] as any)
+            req.body.filters.toLocation_placeId
+                ? ([{ toLocation: req.body.filters.toLocation_placeId }] as any)
                 : []
         )
         .concat(
@@ -746,6 +825,7 @@ type IReqSApplyAsCarrier = Request<
         orderId: string;
         fromLocation?: string;
         fromLocation_placeId?: string;
+        fromLocationBounds?: IBounds;
         arrivalDate: Date;
     }
 >;
@@ -760,12 +840,19 @@ export const applyOrderAsCarrier = async (
         return res.status(404).send({ message: 'Status not found!' });
     }
 
-    let fromLocationData = req.body.fromLocation
-        ? {
-              fromLocation: req.body.fromLocation,
-              fromLocation_placeId: req.body.fromLocation_placeId,
-          }
-        : {};
+    let fromLocationData =
+        req.body.fromLocation && req.body.fromLocationBounds
+            ? {
+                  fromLocation: req.body.fromLocation,
+                  fromLocation_placeId: req.body.fromLocation_placeId,
+                  fromLocationPolygon: {
+                      type: 'Polygon',
+                      coordinates: convertBoundsToPolygon(
+                          req.body.fromLocationBounds
+                      ),
+                  },
+              }
+            : {};
 
     const order = await Order.findByIdAndUpdate(
         { _id: req.body.orderId },
@@ -942,9 +1029,25 @@ export const suggestChangesByCarrier = async (req: Request, res: Response) => {
                     fromLocation_placeId:
                         req.body.changes.fromLocation_placeId ??
                         order.fromLocation_placeId,
+                    fromLocationPolygon: req.body.changes.fromLocationBounds
+                        ? {
+                              type: 'Polygon',
+                              coordinates: convertBoundsToPolygon(
+                                  req.body.fromLocationBounds
+                              ),
+                          }
+                        : order.fromLocationPolygon,
                     toLocation_placeId:
                         req.body.changes.toLocation_placeId ??
                         order.toLocation_placeId,
+                    toLocationPolygon: req.body.changes.toLocationBounds
+                        ? {
+                              type: 'Polygon',
+                              coordinates: convertBoundsToPolygon(
+                                  req.body.toLocationBounds
+                              ),
+                          }
+                        : order.toLocationPolygon,
                     productName:
                         req.body.changes.productName ?? order.productName,
                     productUri: req.body.changes.productUri ?? order.productUri,
@@ -1066,9 +1169,25 @@ export const suggestChangesByReceiver = async (req: Request, res: Response) => {
                     fromLocation_placeId:
                         req.body.changes.fromLocation_placeId ??
                         order.fromLocation_placeId,
+                    fromLocationPolygon: req.body.changes.fromLocationBounds
+                        ? {
+                              type: 'Polygon',
+                              coordinates: convertBoundsToPolygon(
+                                  req.body.fromLocationBounds
+                              ),
+                          }
+                        : order.fromLocationPolygon,
                     toLocation_placeId:
                         req.body.changes.toLocation_placeId ??
                         order.toLocation_placeId,
+                    toLocationPolygon: req.body.changes.toLocationBounds
+                        ? {
+                              type: 'Polygon',
+                              coordinates: convertBoundsToPolygon(
+                                  req.body.toLocationBounds
+                              ),
+                          }
+                        : order.toLocationPolygon,
                     productName:
                         req.body.changes.productName ?? order.productName,
                     productUri: req.body.changes.productUri ?? order.productUri,
@@ -1156,10 +1275,43 @@ export const agreeWithChanges = async (req: Request, res: Response) => {
                     order.byCarrierSuggestedChanges?.fromLocation_placeId ??
                     order.byReceiverSuggestedChanges?.fromLocation_placeId ??
                     order.fromLocation_placeId,
+                fromLocationPolygon: order.byCarrierSuggestedChanges
+                    ?.fromLocationBounds
+                    ? {
+                          type: 'Polygon',
+                          coordinates: convertBoundsToPolygon(
+                              order.byCarrierSuggestedChanges.fromLocationBounds
+                          ),
+                      }
+                    : order.byReceiverSuggestedChanges?.fromLocationBounds
+                    ? {
+                          type: 'Polygon',
+                          coordinates: convertBoundsToPolygon(
+                              order.byReceiverSuggestedChanges
+                                  .fromLocationBounds
+                          ),
+                      }
+                    : order.fromLocationPolygon,
                 toLocation_placeId:
                     order.byCarrierSuggestedChanges?.toLocation_placeId ??
                     order.byReceiverSuggestedChanges?.toLocation_placeId ??
                     order.toLocation_placeId,
+                toLocationPolygon: order.byCarrierSuggestedChanges
+                    ?.toLocationBounds
+                    ? {
+                          type: 'Polygon',
+                          coordinates: convertBoundsToPolygon(
+                              order.byCarrierSuggestedChanges.toLocationBounds
+                          ),
+                      }
+                    : order.byReceiverSuggestedChanges?.toLocationBounds
+                    ? {
+                          type: 'Polygon',
+                          coordinates: convertBoundsToPolygon(
+                              order.byReceiverSuggestedChanges.toLocationBounds
+                          ),
+                      }
+                    : order.toLocationPolygon,
                 productName:
                     order.byCarrierSuggestedChanges?.productName ??
                     order.byReceiverSuggestedChanges?.productName ??
