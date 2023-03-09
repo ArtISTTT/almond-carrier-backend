@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { Request, Response } from 'express';
 
-export const getGoogleLozalizedName = (req: Request, res: Response) =>
+export const getGoogleLozalizedName = (place_id: string, language: string) =>
     axios
         .get(`https://maps.googleapis.com/maps/api/place/details/json`, {
             headers: {
@@ -9,17 +9,15 @@ export const getGoogleLozalizedName = (req: Request, res: Response) =>
             },
             withCredentials: true,
             params: {
-                place_id: req.query.place_id,
+                place_id: place_id,
                 key: 'AIzaSyDTDQ8q7QaBnBfDNHzYTAe7eNt34l-bUis',
-                language: req.query.language,
+                language: language,
                 fields: 'formatted_address',
             },
         })
         .then(data => {
-            return res.status(200).send({
-                address: data.data.result.formatted_address,
-            });
+            return data.data.result.formatted_address;
         })
         .catch(err => {
-            return res.status(500).send();
+            return undefined;
         });

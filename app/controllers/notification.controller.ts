@@ -1,7 +1,4 @@
 import db from '../models';
-import * as core from 'express-serve-static-core';
-import { getOrdersOutput } from '../services/getOrdersOutput';
-import { ReviewerType } from '../types/review';
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 

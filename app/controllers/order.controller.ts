@@ -380,7 +380,7 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
         )[0];
 
         return res.status(200).send({
-            orders: getOrdersOutput(orders),
+            orders: await getOrdersOutput(orders, req.query.language as string),
             count: ordersCount?.count,
         });
     }
@@ -534,7 +534,10 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
 
     return res
         .status(200)
-        .send({ orders: getOrdersOutput(orders), count: ordersCount?.count });
+        .send({
+            orders: await getOrdersOutput(orders, req.query.language as string),
+            count: ordersCount?.count,
+        });
 };
 
 export const getMyOrders = async (req: Request, res: Response) => {
@@ -667,7 +670,11 @@ export const getMyOrders = async (req: Request, res: Response) => {
         },
     ]);
 
-    return res.status(200).send({ orders: getOrdersOutput(orders) });
+    return res
+        .status(200)
+        .send({
+            orders: await getOrdersOutput(orders, req.query.language as string),
+        });
 };
 
 export const getOrderById = async (req: Request, res: Response) => {
@@ -801,7 +808,9 @@ export const getOrderById = async (req: Request, res: Response) => {
         res.status(404).send({ message: 'Order not found!' });
     }
 
-    const outputOrder = getOrdersOutput(orders, true)[0];
+    const outputOrder = (
+        await getOrdersOutput(orders, req.query.language as string, true)
+    )[0];
 
     return res.status(200).send({
         order: {

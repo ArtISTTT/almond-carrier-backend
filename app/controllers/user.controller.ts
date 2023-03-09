@@ -329,7 +329,10 @@ export const getUserProfile = async (req: Request, res: Response) => {
         completedOrdersAsReceiver: completedAsReceiver[0]?.count ?? 0,
         completedOrdersAsCarrier: completedAsCarrier[0]?.count ?? 0,
         rating: rating?.averageRating,
-        successOrders: getOrdersOutput(orders),
+        successOrders: await getOrdersOutput(
+            orders,
+            req.query.language as string
+        ),
         ordersInLastMonth: ordersInLastThreeMonths[0]?.count ?? 0,
         completionRate: 77,
         verifiedByEmail: user.verificated,
