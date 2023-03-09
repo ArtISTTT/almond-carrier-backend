@@ -871,7 +871,7 @@ export const applyOrderAsCarrier = async (
         return res.status(404).send({ message: 'Order to apply not found!' });
     }
 
-    global.io.sockets.in(order._id.toString()).emit('new-status');
+    global.io.sockets.in(req.body.orderId).emit('new-status');
 
     await addNewNotification({
         text: notificationText.carrierFound,
@@ -936,7 +936,7 @@ export const applyOrderAsReceiver = async (
         { new: true, lean: true }
     );
 
-    global.io.sockets.in(order._id.toString()).emit('new-status');
+    global.io.sockets.in(req.body.orderId).emit('new-status');
 
     await addNewNotification({
         text: notificationText.recieverFound,
@@ -990,7 +990,7 @@ export const suggestChangesByCarrier = async (req: Request, res: Response) => {
                 { new: true, lean: true }
             );
 
-            global.io.sockets.in(order._id.toString()).emit('new-status');
+            global.io.sockets.in(req.body.orderId).emit('new-status');
 
             return res.status(200).send({ ok: true });
         }
@@ -1130,7 +1130,7 @@ export const suggestChangesByReceiver = async (req: Request, res: Response) => {
                 { new: true, lean: true }
             );
 
-            global.io.sockets.in(order._id.toString()).emit('new-status');
+            global.io.sockets.in(req.body.orderId).emit('new-status');
 
             return res.status(200).send({ ok: true });
         }
@@ -1364,7 +1364,7 @@ export const disagreeWithChanges = async (req: Request, res: Response) => {
 
     await order.save();
 
-    global.io.sockets.in(order._id.toString()).emit('new-status');
+    global.io.sockets.in(req.body.orderId).emit('new-status');
 
     return res.status(200).send({ ok: true });
 };
@@ -1405,7 +1405,7 @@ export const confirmDeal = async (req: Request, res: Response) => {
         notificationType: NotificationType.orderUpdate,
     });
 
-    global.io.sockets.in(order._id.toString()).emit('new-status');
+    global.io.sockets.in(req.body.orderId).emit('new-status');
 
     return res.status(200).send({ ok: true });
 };
@@ -1433,7 +1433,7 @@ export const confirmPayment = async (req: Request, res: Response) => {
         return res.status(404).send({ message: 'Order not found!' });
     }
 
-    global.io.sockets.in(order._id.toString()).emit('new-status');
+    global.io.sockets.in(req.body.orderId).emit('new-status');
 
     await addNewNotification({
         text: notificationText.paymentVerification,
@@ -1469,7 +1469,7 @@ export const completeOrder = async (req: Request, res: Response) => {
         return res.status(404).send({ message: 'Order not found!' });
     }
 
-    global.io.sockets.in(order._id.toString()).emit('new-status');
+    global.io.sockets.in(req.body.orderId).emit('new-status');
 
     return res.status(200).send({ ok: true });
 };
@@ -1497,7 +1497,7 @@ export const cancelOrder = async (req: Request, res: Response) => {
         return res.status(404).send({ message: 'Order not found!' });
     }
 
-    global.io.sockets.in(order._id.toString()).emit('new-status');
+    global.io.sockets.in(req.body.orderId).emit('new-status');
 
     return res.status(200).send({ ok: true });
 };
@@ -1557,7 +1557,7 @@ export const declineOrder = async (req: Request, res: Response) => {
         notificationType: NotificationType.orderUpdate,
     });
 
-    global.io.sockets.in(order._id.toString()).emit('new-status');
+    global.io.sockets.in(req.body.orderId).emit('new-status');
 
     return res.status(200).send({ ok: true });
 };
@@ -1589,7 +1589,7 @@ export const startPayout = async (req: Request, res: Response) => {
         return res.status(404).send({ message: 'Order not found!' });
     }
 
-    global.io.sockets.in(order._id.toString()).emit('new-status');
+    global.io.sockets.in(req.body.orderId).emit('new-status');
 
     return res.status(200).send({ ok: true });
 };
