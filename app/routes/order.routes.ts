@@ -19,8 +19,8 @@ import {
     suggestChangesByReceiver,
 } from '../controllers/order.controller';
 
-import middlewares from '../middlewares';
 import { getGoogleLozalizedName } from '../helpers/getLocalizedPlace';
+import middlewares from '../middlewares';
 
 export default (app: Express) => {
     app.use((req, res, next) => {
@@ -131,11 +131,5 @@ export default (app: Express) => {
         '/api/order/decline-order',
         [middlewares.authJwt.verifyToken],
         declineOrder
-    );
-
-    app.get(
-        '/api/get-localized-name',
-        [middlewares.authJwt.verifyToken],
-        getGoogleLozalizedName
     );
 };
