@@ -1,12 +1,12 @@
-import { Request, Response } from 'express';
-import db from '../models';
-import * as core from 'express-serve-static-core';
 import bcrypt from 'bcryptjs';
-import { getFullUri } from '../services/getFullUri';
+import { Request, Response } from 'express';
+import * as core from 'express-serve-static-core';
 import mongoose from 'mongoose';
-import { getOrdersOutput } from '../services/getOrdersOutput';
-import { uploadFile } from '../aws-s3/uploadFile';
 import sharp from 'sharp';
+import { uploadFile } from '../aws-s3/uploadFile';
+import db from '../models';
+import { getFullUri } from '../services/getFullUri';
+import { getOrdersOutput } from '../services/getOrdersOutput';
 
 export const allAccess = (req: Request, res: Response) => {
     res.status(200).send('Public Content.');
