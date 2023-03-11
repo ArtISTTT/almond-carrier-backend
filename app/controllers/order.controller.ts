@@ -1,15 +1,15 @@
 import { Request, Response } from 'express';
-import mongoose from 'mongoose';
-import db from '../models';
 import * as core from 'express-serve-static-core';
-import { getOrdersOutput } from '../services/getOrdersOutput';
-import {
-    NotificationType,
-    addNewNotification,
-} from './notification.controller';
+import mongoose from 'mongoose';
 import { notificationText } from '../frontendTexts/notifications';
 import { convertBoundsToPolygon } from '../helpers/initialize/convertBoundsToPolygon';
+import db from '../models';
+import { getOrdersOutput } from '../services/getOrdersOutput';
 import { IBounds } from '../types/geometry';
+import {
+    addNewNotification,
+    NotificationType,
+} from './notification.controller';
 
 const User = db.user;
 const Order = db.order;
@@ -280,6 +280,11 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
                 $match: { $and: matchOrderFilters },
             },
             {
+                $sort: {
+                    update_at: -1,
+                },
+            },
+            {
                 $lookup: {
                     from: OrderStatus.collection.name,
                     localField: 'statusId',
@@ -532,12 +537,10 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
         ])
     )[0];
 
-    return res
-        .status(200)
-        .send({
-            orders: await getOrdersOutput(orders, req.query.language as string),
-            count: ordersCount?.count,
-        });
+    return res.status(200).send({
+        orders: await getOrdersOutput(orders, req.query.language as string),
+        count: ordersCount?.count,
+    });
 };
 
 export const getMyOrders = async (req: Request, res: Response) => {
@@ -670,11 +673,9 @@ export const getMyOrders = async (req: Request, res: Response) => {
         },
     ]);
 
-    return res
-        .status(200)
-        .send({
-            orders: await getOrdersOutput(orders, req.query.language as string),
-        });
+    return res.status(200).send({
+        orders: await getOrdersOutput(orders, req.query.language as string),
+    });
 };
 
 export const getOrderById = async (req: Request, res: Response) => {

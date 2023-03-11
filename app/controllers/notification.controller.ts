@@ -1,6 +1,6 @@
-import db from '../models';
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
+import db from '../models';
 
 const Notification = db.notification;
 const Order = db.order;
@@ -87,6 +87,7 @@ export const getNotifications = async (req: Request, res: Response) => {
                 },
             },
         },
+        { $sort: { createdAt: -1 } },
         {
             $lookup: {
                 from: Order.collection.name,
