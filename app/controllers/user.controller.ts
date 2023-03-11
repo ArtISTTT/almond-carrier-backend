@@ -38,7 +38,11 @@ export const getUserProfile = async (req: Request, res: Response) => {
                     pipeline: [
                         {
                             $match: {
-                                name: 'success',
+                                $or: [
+                                    {
+                                        name: 'success',
+                                    },
+                                ],
                             },
                         },
                     ],
@@ -95,10 +99,31 @@ export const getUserProfile = async (req: Request, res: Response) => {
                             },
                         ],
                     },
+                ],
+            },
+        },
+        {
+            $lookup: {
+                from: OrderStatus.collection.name,
+                localField: 'statusId',
+                foreignField: '_id',
+                as: 'status',
+            },
+        },
+        {
+            $unwind: '$status',
+        },
+        {
+            $match: {
+                $or: [
                     {
-                        $expr: {
-                            $eq: [user.successStatus._id, '$statusId'],
-                        },
+                        'status.name': 'success',
+                    },
+                    {
+                        'status.name': 'waitingCarrier',
+                    },
+                    {
+                        'status.name': 'waitingReviever',
                     },
                 ],
             },
@@ -141,17 +166,6 @@ export const getUserProfile = async (req: Request, res: Response) => {
                 path: '$carrier',
                 preserveNullAndEmptyArrays: true,
             },
-        },
-        {
-            $lookup: {
-                from: OrderStatus.collection.name,
-                localField: 'statusId',
-                foreignField: '_id',
-                as: 'status',
-            },
-        },
-        {
-            $unwind: '$status',
         },
         {
             $lookup: {
