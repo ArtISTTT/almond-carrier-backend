@@ -1,21 +1,21 @@
-import { getAdminJs } from './app/adminjs/index';
-import express, { Express, Request, Response } from 'express';
-import cors from 'cors';
+import compression from 'compression';
 import cookieSession from 'cookie-session';
+import cors from 'cors';
 import dotenv from 'dotenv';
+import express, { Express, Request, Response } from 'express';
+import helmet from 'helmet';
+import * as http from 'http';
+import { ConnectOptions } from 'mongoose';
+import * as socketio from 'socket.io';
+import { getAdminJs } from './app/adminjs/index';
+import { initializeDB } from './app/helpers/initialize';
 import db from './app/models';
 import authRoutes from './app/routes/auth.routes';
-import orderRoutes from './app/routes/order.routes';
-import userRoutes from './app/routes/user.routes';
 import chatRoutes from './app/routes/chat.routes';
-import reviewRoutes from './app/routes/review.routes';
 import notificationRoutes from './app/routes/notification.routes';
-import compression from 'compression';
-import helmet from 'helmet';
-import { initializeDB } from './app/helpers/initialize';
-import { ConnectOptions } from 'mongoose';
-import * as http from 'http';
-import * as socketio from 'socket.io';
+import orderRoutes from './app/routes/order.routes';
+import reviewRoutes from './app/routes/review.routes';
+import userRoutes from './app/routes/user.routes';
 import WebSockets from './app/socketio/index';
 dotenv.config();
 
@@ -50,6 +50,10 @@ app.use(
     })
 );
 
+const { adminRouter, rootPath } = getAdminJs();
+
+app.use(rootPath, adminRouter);
+
 // parse requests of content-type - application/json
 app.use(express.json());
 
@@ -72,10 +76,6 @@ app.use(
 app.use('/uploads', express.static('uploads'));
 
 app.use(cors(corsOptions));
-
-const { adminRouter, rootPath } = getAdminJs();
-
-app.use(rootPath, adminRouter);
 
 app.get('/', (req, res) => {
     res.json({ message: 'Welcome to Friendly Carrier back-end application.' });

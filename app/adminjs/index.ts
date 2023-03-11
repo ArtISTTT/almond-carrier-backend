@@ -1,12 +1,11 @@
 import AdminJSExpress from '@adminjs/express';
 import AdminJSMongoose from '@adminjs/mongoose';
 import AdminJS, { ActionContext, ActionRequest, ActionResponse } from 'adminjs';
-import db from '../models';
-import { Request, Response } from 'express';
 import {
     confirmPaymentByAdmin,
     confirmPayoutByAdmin,
 } from '../controllers/order.controller.admin';
+import db from '../models';
 
 const order = db.order;
 const user = db.user;
@@ -26,6 +25,9 @@ export const getAdminJs = () => {
     AdminJS.registerAdapter(AdminJSMongoose);
 
     const admin = new AdminJS({
+        branding: {
+            companyName: 'Friednly Carrier',
+        },
         resources: [
             {
                 resource: order,
@@ -86,7 +88,16 @@ export const getAdminJs = () => {
         ],
     });
 
-    const adminRouter = AdminJSExpress.buildRouter(admin);
+    const adminRouter = AdminJSExpress.buildAuthenticatedRouter(admin, {
+        authenticate: async (email, password) => {
+            if ('adminpassword' === password && 'admin@admin.com' === email) {
+                return true;
+            }
+            return null;
+        },
+        cookieName: 'adminJs',
+        cookiePassword: 'cookiePassword000',
+    });
 
     return { rootPath: admin.options.rootPath, adminRouter };
 };
