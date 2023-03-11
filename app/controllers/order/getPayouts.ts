@@ -38,14 +38,6 @@ export const getPayouts = async (req: Request, res: Response) => {
                     $eq: new mongoose.Types.ObjectId(req.body.userId),
                 },
             },
-            $project: {
-                paymentId: 1,
-                statusId: 1,
-                completedDate: 1,
-                payoutInfo: 1,
-                _id: 1,
-                productName: 1,
-            },
         },
         {
             $lookup: {
@@ -79,6 +71,16 @@ export const getPayouts = async (req: Request, res: Response) => {
                         'status.name': 'awaitingPayout',
                     },
                 ],
+            },
+        },
+        {
+            $project: {
+                _id: 1,
+                productName: 1,
+                completedDate: 1,
+                payoutInfo: 1,
+                payment: 1,
+                status: 1,
             },
         },
     ]);
