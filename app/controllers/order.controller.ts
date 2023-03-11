@@ -11,6 +11,7 @@ import { declineOrder } from './order/declineOrder';
 import { disagreeWithChanges } from './order/disagreeWithChanges';
 import { getMyOrders } from './order/getMyOrders';
 import { getOrderById } from './order/getOrderById';
+import { getPayouts } from './order/getPayouts';
 import { searchOrders } from './order/searchOrders';
 import { startPayout } from './order/startPayout';
 import { suggestChangesByCarrier } from './order/suggestChangesByCarrier';
@@ -29,6 +30,7 @@ export {
     disagreeWithChanges,
     declineOrder,
     getMyOrders,
+    getPayouts,
     getOrderById,
     searchOrders,
     startPayout,

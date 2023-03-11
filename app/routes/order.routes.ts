@@ -13,6 +13,7 @@ import {
     disagreeWithChanges,
     getMyOrders,
     getOrderById,
+    getPayouts,
     searchOrders,
     startPayout,
     suggestChangesByCarrier,
@@ -132,4 +133,6 @@ export default (app: Express) => {
         [middlewares.authJwt.verifyToken],
         declineOrder
     );
+
+    app.get('/api/get-payouts', [middlewares.authJwt.verifyToken], getPayouts);
 };

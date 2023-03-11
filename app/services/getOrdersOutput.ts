@@ -15,6 +15,7 @@ export const getOrdersOutput = (
                           order.byReceiverSuggestedChanges,
                       dealConfirmedByCarrier: order.dealConfirmedByCarrier,
                       dealConfirmedByReceiver: order.dealConfirmedByReceiver,
+                      payoutInfo: order.payoutInfo,
                   }
                 : {};
 
