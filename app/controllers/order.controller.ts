@@ -7,6 +7,7 @@ import { confirmDeal } from './order/confirmDeal';
 import { confirmPayment } from './order/confirmPayment';
 import { createOrderAsCarrier } from './order/createOrderAsCarrier';
 import { createOrderAsReceiver } from './order/createOrderAsReceiver';
+import { declineOrder } from './order/declineOrder';
 import { disagreeWithChanges } from './order/disagreeWithChanges';
 import { getMyOrders } from './order/getMyOrders';
 import { getOrderById } from './order/getOrderById';
@@ -26,6 +27,7 @@ export {
     createOrderAsCarrier,
     createOrderAsReceiver,
     disagreeWithChanges,
+    declineOrder,
     getMyOrders,
     getOrderById,
     searchOrders,
