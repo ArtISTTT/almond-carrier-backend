@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
-import mongoose from 'mongoose';
-import db from '../models';
 import * as core from 'express-serve-static-core';
+import mongoose from 'mongoose';
+import { notificationText } from '../frontendTexts/notifications';
+import db from '../models';
 import { ReviewerType } from '../types/review';
 import {
-    NotificationType,
     addNewNotification,
+    NotificationType,
 } from './notification.controller';
-import { notificationText } from '../frontendTexts/notifications';
 
 const User = db.user;
 const Order = db.order;
@@ -113,6 +113,7 @@ export const getUserReviews = async (
             {
                 $unwind: '$userReviewer',
             },
+            { $sort: { 'order.completedDate': -1 } },
             {
                 $project: {
                     reviewerType: 1,
