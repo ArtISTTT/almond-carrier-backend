@@ -19,15 +19,18 @@ export const getOrdersOutput = (
                       payoutInfo: order.payoutInfo,
                       totalPaymentAmount:
                           order.payment.rewardAmount !== undefined &&
-                          order.payment.ourDueComission &&
-                          getOrderPaymentSum({
-                              rewardAmount: order.payment.rewardAmount,
-                              productAmount: order.payment.productAmount,
-                              paymentCPComission:
-                                  order.payment.paymentCPComission,
-                              dueCPComission: order.payment.dueCPComission,
-                              ourDueComission: order.payment.ourDueComission,
-                          }),
+                          order.payment.productAmount !== undefined
+                              ? getOrderPaymentSum({
+                                    rewardAmount: order.payment.rewardAmount,
+                                    productAmount: order.payment.productAmount,
+                                    paymentCPComission:
+                                        order.payment.paymentCPComission,
+                                    dueCPComission:
+                                        order.payment.dueCPComission,
+                                    ourDueComission:
+                                        order.payment.ourDueComission,
+                                })
+                              : undefined,
                   }
                 : {};
 
