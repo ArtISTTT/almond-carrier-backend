@@ -127,12 +127,14 @@ export const suggestChangesByCarrier = async (req: Request, res: Response) => {
 
         global.io.sockets.in(req.body.orderId).emit('new-status');
 
-        await addNewNotification({
-            text: notificationText.newChangesForReview,
-            orderId: req.body.orderId,
-            userForId: String(order.recieverId),
-            notificationType: NotificationType.orderUpdate,
-        });
+        if (order.recieverId) {
+            await addNewNotification({
+                text: notificationText.newChangesForReview,
+                orderId: req.body.orderId,
+                userForId: String(order.recieverId),
+                notificationType: NotificationType.orderUpdate,
+            });
+        }
 
         return res.status(200).send({ ok: true });
     }

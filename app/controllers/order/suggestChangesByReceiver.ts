@@ -12,7 +12,6 @@ const Order = db.order;
 const OrderStatus = db.orderStatus;
 const Payment = db.payment;
 
-
 export const suggestChangesByReceiver = async (req: Request, res: Response) => {
     const orders = await Order.aggregate([
         {
@@ -142,12 +141,14 @@ export const suggestChangesByReceiver = async (req: Request, res: Response) => {
 
         global.io.sockets.in(req.body.orderId).emit('new-status');
 
-        await addNewNotification({
-            text: notificationText.newChangesForReview,
-            orderId: req.body.orderId,
-            userForId: String(order.carrierId),
-            notificationType: NotificationType.orderUpdate,
-        });
+        if (order.carrierId) {
+            await addNewNotification({
+                text: notificationText.newChangesForReview,
+                orderId: req.body.orderId,
+                userForId: String(order.carrierId),
+                notificationType: NotificationType.orderUpdate,
+            });
+        }
 
         return res.status(200).send({ ok: true });
     }
