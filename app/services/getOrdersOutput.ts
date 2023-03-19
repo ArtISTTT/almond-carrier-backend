@@ -1,4 +1,5 @@
 import { getGoogleLozalizedName } from '../helpers/getLocalizedPlace';
+import { getOrderPaymentSum } from '../helpers/getOrderPaymentSum';
 
 export const getOrdersOutput = (
     orders: any[],
@@ -16,6 +17,17 @@ export const getOrdersOutput = (
                       dealConfirmedByCarrier: order.dealConfirmedByCarrier,
                       dealConfirmedByReceiver: order.dealConfirmedByReceiver,
                       payoutInfo: order.payoutInfo,
+                      totalPaymentAmount:
+                          order.payment.rewardAmount !== undefined &&
+                          order.payment.ourDueComission &&
+                          getOrderPaymentSum({
+                              rewardAmount: order.payment.rewardAmount,
+                              productAmount: order.payment.productAmount,
+                              paymentCPComission:
+                                  order.payment.paymentCPComission,
+                              dueCPComission: order.payment.dueCPComission,
+                              ourDueComission: order.payment.ourDueComission,
+                          }),
                   }
                 : {};
 

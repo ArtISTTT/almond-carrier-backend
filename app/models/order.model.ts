@@ -114,6 +114,10 @@ export const OrderModel = mongoose.model(
                 required: false,
             },
             payoutInfo: {
+                isPayedOut: {
+                    type: Boolean,
+                    default: false,
+                },
                 phoneNumber: {
                     type: String,
                     required: false,

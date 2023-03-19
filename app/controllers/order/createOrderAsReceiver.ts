@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import * as core from 'express-serve-static-core';
+import { COMISSIONS } from '../../helpers/consts';
 import { convertBoundsToPolygon } from '../../helpers/initialize/convertBoundsToPolygon';
 import db from '../../models';
 import { IBounds } from '../../types/geometry';
@@ -44,6 +45,9 @@ export const createOrderAsReceiver = async (
         rewardAmount: req.body.rewardAmount,
         productAmount: req.body.productAmount,
         currency: req.body.currency,
+        paymentCPComission: COMISSIONS.PAYMENT_CP_COMISSION,
+        dueCPComission: COMISSIONS.DUE_PAYOUT_CP_COMISSION,
+        ourDueComission: COMISSIONS.DUE_OUR_COMISSION,
     });
 
     await Order.create({

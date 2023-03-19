@@ -12,6 +12,18 @@ export const PaymentModel = mongoose.model(
                 type: Number,
                 require: false,
             },
+            paymentCPComission: {
+                type: Number,
+                required: true,
+            },
+            dueCPComission: {
+                type: Number,
+                required: true,
+            },
+            ourDueComission: {
+                type: Number,
+                required: true,
+            },
             isPayed: {
                 type: Boolean,
                 require: true,
