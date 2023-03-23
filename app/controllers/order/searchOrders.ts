@@ -259,15 +259,56 @@ export const searchOrders = async (req: IReqSearchOrders, res: Response) => {
             req.body.filters.fromLocation_placeId
                 ? ([
                       {
-                          fromLocation_placeId:
-                              req.body.filters.fromLocation_placeId,
+                          $or: [
+                              {
+                                  fromLocation_placeId:
+                                      req.body.filters.fromLocation_placeId,
+                              },
+                              {
+                                  fromLocationPolygon: {
+                                      $geoWithin: {
+                                          $geometry: {
+                                              type: 'Polygon',
+                                              coordinates:
+                                                  convertBoundsToPolygon(
+                                                      req.body.filters
+                                                          .fromLocationBounds
+                                                  ),
+                                          },
+                                      },
+                                  },
+                              },
+                          ],
                       },
                   ] as any)
                 : []
         )
         .concat(
             req.body.filters.toLocation_placeId
-                ? ([{ toLocation: req.body.filters.toLocation_placeId }] as any)
+                ? ([
+                      {
+                          $or: [
+                              {
+                                  toLocation_placeId:
+                                      req.body.filters.toLocation_placeId,
+                              },
+                              {
+                                  toLocationPolygon: {
+                                      $geoWithin: {
+                                          $geometry: {
+                                              type: 'Polygon',
+                                              coordinates:
+                                                  convertBoundsToPolygon(
+                                                      req.body.filters
+                                                          .toLocationBounds
+                                                  ),
+                                          },
+                                      },
+                                  },
+                              },
+                          ],
+                      },
+                  ] as any)
                 : []
         )
         .concat(
