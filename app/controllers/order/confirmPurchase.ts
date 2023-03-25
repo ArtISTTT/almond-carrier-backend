@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import fs from 'fs';
 import { uploadFile } from '../../aws-s3/uploadFile';
 import { notificationText } from '../../frontendTexts/notifications';
 import db from '../../models';
@@ -13,19 +14,27 @@ const OrderStatus = db.orderStatus;
 export const confirmPurchase = async (req: Request, res: Response) => {
     const files = req.files;
 
-    if (Array.isArray(files) && files.hasOwnProperty('map')) {
+    if (Array.isArray(files)) {
         const uploadedFiles = await Promise.all(
             files.map(async file => {
-                const result = await uploadFile(
-                    file.path,
-                    file.filename,
-                    req,
-                    res,
-                    file.buffer,
-                    'order-files'
-                );
+                let location = undefined;
 
-                return result.Location as string;
+                fs.readFile(file.path, async (err, data) => {
+                    const result = await uploadFile(
+                        file.path,
+                        file.filename,
+                        req,
+                        res,
+                        data,
+                        'order-files'
+                    );
+
+                    console.log(result);
+
+                    location = result.Location as string;
+                });
+
+                return location;
             })
         );
 
@@ -63,4 +72,6 @@ export const confirmPurchase = async (req: Request, res: Response) => {
 
         return res.status(200).send({ uploadedFiles });
     }
+
+    return res.status(500).send({ ok: false });
 };

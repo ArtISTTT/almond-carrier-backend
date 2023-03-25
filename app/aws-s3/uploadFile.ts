@@ -27,6 +27,7 @@ export const uploadFile = async (
     s3.upload(putParams, undefined, async (err, data) => {
         if (err) {
             ok = false;
+            console.log(err);
         } else {
             await User.updateOne(
                 { _id: req.body.userId },

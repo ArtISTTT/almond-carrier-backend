@@ -8,6 +8,7 @@ import * as http from 'http';
 import { ConnectOptions } from 'mongoose';
 import * as socketio from 'socket.io';
 import { getAdminJs } from './app/adminjs/index';
+import { updateAWSConfig } from './app/aws-s3';
 import { initializeDB } from './app/helpers/initialize';
 import db from './app/models';
 import authRoutes from './app/routes/auth.routes';
@@ -17,6 +18,7 @@ import orderRoutes from './app/routes/order.routes';
 import reviewRoutes from './app/routes/review.routes';
 import userRoutes from './app/routes/user.routes';
 import WebSockets from './app/socketio/index';
+
 dotenv.config();
 
 const connectionString = process.env.MONGO_URL as string;
@@ -108,6 +110,7 @@ const start = async () => {
         });
 
     server.listen(port, () => {
+        updateAWSConfig();
         console.log(
             `⚡️[server]: Server is running at http://localhost:${port}`
         );

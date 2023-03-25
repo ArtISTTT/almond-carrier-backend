@@ -3,13 +3,17 @@ import multer from 'multer';
 import multerS3 from 'multer-s3';
 import { keys } from './keys';
 
-aws.config.update({
-    accessKeyId: keys.iam_access_id,
-    secretAccessKey: keys.iam_secret,
-    region: 'us-east-1',
-});
+export let s3 = new aws.S3();
 
-export const s3 = new aws.S3();
+export const updateAWSConfig = () => {
+    aws.config.update({
+        accessKeyId: process.env.IAM_ACCESS_ID,
+        secretAccessKey: process.env.IAM_SECRET,
+        region: 'us-east-1',
+    });
+
+    s3 = new aws.S3();
+};
 
 const storage = multer.diskStorage({
     destination: 'uploads/',
