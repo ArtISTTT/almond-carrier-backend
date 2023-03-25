@@ -137,7 +137,7 @@ export default (app: Express) => {
     );
 
     app.post(
-        '/api/confirm-purchase',
+        '/api/order/confirm-purchase',
         [upload.array('file'), middlewares.authJwt.verifyToken],
         confirmPurchase
     );
