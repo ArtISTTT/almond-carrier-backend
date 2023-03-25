@@ -19,6 +19,8 @@ export const confirmPurchase = async (req: Request, res: Response) => {
             files.map(async file => {
                 let location = undefined;
 
+                const isPdf = file.filename.split('.').pop() === 'pdf';
+
                 fs.readFile(file.path, async (err, data) => {
                     const result = await uploadFile(
                         file.path,
@@ -26,7 +28,10 @@ export const confirmPurchase = async (req: Request, res: Response) => {
                         req,
                         res,
                         data,
-                        'order-files'
+                        'order-files',
+                        isPdf ? 'application/pdf' : undefined,
+                        isPdf ? 'binary' : undefined,
+                        isPdf ? 'inline' : undefined
                     );
 
                     console.log(result);
@@ -51,7 +56,7 @@ export const confirmPurchase = async (req: Request, res: Response) => {
             {
                 $set: {
                     purchaseItemFiles: [uploadedFiles],
-                    statusId: status._id,
+                    // statusId: status._id,
                 },
             },
             { new: true, lean: true }

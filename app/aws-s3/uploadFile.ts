@@ -11,14 +11,19 @@ export const uploadFile = async (
     req: Request,
     res: Response,
     data: Buffer,
-    specificFolder?: string
+    specificFolder?: string,
+    ContentType?: string,
+    ContentEncoding?: string,
+    ContentDeposition?: string
 ): Promise<{ ok: boolean; Location?: string }> => {
     const putParams = {
         Bucket: 'img-bucket-friendly-carrier',
         Key: specificFolder ? `${specificFolder}/${targetName}` : targetName,
         Body: data,
         ACL: 'public-read-write',
-        ContentType: 'image/jpeg',
+        ContentType: ContentType ?? 'image/jpeg',
+        ContentEncoding,
+        ContentDeposition,
     };
 
     let ok = false;
