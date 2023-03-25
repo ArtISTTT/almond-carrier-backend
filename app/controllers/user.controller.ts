@@ -588,13 +588,22 @@ export const updateAvatar = async (req: Request, res: Response) => {
             return image.toBuffer();
         })
         .then(async data => {
-            return await uploadFile(
+            const result = await uploadFile(
                 req.file.path,
                 req.file.filename,
                 req,
                 res,
                 data
             );
+
+            if (result.ok && result.Location) {
+                return res.status(200).send({
+                    message: 'File saved',
+                    avatar: result.Location,
+                });
+            } else {
+                return res.status(500).send({ message: 'errorWhileUploading' });
+            }
         })
         .catch(err => {
             return res.status(500).send({

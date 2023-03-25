@@ -8,6 +8,8 @@ export const notificationText = {
     carrierFound: 'carrierFound',
     recieverFound: 'recieverFound',
     searchingForANewPartner: 'searchingForANewPartner',
+    purchaseCompleted: 'purchaseCompleted',
+    purchaseReviewed: 'purchaseReviewed',
     newReview: 'newReview',
     dealConfirmedByPartner: 'dealConfirmedByPartner',
 };

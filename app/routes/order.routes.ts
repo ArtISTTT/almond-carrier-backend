@@ -20,6 +20,8 @@ import {
     suggestChangesByReceiver,
 } from '../controllers/order.controller';
 
+import { upload } from '../aws-s3';
+import { confirmPurchase } from '../controllers/order/confirmPurchase';
 import { getGoogleLozalizedName } from '../helpers/getLocalizedPlace';
 import middlewares from '../middlewares';
 
@@ -132,6 +134,12 @@ export default (app: Express) => {
         '/api/order/decline-order',
         [middlewares.authJwt.verifyToken],
         declineOrder
+    );
+
+    app.post(
+        '/api/confirm-purchase',
+        [upload.array('file'), middlewares.authJwt.verifyToken],
+        confirmPurchase
     );
 
     app.get('/api/get-payouts', [middlewares.authJwt.verifyToken], getPayouts);

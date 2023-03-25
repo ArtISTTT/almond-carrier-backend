@@ -1,7 +1,7 @@
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { Request, Response } from 'express';
 import fs from 'fs';
 import { s3 } from '.';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import db from '../models';
 const User = db.user;
 
@@ -10,21 +10,23 @@ export const uploadFile = async (
     targetName: Express.Multer.File['filename'],
     req: Request,
     res: Response,
-    data: Buffer
-) => {
+    data: Buffer,
+    specificFolder?: string
+): Promise<{ ok: boolean; Location?: string }> => {
     const putParams = {
         Bucket: 'img-bucket-friendly-carrier',
-        Key: targetName,
+        Key: specificFolder ? `${specificFolder}/${targetName}` : targetName,
         Body: data,
         ACL: 'public-read-write',
         ContentType: 'image/jpeg',
     };
 
+    let ok = false;
+    let Location = undefined;
+
     s3.upload(putParams, undefined, async (err, data) => {
         if (err) {
-            return res.status(500).send({
-                message: err,
-            });
+            ok = false;
         } else {
             await User.updateOne(
                 { _id: req.body.userId },
@@ -38,10 +40,13 @@ export const uploadFile = async (
 
             fs.unlink(source, () => {});
 
-            return res.status(200).send({
-                message: 'Avatar successfully updated',
-                avatar: data.Location,
-            });
+            Location = data.Location;
+            ok = true;
         }
     });
+
+    return {
+        ok,
+        Location,
+    };
 };

@@ -127,6 +127,10 @@ export const OrderModel = mongoose.model(
                     required: false,
                 },
             },
+            purchaseItemFiles: {
+                type: Array,
+                required: false,
+            },
         },
         {
             timestamps: true,

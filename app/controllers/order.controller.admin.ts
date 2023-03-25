@@ -1,10 +1,10 @@
+import { BaseRecord } from 'adminjs';
+import { notificationText } from '../frontendTexts/notifications';
 import db from '../models';
 import {
-    NotificationType,
     addNewNotification,
+    NotificationType,
 } from './notification.controller';
-import { notificationText } from '../frontendTexts/notifications';
-import { BaseRecord } from 'adminjs';
 
 const User = db.user;
 const Order = db.order;
@@ -20,7 +20,7 @@ export const isConfirmPaymentByAdminAccessible = async (record: BaseRecord) => {
 
 export const confirmPaymentByAdmin = async (record: BaseRecord) => {
     const status = await OrderStatus.findOne({
-        name: 'awaitingDelivery',
+        name: 'awaitingPurchase',
     });
 
     if (!status) {
