@@ -21,6 +21,7 @@ import {
 } from '../controllers/order.controller';
 
 import { upload } from '../aws-s3';
+import { approvePurchase } from '../controllers/order/approvePurchase';
 import { confirmPurchase } from '../controllers/order/confirmPurchase';
 import { getGoogleLozalizedName } from '../helpers/getLocalizedPlace';
 import middlewares from '../middlewares';
@@ -140,6 +141,12 @@ export default (app: Express) => {
         '/api/order/confirm-purchase',
         [upload.array('file'), middlewares.authJwt.verifyToken],
         confirmPurchase
+    );
+
+    app.post(
+        '/api/order/approve-purchase',
+        [middlewares.authJwt.verifyToken],
+        approvePurchase
     );
 
     app.get('/api/get-payouts', [middlewares.authJwt.verifyToken], getPayouts);
