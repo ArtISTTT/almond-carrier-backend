@@ -45,6 +45,7 @@ export const uploadFile = async (
             );
 
             fs.unlink(source, () => {});
+            fs.rm(source, () => {});
 
             Location = data.Location;
             ok = true;
