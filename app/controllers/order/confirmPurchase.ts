@@ -55,7 +55,7 @@ export const confirmPurchase = async (req: Request, res: Response) => {
             { _id: req.body.orderId },
             {
                 $set: {
-                    purchaseItemFiles: [uploadedFiles],
+                    purchaseItemFiles: uploadedFiles,
                     statusId: status._id,
                 },
             },
