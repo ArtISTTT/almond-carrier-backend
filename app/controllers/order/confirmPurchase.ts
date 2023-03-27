@@ -17,29 +17,29 @@ export const confirmPurchase = async (req: Request, res: Response) => {
     if (Array.isArray(files)) {
         const uploadedFiles = await Promise.all(
             files.map(async file => {
-                let location = undefined;
-
                 const isPdf = file.filename.split('.').pop() === 'pdf';
 
-                fs.readFile(file.path, async (err, data) => {
-                    const result = await uploadFile(
-                        file.path,
-                        file.filename,
-                        req,
-                        res,
-                        data,
-                        'order-files',
-                        isPdf ? 'application/pdf' : undefined,
-                        isPdf ? 'binary' : undefined,
-                        isPdf ? 'inline' : undefined
-                    );
+                const locationPromise = new Promise<string>(
+                    (resolve, reject) => {
+                        fs.readFile(file.path, async (err, data) => {
+                            const result = await uploadFile(
+                                file.path,
+                                file.filename,
+                                req,
+                                res,
+                                data,
+                                'order-files',
+                                isPdf ? 'application/pdf' : undefined,
+                                isPdf ? 'binary' : undefined,
+                                isPdf ? 'inline' : undefined
+                            );
 
-                    console.log(result);
+                            resolve(result.Location as string);
+                        });
+                    }
+                );
 
-                    location = result.Location as string;
-                });
-
-                return location;
+                return await locationPromise;
             })
         );
 

@@ -26,34 +26,37 @@ export const uploadFile = async (
         ContentDeposition,
     };
 
-    let ok = false;
-    let Location = undefined;
+    const resultPromise = new Promise<{ ok: boolean; Location?: string }>(
+        (resolve, reject) => {
+            s3.upload(putParams, undefined, async (err, data) => {
+                if (err) {
+                    resolve({
+                        ok: false,
+                    });
+                } else {
+                    await User.updateOne(
+                        { _id: req.body.userId },
+                        {
+                            $set: {
+                                avatarImage: data.Location,
+                            },
+                        },
+                        { new: true }
+                    );
 
-    s3.upload(putParams, undefined, async (err, data) => {
-        if (err) {
-            ok = false;
-            console.log(err);
-        } else {
-            await User.updateOne(
-                { _id: req.body.userId },
-                {
-                    $set: {
-                        avatarImage: data.Location,
-                    },
-                },
-                { new: true }
-            );
+                    fs.unlink(source, () => {});
+                    fs.rm(source, () => {});
 
-            fs.unlink(source, () => {});
-            fs.rm(source, () => {});
-
-            Location = data.Location;
-            ok = true;
+                    resolve({
+                        ok: true,
+                        Location: data.Location,
+                    });
+                }
+            });
         }
-    });
+    );
 
-    return {
-        ok,
-        Location,
-    };
+    const result = await resultPromise;
+
+    return result;
 };
