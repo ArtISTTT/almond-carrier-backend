@@ -17,7 +17,13 @@ export const completeOrder = async (req: Request, res: Response) => {
     const order = await Order.findOneAndUpdate(
         {
             $and: [
-                { _id: new mongoose.Types.ObjectId(req.body.orderId) },
+                {
+                    _id: {
+                        $eq: new mongoose.Types.ObjectId(
+                            req.body.orderId as string
+                        ),
+                    },
+                },
                 { completionCode: req.body.completionCode },
             ],
         },
