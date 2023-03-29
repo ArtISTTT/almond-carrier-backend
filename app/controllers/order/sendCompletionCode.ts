@@ -12,7 +12,7 @@ export const sendCompletionCode = async (req: Request, res: Response) => {
 
     const order = await Order.findByIdAndUpdate(
         {
-            $and: [{ _id: req.body.orderId }],
+            _id: req.body.orderId,
         },
         {
             $set: {

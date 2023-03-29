@@ -9,7 +9,7 @@ const getRandomNumberAsString = (): string => {
 export const generateRandomCodeAsString = (digitsNumber: number) => {
     let result = '';
 
-    for (let i = 0; i <= digitsNumber; i++) {
+    for (let i = 0; i < digitsNumber; i++) {
         result += getRandomNumberAsString();
     }
 
