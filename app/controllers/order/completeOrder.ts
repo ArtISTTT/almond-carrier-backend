@@ -15,10 +15,12 @@ export const completeOrder = async (req: Request, res: Response) => {
 
     const order = await Order.findByIdAndUpdate(
         {
-            $and: [
-                { _id: req.body.orderId },
-                { completionCode: req.body.completionCode },
-            ],
+            $match: {
+                $and: [
+                    { _id: req.body.orderId },
+                    { completionCode: req.body.completionCode },
+                ],
+            },
         },
         {
             $set: {
