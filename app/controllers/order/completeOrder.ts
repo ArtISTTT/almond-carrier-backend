@@ -13,14 +13,12 @@ export const completeOrder = async (req: Request, res: Response) => {
         return res.status(404).send({ message: 'Status not found' });
     }
 
-    const order = await Order.findByIdAndUpdate(
+    const order = await Order.findOneAndUpdate(
         {
-            $match: {
-                $and: [
-                    { _id: req.body.orderId },
-                    { completionCode: req.body.completionCode },
-                ],
-            },
+            $and: [
+                { _id: req.body.orderId },
+                { completionCode: req.body.completionCode },
+            ],
         },
         {
             $set: {
