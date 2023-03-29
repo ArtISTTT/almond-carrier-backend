@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import db from '../../models';
 
 const Order = db.order;
@@ -16,7 +17,7 @@ export const completeOrder = async (req: Request, res: Response) => {
     const order = await Order.findOneAndUpdate(
         {
             $and: [
-                { _id: req.body.orderId },
+                { _id: new mongoose.Types.ObjectId(req.body.orderId) },
                 { completionCode: req.body.completionCode },
             ],
         },
