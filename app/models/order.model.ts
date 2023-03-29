@@ -113,6 +113,10 @@ export const OrderModel = mongoose.model(
                 type: Boolean,
                 required: false,
             },
+            completionCode: {
+                type: String,
+                required: false,
+            },
             payoutInfo: {
                 isPayedOut: {
                     type: Boolean,

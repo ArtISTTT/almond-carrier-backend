@@ -14,7 +14,12 @@ export const completeOrder = async (req: Request, res: Response) => {
     }
 
     const order = await Order.findByIdAndUpdate(
-        { _id: req.body.orderId },
+        {
+            $and: [
+                { _id: req.body.orderId },
+                { completionCode: req.body.completionCode },
+            ],
+        },
         {
             $set: {
                 statusId: status._id,
@@ -25,7 +30,7 @@ export const completeOrder = async (req: Request, res: Response) => {
     );
 
     if (!order) {
-        return res.status(404).send({ message: 'Order not found!' });
+        return res.status(404).send({ message: 'incorrectCompletionCode' });
     }
 
     global.io.sockets.in(req.body.orderId).emit('new-status');

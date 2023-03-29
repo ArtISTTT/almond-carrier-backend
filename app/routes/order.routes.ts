@@ -23,6 +23,7 @@ import {
 import { upload } from '../aws-s3';
 import { approvePurchase } from '../controllers/order/approvePurchase';
 import { confirmPurchase } from '../controllers/order/confirmPurchase';
+import { sendCompletionCode } from '../controllers/order/sendCompletionCode';
 import { getGoogleLozalizedName } from '../helpers/getLocalizedPlace';
 import middlewares from '../middlewares';
 
@@ -147,6 +148,12 @@ export default (app: Express) => {
         '/api/order/approve-purchase',
         [middlewares.authJwt.verifyToken],
         approvePurchase
+    );
+
+    app.post(
+        '/api/order/send-completion-code',
+        [middlewares.authJwt.verifyToken],
+        sendCompletionCode
     );
 
     app.get('/api/get-payouts', [middlewares.authJwt.verifyToken], getPayouts);
