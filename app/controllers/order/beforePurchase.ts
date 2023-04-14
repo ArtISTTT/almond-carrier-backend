@@ -55,12 +55,7 @@ export const beforePurchase = async (req: Request, res: Response) => {
             { _id: req.body.orderId },
             {
                 $set: {
-                    beforePurchaseItemFiles: {
-                        $concatArrays: [
-                            '$beforePurchaseItemFiles',
-                            uploadedFiles,
-                        ],
-                    },
+                    beforePurchaseItemFiles: uploadedFiles,
                     statusId: status._id,
                 },
             },
