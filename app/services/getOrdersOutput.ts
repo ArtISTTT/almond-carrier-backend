@@ -18,6 +18,7 @@ export const getOrdersOutput = (
                       dealConfirmedByReceiver: order.dealConfirmedByReceiver,
                       payoutInfo: order.payoutInfo,
                       purchaseItemFiles: order.purchaseItemFiles,
+                      beforePurchaseItemFiles: order.beforePurchaseItemFiles,
                       totalPaymentAmount:
                           order.payment.rewardAmount !== undefined &&
                           order.payment.productAmount !== undefined
