@@ -21,8 +21,11 @@ import {
 } from '../controllers/order.controller';
 
 import { upload } from '../aws-s3';
+import { approveBeforePurchase } from '../controllers/order/approveBeforePurchase';
 import { approvePurchase } from '../controllers/order/approvePurchase';
+import { beforePurchase } from '../controllers/order/beforePurchase';
 import { confirmPurchase } from '../controllers/order/confirmPurchase';
+import { rejectBeforePurchase } from '../controllers/order/rejectBeforePurchas';
 import { sendCompletionCode } from '../controllers/order/sendCompletionCode';
 import { getGoogleLozalizedName } from '../helpers/getLocalizedPlace';
 import middlewares from '../middlewares';
@@ -136,6 +139,24 @@ export default (app: Express) => {
         '/api/order/decline-order',
         [middlewares.authJwt.verifyToken],
         declineOrder
+    );
+
+    app.post(
+        '/api/order/before-purchase',
+        [upload.array('file'), middlewares.authJwt.verifyToken],
+        beforePurchase
+    );
+
+    app.post(
+        '/api/order/approve-before-purchase',
+        [middlewares.authJwt.verifyToken],
+        approveBeforePurchase
+    );
+
+    app.post(
+        '/api/order/reject-before-purchase',
+        [middlewares.authJwt.verifyToken],
+        rejectBeforePurchase
     );
 
     app.post(

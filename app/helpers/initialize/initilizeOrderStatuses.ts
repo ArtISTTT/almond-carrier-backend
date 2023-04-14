@@ -45,6 +45,22 @@ export const initializeOrderStatuses = () => {
                 name: 'waitingForPaymentVerification',
             }).save(handleSave('waitingForPaymentVerification'));
 
+            // процесс загрузки фото товаров перед покупкой
+            new Status({
+                // перед покупкой перевозчик загружает фото и файлы
+                name: 'awaitingBeforePurchaseItemsFiles',
+            }).save(handleSave('awaitingBeforePurchaseItemsFiles'));
+
+            // процесс проверки товара перед покупкой
+            new Status({
+                // перед покупкой получатель проверяет фото
+                name: 'awaitingRecieverItemBeforePurchasePhotosConfirmation',
+            }).save(
+                handleSave(
+                    'awaitingRecieverItemBeforePurchasePhotosConfirmation'
+                )
+            );
+
             // процесс покупки
             new Status({
                 // После подтверждения оплаты начинается процесс покупки продавцом в магазине

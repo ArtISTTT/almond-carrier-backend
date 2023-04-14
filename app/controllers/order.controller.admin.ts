@@ -20,7 +20,7 @@ export const isConfirmPaymentByAdminAccessible = async (record: BaseRecord) => {
 
 export const confirmPaymentByAdmin = async (record: BaseRecord) => {
     const status = await OrderStatus.findOne({
-        name: 'awaitingPurchase',
+        name: 'awaitingBeforePurchaseItemsFiles',
     });
 
     if (!status) {

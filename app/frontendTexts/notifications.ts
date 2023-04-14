@@ -12,4 +12,7 @@ export const notificationText = {
     purchaseReviewed: 'purchaseReviewed',
     newReview: 'newReview',
     dealConfirmedByPartner: 'dealConfirmedByPartner',
+    beforePurchaseFilesUploaded: 'beforePurchaseFilesUploaded',
+    beforePurchaseReviewed: 'beforePurchaseReviewed',
+    beforePurchaseRejected: 'beforePurchaseRejected',
 };

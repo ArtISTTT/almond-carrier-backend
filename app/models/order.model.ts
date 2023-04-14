@@ -135,6 +135,16 @@ export const OrderModel = mongoose.model(
                 type: Array,
                 required: false,
             },
+            beforePurchaseItemFiles: {
+                type: Array,
+                required: false,
+                default: [],
+            },
+            onCompleteItemFiles: {
+                type: Array,
+                required: false,
+                default: [],
+            },
         },
         {
             timestamps: true,
