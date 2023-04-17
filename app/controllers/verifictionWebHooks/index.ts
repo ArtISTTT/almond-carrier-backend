@@ -6,15 +6,17 @@ const User = db.user;
 export const verificationWebHook = async (req: Request, res: Response) => {
     const verificationResult = req.body;
 
+    console.log(verificationResult);
+
     const user = await User.findByIdAndUpdate(
         { _id: verificationResult.reference },
         {
             $set: {
                 idVerification: {
                     ...verificationResult,
-                    isVerificated:
-                        verificationResult.result.face_match === 'pass' &&
-                        verificationResult.result.data_match === 'pass',
+                    // isVerificated:
+                    //     verificationResult.result.face_match === 'pass' &&
+                    //     verificationResult.result.data_match === 'pass',
                 },
             },
         },
