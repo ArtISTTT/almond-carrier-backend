@@ -8,8 +8,8 @@ export const verificationWebHook = async (req: Request, res: Response) => {
 
     console.log(verificationResult);
 
-    const user = await User.findByIdAndUpdate(
-        { _id: verificationResult.reference },
+    const user = await User.findOneAndUpdate(
+        { email: verificationResult.email },
         {
             $set: {
                 idVerification: {
