@@ -14,9 +14,8 @@ export const verificationWebHook = async (req: Request, res: Response) => {
             $set: {
                 idVerification: {
                     ...verificationResult,
-                    // isVerificated:
-                    //     verificationResult.result.face_match === 'pass' &&
-                    //     verificationResult.result.data_match === 'pass',
+                    isVerificated:
+                        verificationResult.event === 'verification.accepted',
                 },
             },
         },
