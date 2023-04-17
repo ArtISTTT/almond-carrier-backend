@@ -466,6 +466,7 @@ export const userBoard = async (req: Request, res: Response) => {
         avatar: user.avatarImage,
         completedOrders: user.successOrders.length,
         rating: rating?.averageRating,
+        idVerificationCompleted: user.idVerification.isVerificated,
     });
 };
 
