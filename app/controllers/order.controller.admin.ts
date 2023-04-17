@@ -80,3 +80,13 @@ export const confirmPayoutByAdmin = async (record: BaseRecord) => {
         notificationType: NotificationType.orderUpdate,
     });
 };
+
+export const confirmVerificationByAdmin = async (record: BaseRecord) => {
+    await record.update({
+        idVerification: {
+            isVerificated: true,
+        },
+    });
+
+    await record.save();
+};

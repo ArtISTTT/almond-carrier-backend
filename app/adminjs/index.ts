@@ -4,6 +4,7 @@ import AdminJS, { ActionContext, ActionRequest, ActionResponse } from 'adminjs';
 import {
     confirmPaymentByAdmin,
     confirmPayoutByAdmin,
+    confirmVerificationByAdmin,
 } from '../controllers/order.controller.admin';
 import db from '../models';
 
@@ -78,7 +79,34 @@ export const getAdminJs = () => {
                     },
                 },
             },
-            { resource: user },
+            {
+                resource: user,
+                options: {
+                    actions: {
+                        verificate: {
+                            actionType: 'record',
+                            component: false,
+                            guard: 'doYouWantToVerificate?',
+                            handler: (
+                                request: ActionRequest,
+                                response: ActionResponse,
+                                context: ActionContext
+                            ) => {
+                                const { record, currentAdmin } = context;
+
+                                if (record) {
+                                    confirmVerificationByAdmin(record);
+                                }
+
+                                return {
+                                    record: record?.toJSON(currentAdmin),
+                                    msg: 'Confirmed verification',
+                                };
+                            },
+                        },
+                    },
+                },
+            },
             { resource: orderStatus },
             { resource: payment },
             { resource: review },

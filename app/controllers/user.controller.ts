@@ -353,7 +353,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
         verifiedByEmail: user.verificated,
         verifiedByPhone: false,
         fromLocation: 'Moscow',
-        idVerification: user.idVerification,
+        idVerificationCompleted: user.idVerification.isVerificated,
     });
 };
 
