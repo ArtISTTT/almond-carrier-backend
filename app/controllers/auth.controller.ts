@@ -1,16 +1,16 @@
-import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import db from '../models';
+import mongoose from 'mongoose';
 import authConfig from '../config/auth.config';
-import crypto from 'crypto';
+import { generateRandomCodeAsString } from '../helpers/initialize/generateRandomCode';
 import {
     sendRecoverPasswordEmail,
     sendRecoverPasswordSuccessfullyEmail,
 } from '../mailService/recoverPassword';
-import { generateRandomCodeAsString } from '../helpers/initialize/generateRandomCode';
 import { sendVerification } from '../mailService/verificationCode';
+import db from '../models';
 
 const User = db.user;
 const Role = db.role;

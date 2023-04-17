@@ -17,6 +17,7 @@ import notificationRoutes from './app/routes/notification.routes';
 import orderRoutes from './app/routes/order.routes';
 import reviewRoutes from './app/routes/review.routes';
 import userRoutes from './app/routes/user.routes';
+import verificationWebHooksRouter from './app/routes/verificationWebHook.routes';
 import WebSockets from './app/socketio/index';
 
 dotenv.config();
@@ -93,6 +94,7 @@ chatRoutes(app);
 orderRoutes(app);
 reviewRoutes(app);
 notificationRoutes(app);
+verificationWebHooksRouter(app);
 
 const start = async () => {
     await db.mongoose

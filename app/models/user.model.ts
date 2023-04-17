@@ -50,6 +50,13 @@ export const UserModel = mongoose.model(
                 required: true,
                 default: false,
             },
+            idVerification: {
+                type: Object,
+                required: true,
+                default: {
+                    isVerificated: false,
+                },
+            },
         },
         {
             timestamps: true,
