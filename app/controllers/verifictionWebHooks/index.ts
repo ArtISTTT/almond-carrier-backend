@@ -9,7 +9,7 @@ export const verificationWebHook = async (req: Request, res: Response) => {
     console.log(verificationResult);
 
     const user = await User.findOneAndUpdate(
-        { _id: verificationResult.email },
+        { email: verificationResult.email },
         {
             $set: {
                 idVerification: {
