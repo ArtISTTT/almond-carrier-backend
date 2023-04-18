@@ -52,7 +52,7 @@ export const UserModel = mongoose.model(
             },
             idVerification: {
                 type: Object,
-                required: true,
+                required: false,
                 default: {
                     isVerificated: false,
                 },
