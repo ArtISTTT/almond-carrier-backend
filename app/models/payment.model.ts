@@ -37,6 +37,10 @@ export const PaymentModel = mongoose.model(
                 type: String,
                 require: true,
             },
+            paymentOrderId: {
+                type: String,
+                required: false,
+            },
         },
         {
             timestamps: true,

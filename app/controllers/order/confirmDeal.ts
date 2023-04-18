@@ -1,13 +1,16 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { notificationText } from '../../frontendTexts/notifications';
+import { getOrderPaymentSum } from '../../helpers/getOrderPaymentSum';
 import db from '../../models';
+import { createOrderForPayment } from '../../payment/createOrder';
 import {
     addNewNotification,
     NotificationType,
 } from './../notification.controller';
 
 const Order = db.order;
+const Payment = db.payment;
 const OrderStatus = db.orderStatus;
 
 export const confirmDeal = async (req: Request, res: Response) => {
@@ -29,12 +32,31 @@ export const confirmDeal = async (req: Request, res: Response) => {
 
     if (order.dealConfirmedByCarrier && order.dealConfirmedByReceiver) {
         const status = await OrderStatus.findOne({ name: 'waitingForPayment' });
+        const payment = await Payment.findById(order.paymentId);
 
-        if (!status) {
-            return res.status(404).send({ message: 'Status not found!' });
+        if (!status || !payment) {
+            return res
+                .status(404)
+                .send({ message: 'Status/Payment not found!' });
         }
 
         order.statusId = status._id;
+
+        // creating payment order
+
+        const orderAmount = getOrderPaymentSum({
+            rewardAmount: payment.rewardAmount as number,
+            productAmount: payment.productAmount as number,
+            paymentCPComission: payment.paymentCPComission,
+            dueCPComission: payment.dueCPComission,
+            ourDueComission: payment.ourDueComission,
+        });
+
+        const paymentOrderId = await createOrderForPayment({
+            amount: orderAmount,
+            orderId: req.body.orderId,
+            productName: order.productName,
+        });
     }
 
     await order.save();

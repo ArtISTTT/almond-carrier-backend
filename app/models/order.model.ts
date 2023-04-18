@@ -4,11 +4,11 @@ const polygonSchema = new mongoose.Schema({
     type: {
         type: String,
         enum: ['Polygon'],
-        required: true,
+        required: false,
     },
     coordinates: {
         type: [[[Number]]],
-        required: true,
+        required: false,
     },
 });
 
