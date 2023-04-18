@@ -54,7 +54,7 @@ export const confirmDeal = async (req: Request, res: Response) => {
 
         const paymentOrderId = await createOrderForPayment({
             amount: orderAmount,
-            orderId: req.body.orderId,
+            orderId: req.body.orderId as string,
             productName: order.productName,
         });
     }
