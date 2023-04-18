@@ -34,7 +34,7 @@ export const createOrderForPayment = async ({
         sector,
         reference: orderId,
         amount,
-        currency: 643,
+        currency,
         description: productName,
         signature,
     });
@@ -50,17 +50,18 @@ export const createOrderForPayment = async ({
     try {
         const data = await instance.post(
             'webapi/Register',
-            {},
-            {
-                params: {
-                    sector,
-                    reference: orderId,
-                    amount,
-                    currency,
-                    description: productName,
-                    signature,
-                },
-            }
+            info
+            // {},
+            // {
+            //     params: {
+            //         sector,
+            //         reference: orderId,
+            //         amount,
+            //         currency,
+            //         description: productName,
+            //         signature,
+            //     },
+            // }
         );
 
         console.log(data.data);
