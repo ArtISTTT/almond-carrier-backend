@@ -48,23 +48,25 @@ export const createOrderForPayment = async ({
     info.append('signature', signature);
 
     try {
-        const data = await instance.post(
-            'webapi/Register',
-            info
-            // {},
-            // {
-            //     params: {
-            //         sector,
-            //         reference: orderId,
-            //         amount,
-            //         currency,
-            //         description: productName,
-            //         signature,
-            //     },
-            // }
+        const data = await axios.post(
+            process.env.PAYGINE_URI + 'webapi/Register',
+            undefined,
+            {
+                params: {
+                    signature,
+                    sector,
+                    amount,
+                    reference: orderId,
+                    currency,
+                    description: productName,
+                },
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            }
         );
 
-        console.log(data.data);
+        console.log(data);
     } catch (e) {
         console.log(e);
     }
