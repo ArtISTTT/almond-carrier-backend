@@ -13,13 +13,13 @@ const Order = db.order;
 
 export const paymentWebHook = async (req: Request, res: Response) => {
     const data = req.body;
-    console.log(req.body, '--', data.order_state[0]);
+    console.log(req.body, '--', data.state[0]);
 
     if (data) {
         return res.status(200).send();
     }
 
-    if (data.order_state[0] === 'AUTHORIZED' && data.state[0] === 'APPROVED') {
+    if (data.state[0] === 'APPROVED') {
         await Payment.findOneAndUpdate(
             {
                 paymentOrderId: data.order_id[0],
@@ -60,14 +60,14 @@ export const paymentWebHook = async (req: Request, res: Response) => {
         await addNewNotification({
             text: notificationText.paymentSuccess,
             orderId: data.reference[0],
-            userForId: order.recieverId.toString(),
+            userForId: order.recieverId?.toString(),
             notificationType: NotificationType.orderUpdate,
         });
 
         await addNewNotification({
             text: notificationText.paymentSuccess,
             orderId: data.reference[0],
-            userForId: order.carrierId.toString(),
+            userForId: order.carrierId?.toString(),
             notificationType: NotificationType.orderUpdate,
         });
     }
