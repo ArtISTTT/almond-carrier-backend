@@ -25,5 +25,5 @@ export const verificationWebHook = async (req: Request, res: Response) => {
         { new: true }
     );
 
-    return;
+    return res.status(200).send();
 };
