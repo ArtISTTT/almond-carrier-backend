@@ -70,6 +70,8 @@ export const confirmDeal = async (req: Request, res: Response) => {
         if (paymentOrderId) {
             payment.paymentOrderId = paymentOrderId;
         }
+
+        await payment.save();
     }
 
     await order.save();
