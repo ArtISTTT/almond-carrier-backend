@@ -13,8 +13,8 @@ const OrderStatus = db.orderStatus;
 const Order = db.order;
 
 export const paymentWebHook = async (req: Request, res: Response) => {
-    const data = req.body;
-    console.log(req.body, '--');
+    const data = req.body.operation;
+    console.log(req.body.operation, '--');
 
     if (data) {
         return res.status(200).send();
