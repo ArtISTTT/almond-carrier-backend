@@ -19,6 +19,7 @@ export const getOrdersOutput = (
                       payoutInfo: order.payoutInfo,
                       purchaseItemFiles: order.purchaseItemFiles,
                       beforePurchaseItemFiles: order.beforePurchaseItemFiles,
+                      paymentOrderId: order.payment.paymentOrderId,
                       totalPaymentAmount:
                           order.payment.rewardAmount !== undefined &&
                           order.payment.productAmount !== undefined
