@@ -40,12 +40,12 @@ export const createOrderForPayment = async ({
                 params: {
                     signature,
                     sector,
-                    amount,
+                    amount: amount * 100,
                     reference: orderId,
                     currency,
                     description: productName,
                     mode: 1,
-                    fee,
+                    fee: fee * 100,
                 },
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
