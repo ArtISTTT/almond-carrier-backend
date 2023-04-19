@@ -14,7 +14,7 @@ const Order = db.order;
 
 export const paymentWebHook = async (req: Request, res: Response) => {
     const data = req.body;
-    console.log(req.body, '--', data.state[0]);
+    console.log(req.body, '--');
 
     if (data) {
         return res.status(200).send();
