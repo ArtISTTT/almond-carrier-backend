@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import { XMLParser } from 'fast-xml-parser';
+import mongoose from 'mongoose';
 import { notificationText } from '../../frontendTexts/notifications';
 import db from '../../models';
 import {
@@ -60,14 +61,14 @@ export const paymentWebHook = async (req: Request, res: Response) => {
         await addNewNotification({
             text: notificationText.paymentSuccess,
             orderId: data.reference[0],
-            userForId: order.recieverId?.toString(),
+            userForId: (order.recieverId as mongoose.Types.ObjectId).toString(),
             notificationType: NotificationType.orderUpdate,
         });
 
         await addNewNotification({
             text: notificationText.paymentSuccess,
             orderId: data.reference[0],
-            userForId: order.carrierId?.toString(),
+            userForId: (order.carrierId as mongoose.Types.ObjectId).toString(),
             notificationType: NotificationType.orderUpdate,
         });
     }

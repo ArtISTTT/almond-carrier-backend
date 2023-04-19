@@ -353,7 +353,7 @@ export const getUserProfile = async (req: Request, res: Response) => {
         verifiedByEmail: user.verificated,
         verifiedByPhone: false,
         fromLocation: 'Moscow',
-        idVerificationCompleted: user.idVerification.isVerificated,
+        idVerificationCompleted: user.idVerification?.isVerificated,
     });
 };
 
@@ -466,7 +466,7 @@ export const userBoard = async (req: Request, res: Response) => {
         avatar: user.avatarImage,
         completedOrders: user.successOrders.length,
         rating: rating?.averageRating,
-        idVerificationCompleted: user.idVerification.isVerificated,
+        idVerificationCompleted: user.idVerification?.isVerificated,
     });
 };
 
