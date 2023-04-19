@@ -1,6 +1,11 @@
 import { Request, Response } from 'express';
 import { XMLParser } from 'fast-xml-parser';
+import { notificationText } from '../../frontendTexts/notifications';
 import db from '../../models';
+import {
+    addNewNotification,
+    NotificationType,
+} from '../notification.controller';
 
 const Payment = db.payment;
 const OrderStatus = db.orderStatus;
@@ -36,7 +41,7 @@ export const paymentWebHook = async (req: Request, res: Response) => {
             return res.status(200).send();
         }
 
-        await Order.findByIdAndUpdate(
+        const order = await Order.findByIdAndUpdate(
             { _id: data.reference[0] },
             {
                 $set: {
@@ -45,6 +50,26 @@ export const paymentWebHook = async (req: Request, res: Response) => {
             },
             { new: true, lean: true }
         );
+
+        if (!order) {
+            return res.status(200).send();
+        }
+
+        global.io.sockets.in(data.reference[0]).emit('new-status');
+
+        await addNewNotification({
+            text: notificationText.paymentSuccess,
+            orderId: data.reference[0],
+            userForId: order.recieverId.toString(),
+            notificationType: NotificationType.orderUpdate,
+        });
+
+        await addNewNotification({
+            text: notificationText.paymentSuccess,
+            orderId: data.reference[0],
+            userForId: order.carrierId.toString(),
+            notificationType: NotificationType.orderUpdate,
+        });
     }
 
     return res.status(200).send();
