@@ -23,10 +23,12 @@ export const createOrderForPayment = async ({
     productName,
 }: ICreateOrderForPayment): Promise<string | undefined> => {
     const currency = 643;
+    const resAmount = amount * 100;
+    const resFee = fee * 100;
     const sector = process.env.PAYGINE_SECTOR_ID as string;
     const password = process.env.PAYGINE_PASSWORD as string;
     const signatureString =
-        sector + amount.toString() + currency.toString() + password;
+        sector + resAmount.toString() + currency.toString() + password;
     const md5String = md5(signatureString, {
         encoding: 'UTF-8',
     });
@@ -40,12 +42,12 @@ export const createOrderForPayment = async ({
                 params: {
                     signature,
                     sector,
-                    amount: amount * 100,
+                    amount: resAmount,
                     reference: orderId,
                     currency,
                     description: productName,
                     mode: 1,
-                    fee: fee * 100,
+                    fee: resFee,
                 },
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
