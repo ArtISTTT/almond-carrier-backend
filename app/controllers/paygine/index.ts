@@ -9,50 +9,52 @@ const Order = db.order;
 export const paymentWebHook = async (req: Request, res: Response) => {
     const parser = new XMLParser();
 
-    const data = parser.parse(req.body).operation;
+    console.log(req.body, req);
 
-    console.log(req.body, data);
+    // const data = parser.parse(req.body).operation;
 
-    if (!data) {
-        return res.status(200).send();
-    }
+    // console.log(req.body, data);
 
-    if (
-        data.order_state === 'COMPLETED' &&
-        data.state === 'APPROVED' &&
-        data.type === 'SDPayInDebit'
-    ) {
-        await Payment.findOneAndUpdate(
-            {
-                paymentOrderId: data.order_id,
-            },
-            {
-                $set: {
-                    isPayed: true,
-                    paymentDate: new Date(data.date),
-                },
-            },
-            { new: true, lean: true }
-        );
+    // if (!data) {
+    //     return res.status(200).send();
+    // }
 
-        const status = await OrderStatus.findOne({
-            name: 'awaitingBeforePurchaseItemsFiles',
-        });
+    // if (
+    //     data.order_state === 'COMPLETED' &&
+    //     data.state === 'APPROVED' &&
+    //     data.type === 'SDPayInDebit'
+    // ) {
+    //     await Payment.findOneAndUpdate(
+    //         {
+    //             paymentOrderId: data.order_id,
+    //         },
+    //         {
+    //             $set: {
+    //                 isPayed: true,
+    //                 paymentDate: new Date(data.date),
+    //             },
+    //         },
+    //         { new: true, lean: true }
+    //     );
 
-        if (!status) {
-            return res.status(200).send();
-        }
+    //     const status = await OrderStatus.findOne({
+    //         name: 'awaitingBeforePurchaseItemsFiles',
+    //     });
 
-        await Order.findByIdAndUpdate(
-            { _id: data.reference },
-            {
-                $set: {
-                    statusId: status._id,
-                },
-            },
-            { new: true, lean: true }
-        );
-    }
+    //     if (!status) {
+    //         return res.status(200).send();
+    //     }
+
+    //     await Order.findByIdAndUpdate(
+    //         { _id: data.reference },
+    //         {
+    //             $set: {
+    //                 statusId: status._id,
+    //             },
+    //         },
+    //         { new: true, lean: true }
+    //     );
+    // }
 
     return res.status(200).send();
 };
