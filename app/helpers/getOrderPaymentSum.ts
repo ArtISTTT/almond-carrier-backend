@@ -11,10 +11,10 @@ export const getOrderPaymentSum = ({
     paymentPaySystemComission: number; // 0.035
     ourPaymentComission: number; // 0.05
 }) => {
-    return (
+    return Math.ceil(
         (productAmount + rewardAmount) *
-        (1 + paymentPaySystemComission) *
-        (1 + ourPaymentComission)
+            (1 + paymentPaySystemComission) *
+            (1 + ourPaymentComission)
     );
 };
 
@@ -29,15 +29,15 @@ export const getFee = ({
     paymentPaySystemComission: number; // 0.035
     ourPaymentComission: number; // 0.05
 }) => {
-    return (
+    return Math.ceil(
         getOrderPaymentSum({
             productAmount,
             rewardAmount,
             paymentPaySystemComission,
             ourPaymentComission,
         }) -
-        productAmount -
-        rewardAmount
+            productAmount -
+            rewardAmount
     );
 };
 
@@ -47,7 +47,7 @@ export const getPureSummary = ({
 }: {
     productAmount: number;
     rewardAmount: number;
-}) => productAmount + rewardAmount;
+}) => Math.ceil(productAmount + rewardAmount);
 
 // export const getOrderPaymentSum = (info: {
 //     productAmount: number;
