@@ -6,10 +6,13 @@ const User = db.user;
 export const verificationWebHook = async (req: Request, res: Response) => {
     const verificationResult = req.body;
 
-    console.log(verificationResult);
-
-    const user = await User.findOneAndUpdate(
-        { email: verificationResult.email },
+    await User.findOneAndUpdate(
+        {
+            email: verificationResult.email,
+            idVerification: {
+                isVerificated: false,
+            },
+        },
         {
             $set: {
                 idVerification: {
@@ -21,12 +24,6 @@ export const verificationWebHook = async (req: Request, res: Response) => {
         },
         { new: true }
     );
-
-    if (!user) {
-        return res.status(404).send({
-            ok: false,
-        });
-    }
 
     return;
 };
