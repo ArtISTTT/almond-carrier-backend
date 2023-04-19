@@ -12,15 +12,11 @@ export const PaymentModel = mongoose.model(
                 type: Number,
                 require: false,
             },
-            paymentCPComission: {
+            paymentPaySystemComission: {
                 type: Number,
                 required: true,
             },
-            dueCPComission: {
-                type: Number,
-                required: true,
-            },
-            ourDueComission: {
+            ourPaymentComission: {
                 type: Number,
                 required: true,
             },

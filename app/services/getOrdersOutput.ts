@@ -25,12 +25,10 @@ export const getOrdersOutput = (
                               ? getOrderPaymentSum({
                                     rewardAmount: order.payment.rewardAmount,
                                     productAmount: order.payment.productAmount,
-                                    paymentCPComission:
-                                        order.payment.paymentCPComission,
-                                    dueCPComission:
-                                        order.payment.dueCPComission,
-                                    ourDueComission:
-                                        order.payment.ourDueComission,
+                                    paymentPaySystemComission:
+                                        order.payment.paymentPaySystemComission,
+                                    ourPaymentComission:
+                                        order.payment.ourPaymentComission,
                                 })
                               : undefined,
                   }

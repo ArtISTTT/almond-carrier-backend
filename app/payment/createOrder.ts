@@ -13,13 +13,15 @@ type ICreateOrderForPayment = {
     amount: number;
     orderId: string;
     productName: string;
+    fee: number;
 };
 
 export const createOrderForPayment = async ({
     amount,
+    fee,
     orderId,
     productName,
-}: ICreateOrderForPayment) => {
+}: ICreateOrderForPayment): Promise<string | undefined> => {
     const currency = 643;
     const sector = process.env.PAYGINE_SECTOR_ID as string;
     const password = process.env.PAYGINE_PASSWORD as string;
@@ -29,23 +31,6 @@ export const createOrderForPayment = async ({
         encoding: 'UTF-8',
     });
     const signature = Buffer.from(md5String).toString('base64');
-
-    console.log({
-        sector,
-        reference: orderId,
-        amount,
-        currency,
-        description: productName,
-        signature,
-    });
-
-    const info = new URLSearchParams();
-    info.append('sector', sector);
-    info.append('reference', orderId);
-    info.append('amount', amount.toString());
-    info.append('currency', currency.toString());
-    info.append('description', productName);
-    info.append('signature', signature);
 
     try {
         const data = await axios.post(
@@ -59,6 +44,8 @@ export const createOrderForPayment = async ({
                     reference: orderId,
                     currency,
                     description: productName,
+                    mode: 1,
+                    fee,
                 },
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded',
@@ -66,7 +53,7 @@ export const createOrderForPayment = async ({
             }
         );
 
-        console.log(data);
+        return data.data;
     } catch (e) {
         console.log(e);
     }

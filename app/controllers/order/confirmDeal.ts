@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { notificationText } from '../../frontendTexts/notifications';
-import { getOrderPaymentSum } from '../../helpers/getOrderPaymentSum';
+import {
+    getFee,
+    getOrderPaymentSum,
+    getPureSummary,
+} from '../../helpers/getOrderPaymentSum';
 import db from '../../models';
 import { createOrderForPayment } from '../../payment/createOrder';
 import {
@@ -44,19 +48,28 @@ export const confirmDeal = async (req: Request, res: Response) => {
 
         // creating payment order
 
-        const orderAmount = getOrderPaymentSum({
+        const fee = getFee({
             rewardAmount: payment.rewardAmount as number,
             productAmount: payment.productAmount as number,
-            paymentCPComission: payment.paymentCPComission,
-            dueCPComission: payment.dueCPComission,
-            ourDueComission: payment.ourDueComission,
+            paymentPaySystemComission: payment.paymentPaySystemComission,
+            ourPaymentComission: payment.ourPaymentComission,
+        });
+
+        const amount = getPureSummary({
+            rewardAmount: payment.rewardAmount as number,
+            productAmount: payment.productAmount as number,
         });
 
         const paymentOrderId = await createOrderForPayment({
-            amount: orderAmount,
+            amount: amount,
+            fee: fee,
             orderId: req.body.orderId as string,
             productName: order.productName as string,
         });
+
+        if (paymentOrderId) {
+            payment.paymentOrderId = paymentOrderId;
+        }
     }
 
     await order.save();

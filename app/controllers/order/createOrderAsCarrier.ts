@@ -41,9 +41,8 @@ export const createOrderAsCarrier = async (
     const payment = new Payment({
         rewardAmount: req.body.rewardAmount,
         currency: req.body.currency,
-        paymentCPComission: COMISSIONS.PAYMENT_CP_COMISSION,
-        dueCPComission: COMISSIONS.DUE_PAYOUT_CP_COMISSION,
-        ourDueComission: COMISSIONS.DUE_OUR_COMISSION,
+        paymentPaySystemComission: COMISSIONS.PAYMENT_CP_COMISSION,
+        ourPaymentComission: COMISSIONS.DUE_OUR_COMISSION,
     });
 
     payment.save(err => {
