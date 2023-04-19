@@ -16,7 +16,7 @@ export const paymentWebHook = async (req: Request, res: Response) => {
     const data = req.body.operation;
     console.log(req.body.operation, '--');
 
-    if (data) {
+    if (!data) {
         return res.status(200).send();
     }
 
