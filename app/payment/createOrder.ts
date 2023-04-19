@@ -23,7 +23,7 @@ export const createOrderForPayment = async ({
     productName,
 }: ICreateOrderForPayment): Promise<string | undefined> => {
     const currency = 643;
-    const resAmount = (amount + fee) * 100;
+    const resAmount = amount * 100;
     const resFee = fee * 100;
     const sector = process.env.PAYGINE_SECTOR_ID as string;
     const password = process.env.PAYGINE_PASSWORD as string;
