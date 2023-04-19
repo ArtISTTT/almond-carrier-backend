@@ -4,26 +4,26 @@ import db from '../../models';
 const User = db.user;
 
 export const verificationWebHook = async (req: Request, res: Response) => {
-    const verificationResult = req.body;
+    const verificationResult = req;
 
-    await User.findOneAndUpdate(
-        {
-            email: verificationResult.email,
-            idVerification: {
-                isVerificated: false,
-            },
-        },
-        {
-            $set: {
-                idVerification: {
-                    ...verificationResult,
-                    isVerificated:
-                        verificationResult.event === 'verification.accepted',
-                },
-            },
-        },
-        { new: true }
-    );
+    // await User.findOneAndUpdate(
+    //     {
+    //         email: verificationResult.email,
+    //         idVerification: {
+    //             isVerificated: false,
+    //         },
+    //     },
+    //     {
+    //         $set: {
+    //             idVerification: {
+    //                 ...verificationResult,
+    //                 isVerificated:
+    //                     verificationResult.event === 'verification.accepted',
+    //             },
+    //         },
+    //     },
+    //     { new: true }
+    // );
 
     return res.status(200).send();
 };
