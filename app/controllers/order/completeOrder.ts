@@ -45,7 +45,13 @@ export const completeOrder = async (req: Request, res: Response) => {
 
     const payment = await Payment.findById(order.paymentId);
 
-    if (!payment || !payment.productAmount || !payment.rewardAmount) {
+    if (
+        !payment ||
+        !payment.productAmount ||
+        !payment.rewardAmount ||
+        !payment.sdRef ||
+        !order.productName
+    ) {
         return res.status(404).send({ message: 'payoutError' });
     }
 
