@@ -37,6 +37,14 @@ export const PaymentModel = mongoose.model(
                 type: String,
                 required: false,
             },
+            payoutOrderId: {
+                type: String,
+                required: false,
+            },
+            paymentOperationId: {
+                type: String,
+                required: false,
+            },
             sdRef: {
                 type: String,
                 required: false,

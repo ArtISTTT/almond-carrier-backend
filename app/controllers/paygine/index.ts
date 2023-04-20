@@ -14,7 +14,7 @@ const Order = db.order;
 
 export const paymentWebHook = async (req: Request, res: Response) => {
     const data = req.body.operation;
-    console.log(req.body.operation, '--');
+    console.log('NEW PAY: ', req.body.operation);
 
     if (!data) {
         return res.status(200).send();
@@ -29,6 +29,7 @@ export const paymentWebHook = async (req: Request, res: Response) => {
                 $set: {
                     isPayed: true,
                     paymentDate: new Date(data.date[0]),
+                    paymentOperationId: data.id[0],
                 },
             },
             { new: true, lean: true }

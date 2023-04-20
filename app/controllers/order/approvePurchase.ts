@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { notificationText } from '../../frontendTexts/notifications';
 import db from '../../models';
+import { completeOrderForPayment } from '../../payment/createOrder';
 import {
     addNewNotification,
     NotificationType,
@@ -8,8 +9,30 @@ import {
 
 const Order = db.order;
 const OrderStatus = db.orderStatus;
+const Payment = db.payment;
 
 export const approvePurchase = async (req: Request, res: Response) => {
+    const order = await Order.findById(req.body.orderId);
+
+    if (!order) {
+        return res.status(404).send({ message: 'Order not found!' });
+    }
+
+    const payment = await Payment.findById(order.paymentId);
+
+    if (!payment || !payment.sdRef || !payment.paymentOperationId) {
+        return res.status(404).send({ message: 'paymentNotFound' });
+    }
+
+    const paymentCompleted = await completeOrderForPayment({
+        paymentOperationId: payment.paymentOperationId,
+        sdRef: payment.sdRef,
+    });
+
+    if (!paymentCompleted) {
+        return res.status(404).send({ message: 'couldNotCompletePayment' });
+    }
+
     const status = await OrderStatus.findOne({
         name: 'awaitingDelivery',
     });
@@ -18,19 +41,9 @@ export const approvePurchase = async (req: Request, res: Response) => {
         return res.status(404).send({ message: 'Status not found' });
     }
 
-    const order = await Order.findByIdAndUpdate(
-        { _id: req.body.orderId },
-        {
-            $set: {
-                statusId: status._id,
-            },
-        },
-        { new: true, lean: true }
-    );
+    order.statusId = status._id;
 
-    if (!order) {
-        return res.status(404).send({ message: 'Order not found!' });
-    }
+    await order.save();
 
     global.io.sockets.in(req.body.orderId).emit('new-status');
 
