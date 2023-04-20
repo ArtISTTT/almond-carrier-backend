@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { notificationText } from '../../frontendTexts/notifications';
@@ -68,6 +69,8 @@ export const confirmDeal = async (req: Request, res: Response) => {
         });
 
         if (paymentOrderId) {
+            const sdRef = randomUUID();
+            payment.sdRef = sdRef;
             payment.paymentOrderId = paymentOrderId;
         }
 
