@@ -20,7 +20,7 @@ export const paymentWebHook = async (req: Request, res: Response) => {
         return res.status(200).send();
     }
 
-    if (data.state[0] === 'APPROVED') {
+    if (data.order_state[0] === 'AUTHORIZED') {
         await Payment.findOneAndUpdate(
             {
                 paymentOrderId: data.order_id[0],
