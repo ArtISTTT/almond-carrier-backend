@@ -70,6 +70,7 @@ export const confirmDeal = async (req: Request, res: Response) => {
 
         if (paymentOrderId) {
             const sdRef = randomUUID();
+            console.log('sdref', sdRef);
             payment.sdRef = sdRef;
             payment.paymentOrderId = paymentOrderId;
         }
