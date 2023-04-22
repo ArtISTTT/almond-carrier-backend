@@ -599,6 +599,15 @@ export const updateAvatar = async (req: Request, res: Response) => {
             );
 
             if (result.ok && result.Location) {
+                await User.updateOne(
+                    { _id: req.body.userId },
+                    {
+                        $set: {
+                            avatarImage: result.Location,
+                        },
+                    },
+                    { new: true }
+                );
                 return res.status(200).send({
                     message: 'File saved',
                     avatar: result.Location,

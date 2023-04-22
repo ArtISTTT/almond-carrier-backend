@@ -34,16 +34,6 @@ export const uploadFile = async (
                         ok: false,
                     });
                 } else {
-                    await User.updateOne(
-                        { _id: req.body.userId },
-                        {
-                            $set: {
-                                avatarImage: data.Location,
-                            },
-                        },
-                        { new: true }
-                    );
-
                     fs.unlink(source, () => {});
                     fs.rm(source, () => {});
 
