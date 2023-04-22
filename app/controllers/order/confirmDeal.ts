@@ -68,7 +68,6 @@ export const confirmDeal = async (req: Request, res: Response) => {
             fee: fee,
             orderId: req.body.orderId as string,
             productName: order.productName as string,
-            sdRef,
         });
 
         if (paymentOrderId) {
