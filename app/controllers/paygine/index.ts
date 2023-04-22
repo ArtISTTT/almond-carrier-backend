@@ -20,9 +20,11 @@ export const paymentWebHook = async (req: Request, res: Response) => {
         return res.status(200).send();
     }
 
-    const paymentForPayStage = await Payment.findOneAndUpdate({
+    const paymentForPayStage = await Payment.findOne({
         paymentOrderId: data.order_id[0],
     });
+
+    console.log(paymentForPayStage);
 
     if (paymentForPayStage && data.order_state[0] === 'AUTHORIZED') {
         paymentForPayStage.update(
@@ -76,7 +78,7 @@ export const paymentWebHook = async (req: Request, res: Response) => {
             notificationType: NotificationType.orderUpdate,
         });
     } else {
-        const paymentForPayoutStage = await Payment.findOneAndUpdate({
+        const paymentForPayoutStage = await Payment.findOne({
             payoutOrderId: data.order_id[0],
         });
 
