@@ -49,6 +49,19 @@ export const PaymentModel = mongoose.model(
                 type: String,
                 required: false,
             },
+            isPayedOut: {
+                type: Boolean,
+                required: false,
+                default: false,
+            },
+            payOutDate: {
+                type: Date,
+                require: false,
+            },
+            payOutOperationId: {
+                type: String,
+                required: false,
+            },
         },
         {
             timestamps: true,

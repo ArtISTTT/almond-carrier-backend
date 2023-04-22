@@ -20,11 +20,12 @@ export const paymentWebHook = async (req: Request, res: Response) => {
         return res.status(200).send();
     }
 
-    if (data.order_state[0] === 'AUTHORIZED') {
-        await Payment.findOneAndUpdate(
-            {
-                paymentOrderId: data.order_id[0],
-            },
+    const paymentForPayStage = await Payment.findOneAndUpdate({
+        paymentOrderId: data.order_id[0],
+    });
+
+    if (paymentForPayStage && data.order_state[0] === 'AUTHORIZED') {
+        paymentForPayStage.update(
             {
                 $set: {
                     isPayed: true,
@@ -34,6 +35,8 @@ export const paymentWebHook = async (req: Request, res: Response) => {
             },
             { new: true, lean: true }
         );
+
+        await paymentForPayStage.save();
 
         const status = await OrderStatus.findOne({
             name: 'awaitingBeforePurchaseItemsFiles',
@@ -72,6 +75,58 @@ export const paymentWebHook = async (req: Request, res: Response) => {
             userForId: (order.carrierId as mongoose.Types.ObjectId).toString(),
             notificationType: NotificationType.orderUpdate,
         });
+    } else {
+        const paymentForPayoutStage = await Payment.findOneAndUpdate({
+            payoutOrderId: data.order_id[0],
+        });
+
+        if (paymentForPayoutStage && data.order_state[0] === 'COMPLETED') {
+            paymentForPayoutStage.update(
+                {
+                    $set: {
+                        isPayedOut: true,
+                        payOutDate: new Date(data.date[0]),
+                        payOutOperationId: data.id[0],
+                    },
+                },
+                { new: true, lean: true }
+            );
+
+            await paymentForPayoutStage.save();
+
+            const status = await OrderStatus.findOne({
+                name: 'success',
+            });
+
+            if (!status) {
+                return res.status(200).send();
+            }
+
+            const order = await Order.findByIdAndUpdate(
+                { _id: data.reference[0] },
+                {
+                    $set: {
+                        statusId: status._id,
+                    },
+                },
+                { new: true, lean: true }
+            );
+
+            if (!order) {
+                return res.status(200).send();
+            }
+
+            global.io.sockets.in(data.reference[0]).emit('new-status');
+
+            await addNewNotification({
+                text: notificationText.payoutSuccess,
+                orderId: data.reference[0],
+                userForId: (
+                    order.carrierId as mongoose.Types.ObjectId
+                ).toString(),
+                notificationType: NotificationType.orderUpdate,
+            });
+        }
     }
 
     return res.status(200).send();
