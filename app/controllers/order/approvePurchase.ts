@@ -27,6 +27,7 @@ export const approvePurchase = async (req: Request, res: Response) => {
     const paymentCompleted = await completeOrderForPayment({
         paymentOperationId: payment.paymentOperationId,
         sdRef: payment.sdRef,
+        paymentOrderId: payment.paymentOrderId,
     });
 
     if (!paymentCompleted) {

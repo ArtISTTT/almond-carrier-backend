@@ -64,15 +64,17 @@ export const createOrderForPayment = async ({
 type ICompleteOrderForPayment = {
     paymentOperationId: string;
     sdRef: string;
+    paymentOrderId: string;
 };
 
 export const completeOrderForPayment = async ({
     paymentOperationId,
     sdRef,
+    paymentOrderId,
 }: ICompleteOrderForPayment) => {
     const sector = process.env.PAYGINE_SECTOR_ID as string;
     const password = process.env.PAYGINE_PASSWORD as string;
-    const signatureString = sector + paymentOperationId + sdRef + password;
+    const signatureString = sector + paymentOrderId + sdRef + password;
     const md5String = md5(signatureString, {
         encoding: 'UTF-8',
     });
@@ -86,7 +88,7 @@ export const completeOrderForPayment = async ({
                 params: {
                     signature,
                     sector,
-                    id: paymentOperationId,
+                    id: paymentOrderId,
                     sd_ref: sdRef,
                 },
                 headers: {
