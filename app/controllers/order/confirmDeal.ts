@@ -61,15 +61,17 @@ export const confirmDeal = async (req: Request, res: Response) => {
             productAmount: payment.productAmount as number,
         });
 
+        const sdRef = randomUUID();
+
         const paymentOrderId = await createOrderForPayment({
             amount: amount,
             fee: fee,
             orderId: req.body.orderId as string,
             productName: order.productName as string,
+            sdRef,
         });
 
         if (paymentOrderId) {
-            const sdRef = randomUUID();
             console.log('sdref', sdRef);
             payment.sdRef = sdRef;
             payment.paymentOrderId = paymentOrderId;
