@@ -24,19 +24,10 @@ export const paymentWebHook = async (req: Request, res: Response) => {
         paymentOrderId: data.order_id[0],
     });
 
-    console.log(paymentForPayStage);
-
     if (paymentForPayStage && data.order_state[0] === 'AUTHORIZED') {
-        paymentForPayStage.update(
-            {
-                $set: {
-                    isPayed: true,
-                    paymentDate: new Date(data.date[0]),
-                    paymentOperationId: data.id[0],
-                },
-            },
-            { new: true, lean: true }
-        );
+        paymentForPayStage.isPayed = true;
+        paymentForPayStage.paymentDate = new Date(data.date[0]);
+        paymentForPayStage.paymentOperationId = data.id[0];
 
         await paymentForPayStage.save();
 
@@ -83,16 +74,9 @@ export const paymentWebHook = async (req: Request, res: Response) => {
         });
 
         if (paymentForPayoutStage && data.order_state[0] === 'COMPLETED') {
-            paymentForPayoutStage.update(
-                {
-                    $set: {
-                        isPayedOut: true,
-                        payOutDate: new Date(data.date[0]),
-                        payOutOperationId: data.id[0],
-                    },
-                },
-                { new: true, lean: true }
-            );
+            paymentForPayoutStage.isPayedOut = true;
+            paymentForPayoutStage.payOutDate = new Date(data.date[0]);
+            paymentForPayoutStage.payOutOperationId = data.id[0];
 
             await paymentForPayoutStage.save();
 
