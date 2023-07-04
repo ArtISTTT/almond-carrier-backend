@@ -3,3 +3,5 @@ dist
 uploads
 Friendly Carrier/
 .env
+externaldb
+mongo
