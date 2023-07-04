@@ -8,7 +8,8 @@
         "start": "node dist/index.js",
         "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
         "db": "mongod --config ./externaldb.conf",
-        "lintfix": "eslint app --fix --cache"
+        "lintfix": "eslint app --fix --cache",
+        "build-and-run": "npm run build && npm run db && npm run start"
     },
     "author": "",
     "license": "ISC",
