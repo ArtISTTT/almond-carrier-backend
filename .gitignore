@@ -5,3 +5,4 @@ Friendly Carrier/
 .env
 externaldb
 mongo
+externaldb.conf
