@@ -9,7 +9,7 @@
         "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/index.js\"",
         "db": "mongod --config ./externaldb.conf",
         "lintfix": "eslint app --fix --cache",
-        "build-and-run": "npm run build && npm run db && npm run start"
+        "build-and-run": "npm run build && npm run start"
     },
     "author": "",
     "license": "ISC",
