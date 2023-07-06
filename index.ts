@@ -69,6 +69,7 @@ app.use(
         name: 'friendly-session',
         secret: process.env.SESSION_SECRET,
         httpOnly: true,
+        keys: [process.env.SESSION_SECRET ?? 'secret'],
     })
 );
 
