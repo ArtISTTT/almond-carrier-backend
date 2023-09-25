@@ -7,7 +7,7 @@ export const sendVerification = (link: string, email: string) => {
                 from: 'support@friendlycarrier.com',
                 to: email,
                 subject: 'Account verification code',
-                text: `Your account verification code: ${link}`,
+                text: `Your account verification link: ${link}`,
             },
             (err, info) => {
                 if (err) {

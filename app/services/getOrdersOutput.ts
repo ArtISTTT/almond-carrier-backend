@@ -1,5 +1,6 @@
 import { getGoogleLozalizedName } from '../helpers/getLocalizedPlace';
 import { getOrderPaymentSum } from '../helpers/getOrderPaymentSum';
+import { getFee } from './../helpers/getOrderPaymentSum';
 
 export const getOrdersOutput = (
     orders: any[],
@@ -23,10 +24,23 @@ export const getOrdersOutput = (
                       paymentOperationId: order.payment.paymentOperationId,
                       payoutOrderId: order.payment.payoutOrderId,
                       sdRef: order.payment.sdRef,
+
                       totalPaymentAmount:
                           order.payment.rewardAmount !== undefined &&
                           order.payment.productAmount !== undefined
                               ? getOrderPaymentSum({
+                                    rewardAmount: order.payment.rewardAmount,
+                                    productAmount: order.payment.productAmount,
+                                    paymentPaySystemComission:
+                                        order.payment.paymentPaySystemComission,
+                                    ourPaymentComission:
+                                        order.payment.ourPaymentComission,
+                                })
+                              : undefined,
+                      totalPaymentFee:
+                          order.payment.rewardAmount !== undefined &&
+                          order.payment.productAmount !== undefined
+                              ? getFee({
                                     rewardAmount: order.payment.rewardAmount,
                                     productAmount: order.payment.productAmount,
                                     paymentPaySystemComission:
