@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import db from '../../models';
 import { getOrdersOutput } from '../../services/getOrdersOutput';
+import logger from '../../services/logger';
 
 const User = db.user;
 const Order = db.order;
@@ -10,6 +11,7 @@ const Payment = db.payment;
 const Review = db.review;
 
 export const getOrderById = async (req: Request, res: Response) => {
+    logger.info('GETTING ORDER BY ID');
     const orders = await Order.aggregate([
         {
             $match: {

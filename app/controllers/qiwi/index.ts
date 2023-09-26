@@ -3,6 +3,7 @@ import { XMLParser } from 'fast-xml-parser';
 import mongoose from 'mongoose';
 import { notificationText } from '../../frontendTexts/notifications';
 import db from '../../models';
+import logger from '../../services/logger';
 import {
     addNewNotification,
     NotificationType,
@@ -14,7 +15,7 @@ const Order = db.order;
 
 export const paymentWebHook = async (req: Request, res: Response) => {
     const data = req.body;
-    console.log('NEW PAY: ', req.body);
+    logger.info('NEW PAY: ', data);
 
     // if (!data) {
     //     return res.status(200).send();
