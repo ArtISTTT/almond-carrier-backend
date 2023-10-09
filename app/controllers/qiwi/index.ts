@@ -15,7 +15,8 @@ const Order = db.order;
 
 export const paymentWebHook = async (req: Request, res: Response) => {
     const data = req.body;
-    logger.info('NEW PAY: ', data);
+    console.log('NEW PAY: ', req.params, req.body);
+    logger.info('NEW PAY: ' + JSON.stringify(data));
 
     // if (!data) {
     //     return res.status(200).send();
