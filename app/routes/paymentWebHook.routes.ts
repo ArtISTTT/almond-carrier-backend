@@ -6,6 +6,7 @@ import { paymentWebHook } from '../controllers/qiwi';
 
 bodyParserXML(bodyParser);
 
+// web hook
 export default (app: Express) => {
     app.post('/payment-callback', bodyParser.xml(), paymentWebHook);
 };
