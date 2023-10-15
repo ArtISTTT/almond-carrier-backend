@@ -71,6 +71,8 @@ export const paymentWebHook = async (req: Request, res: Response) => {
         payment.isPayed = true;
         payment.paymentDate = new Date(data.txn_date);
         payment.paymentOperationId = data.txn_id;
+        payment.txnId = data.txn_id;
+        payment.sign = data.sign;
 
         await payment.save();
 

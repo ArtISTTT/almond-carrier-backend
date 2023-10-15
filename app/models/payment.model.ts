@@ -16,6 +16,8 @@ export interface IPayment extends Document {
     updatedAt?: Date; // Added due to `timestamps: true`
     paymentUrl?: string;
     paymentExpire?: Date;
+    txnId?: string;
+    sign?: string;
 }
 
 export const PaymentModel = mongoose.model<IPayment>(
