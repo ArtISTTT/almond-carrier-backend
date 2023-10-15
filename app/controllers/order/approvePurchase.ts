@@ -14,36 +14,34 @@ const Payment = db.payment;
 export const approvePurchase = async (req: Request, res: Response) => {
     const order = await Order.findById(req.body.orderId);
 
-    if (!order) {
+    if (order == null) {
         return res.status(404).send({ message: 'Order not found!' });
     }
 
     const payment = await Payment.findById(order.paymentId);
 
     if (
-        !payment ||
-        !payment.sdRef ||
+        payment == null ||
         !payment.paymentOperationId ||
         !payment.paymentOrderId
     ) {
         return res.status(404).send({ message: 'paymentNotFound' });
     }
 
-    const paymentCompleted = await completeOrderForPayment({
-        paymentOperationId: payment.paymentOperationId,
-        sdRef: payment.sdRef,
-        paymentOrderId: payment.paymentOrderId,
-    });
+    // const paymentCompleted = await completeOrderForPayment({
+    //     paymentOperationId: payment.paymentOperationId,
+    //     paymentOrderId: payment.paymentOrderId,
+    // });
 
-    if (!paymentCompleted) {
-        return res.status(404).send({ message: 'couldNotCompletePayment' });
-    }
+    // if (!paymentCompleted) {
+    //     return res.status(404).send({ message: 'couldNotCompletePayment' });
+    // }
 
     const status = await OrderStatus.findOne({
         name: 'awaitingDelivery',
     });
 
-    if (!status) {
+    if (status == null) {
         return res.status(404).send({ message: 'Status not found' });
     }
 

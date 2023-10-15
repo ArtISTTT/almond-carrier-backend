@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
-import mongoose from 'mongoose';
 import jwt from 'jsonwebtoken';
-import db from '../models';
+import mongoose from 'mongoose';
 import authConfig from '../config/auth.config';
+import db from '../models';
 
 const { ROLES } = db;
 const User = db.user;

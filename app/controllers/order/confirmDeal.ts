@@ -1,79 +1,55 @@
-import { randomUUID } from 'crypto';
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
 import { notificationText } from '../../frontendTexts/notifications';
-import {
-    getFee,
-    getOrderPaymentSum,
-    getPureSummary,
-} from '../../helpers/getOrderPaymentSum';
 import db from '../../models';
-import { createOrderForPayment } from '../../payment/createOrder';
+import logger from '../../services/logger';
 import {
     addNewNotification,
     NotificationType,
-} from './../notification.controller';
+} from '../notification.controller';
+import { getPaymentUrl } from '../qiwi/getPaymentUrl';
 
 const Order = db.order;
 const Payment = db.payment;
 const OrderStatus = db.orderStatus;
+const User = db.user;
 
 export const confirmDeal = async (req: Request, res: Response) => {
     const order = await Order.findById(req.body.orderId);
 
-    if (!order) {
+    if (order == null) {
         return res.status(404).send({ message: 'Order not found!' });
     }
 
     const userId = new mongoose.Types.ObjectId(req.body.userId);
     let forUserIdNotification = order.recieverId;
 
-    if (order.recieverId && userId.equals(order.recieverId)) {
+    if (order.recieverId != null && userId.equals(order.recieverId)) {
         order.dealConfirmedByReceiver = true;
         forUserIdNotification = order.carrierId;
-    } else if (order.carrierId && userId.equals(order.carrierId)) {
+    } else if (order.carrierId != null && userId.equals(order.carrierId)) {
         order.dealConfirmedByCarrier = true;
     }
 
     if (order.dealConfirmedByCarrier && order.dealConfirmedByReceiver) {
         const status = await OrderStatus.findOne({ name: 'waitingForPayment' });
         const payment = await Payment.findById(order.paymentId);
+        const receiver = await User.findById(order.recieverId);
 
-        if (!status || !payment) {
+        if (payment == null || receiver == null || status == null) {
+            logger.error('[confirmDeal]: Status/Payment/Receiver not found');
+
             return res
                 .status(404)
-                .send({ message: 'Status/Payment not found!' });
+                .send({ message: 'Status/Payment/receiver not found!' });
         }
 
         order.statusId = status._id;
 
-        // creating payment order
+        const paymentUrl = await getPaymentUrl(order, payment, receiver);
 
-        const fee = getFee({
-            rewardAmount: payment.rewardAmount as number,
-            productAmount: payment.productAmount as number,
-            paymentPaySystemComission: payment.paymentPaySystemComission,
-            ourPaymentComission: payment.ourPaymentComission,
-        });
-
-        const amount = getPureSummary({
-            rewardAmount: payment.rewardAmount as number,
-            productAmount: payment.productAmount as number,
-        });
-
-        const sdRef = randomUUID();
-
-        const paymentOrderId = await createOrderForPayment({
-            amount: amount,
-            fee: fee,
-            orderId: req.body.orderId as string,
-            productName: order.productName as string,
-        });
-
-        if (paymentOrderId) {
-            console.log('sdref', sdRef);
-            payment.sdRef = sdRef;
-            payment.paymentOrderId = paymentOrderId;
+        if (paymentUrl) {
+            payment.paymentUrl = paymentUrl;
         }
 
         await payment.save();

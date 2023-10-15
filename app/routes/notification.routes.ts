@@ -1,10 +1,11 @@
+import { Express } from 'express';
 import {
     removeAllNotifications,
+    removeAllNotifications,
     removeNotification,
-} from './../controllers/notification.controller';
-import { Express } from 'express';
+    removeNotification,
+} from '../controllers/notification.controller';
 import middlewares from '../middlewares';
-import { getNotifications } from '../controllers/notification.controller';
 
 export default (app: Express) => {
     app.use((req, res, next) => {

@@ -10,8 +10,8 @@ import {
     userBoard,
 } from '../controllers/user.controller';
 
-import middlewares from '../middlewares';
 import { upload } from '../aws-s3';
+import middlewares from '../middlewares';
 
 export default (app: Express) => {
     app.use((req, res, next) => {

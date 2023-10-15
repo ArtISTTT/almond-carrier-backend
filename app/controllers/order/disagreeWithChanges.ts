@@ -6,7 +6,7 @@ const Order = db.order;
 export const disagreeWithChanges = async (req: Request, res: Response) => {
     const order = await Order.findById(req.body.orderId);
 
-    if (!order) {
+    if (order == null) {
         return res.status(404).send({ message: 'Order not found!' });
     }
 

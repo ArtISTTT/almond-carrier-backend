@@ -10,7 +10,7 @@ export const sendVerification = (link: string, email: string) => {
                 text: `Your account verification link: ${link}`,
             },
             (err, info) => {
-                if (err) {
+                if (err != null) {
                     console.log(err);
                 } else {
                     console.log(info);

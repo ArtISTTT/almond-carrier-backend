@@ -36,7 +36,7 @@ export const createOrderAsReceiver = async (
 ) => {
     const status = await OrderStatus.findOne({ name: 'waitingCarrier' });
 
-    if (!status) {
+    if (status == null) {
         res.status(404).send({ message: 'Status not found' });
         return;
     }
@@ -57,14 +57,15 @@ export const createOrderAsReceiver = async (
         fromLocation: req.body.fromLocation,
         toLocation: req.body.toLocation,
         fromLocation_placeId: req.body.fromLocation_placeId,
-        fromLocationPolygon: req.body.fromLocationBounds
-            ? {
-                  type: 'Polygon',
-                  coordinates: convertBoundsToPolygon(
-                      req.body.fromLocationBounds
-                  ),
-              }
-            : undefined,
+        fromLocationPolygon:
+            req.body.fromLocationBounds != null
+                ? {
+                      type: 'Polygon',
+                      coordinates: convertBoundsToPolygon(
+                          req.body.fromLocationBounds
+                      ),
+                  }
+                : undefined,
         toLocation_placeId: req.body.toLocation_placeId,
         toLocationPolygon: {
             type: 'Polygon',

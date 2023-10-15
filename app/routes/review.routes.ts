@@ -1,5 +1,5 @@
-import { getUserReviews, sendReview } from '../controllers/review.controller';
 import { Express } from 'express';
+import { getUserReviews, sendReview } from '../controllers/review.controller';
 import middlewares from '../middlewares';
 
 export default (app: Express) => {

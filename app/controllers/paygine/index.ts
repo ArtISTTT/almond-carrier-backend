@@ -24,7 +24,7 @@ export const paymentWebHook = async (req: Request, res: Response) => {
         paymentOrderId: data.order_id[0],
     });
 
-    if (paymentForPayStage && data.order_state[0] === 'AUTHORIZED') {
+    if (paymentForPayStage != null && data.order_state[0] === 'AUTHORIZED') {
         paymentForPayStage.isPayed = true;
         paymentForPayStage.paymentDate = new Date(data.date[0]);
         paymentForPayStage.paymentOperationId = data.id[0];
@@ -35,7 +35,7 @@ export const paymentWebHook = async (req: Request, res: Response) => {
             name: 'awaitingBeforePurchaseItemsFiles',
         });
 
-        if (!status) {
+        if (status == null) {
             return res.status(200).send();
         }
 
@@ -49,7 +49,7 @@ export const paymentWebHook = async (req: Request, res: Response) => {
             { new: true, lean: true }
         );
 
-        if (!order) {
+        if (order == null) {
             return res.status(200).send();
         }
 
@@ -73,7 +73,10 @@ export const paymentWebHook = async (req: Request, res: Response) => {
             payoutOrderId: data.order_id[0],
         });
 
-        if (paymentForPayoutStage && data.order_state[0] === 'COMPLETED') {
+        if (
+            paymentForPayoutStage != null &&
+            data.order_state[0] === 'COMPLETED'
+        ) {
             paymentForPayoutStage.isPayedOut = true;
             paymentForPayoutStage.payOutDate = new Date(data.date[0]);
             paymentForPayoutStage.payOutOperationId = data.id[0];
@@ -84,7 +87,7 @@ export const paymentWebHook = async (req: Request, res: Response) => {
                 name: 'success',
             });
 
-            if (!status) {
+            if (status == null) {
                 return res.status(200).send();
             }
 
@@ -98,7 +101,7 @@ export const paymentWebHook = async (req: Request, res: Response) => {
                 { new: true, lean: true }
             );
 
-            if (!order) {
+            if (order == null) {
                 return res.status(200).send();
             }
 

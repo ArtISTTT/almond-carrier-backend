@@ -498,7 +498,7 @@ export const updateUserInfo = async (req: IReqUpdateUser, res: Response) => {
         { new: true, lean: true }
     );
 
-    if (!user) {
+    if (user == null) {
         return res.status(404).send({ message: 'User Not found.' });
     }
 
@@ -532,7 +532,7 @@ export const updateUserPassword = async (
 ) => {
     const user = await User.findById({ _id: req.body.userId });
 
-    if (!user) {
+    if (user == null) {
         return res.status(404).send({
             message: 'User Not found!',
         });
@@ -576,9 +576,9 @@ export const moderatorBoard = (req: Request, res: Response) => {
 export const updateAvatar = async (req: Request, res: Response) => {
     let image = sharp(req.file.path);
 
-    return image
+    return await image
         .metadata()
-        .then(metadata => {
+        .then(async metadata => {
             if (metadata.width && metadata.width > 280) {
                 image = image.resize({ width: 280 });
             }
@@ -587,7 +587,7 @@ export const updateAvatar = async (req: Request, res: Response) => {
                 image = image.resize({ width: 280 });
             }
 
-            return image.toBuffer();
+            return await image.toBuffer();
         })
         .then(async data => {
             const result = await uploadFile(
@@ -612,13 +612,12 @@ export const updateAvatar = async (req: Request, res: Response) => {
                     message: 'File saved',
                     avatar: result.Location,
                 });
-            } else {
-                return res.status(500).send({ message: 'errorWhileUploading' });
             }
+            return res.status(500).send({ message: 'errorWhileUploading' });
         })
-        .catch(err => {
-            return res.status(500).send({
+        .catch(err =>
+            res.status(500).send({
                 message: err,
-            });
-        });
+            })
+        );
 };

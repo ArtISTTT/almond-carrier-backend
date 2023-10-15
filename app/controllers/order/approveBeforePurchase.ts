@@ -14,7 +14,7 @@ export const approveBeforePurchase = async (req: Request, res: Response) => {
         name: 'awaitingPurchase',
     });
 
-    if (!status) {
+    if (status == null) {
         return res.status(404).send({ message: 'Status not found' });
     }
 
@@ -28,7 +28,7 @@ export const approveBeforePurchase = async (req: Request, res: Response) => {
         { new: true, lean: true }
     );
 
-    if (!order) {
+    if (order == null) {
         return res.status(404).send({ message: 'Order not found!' });
     }
 

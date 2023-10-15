@@ -1,7 +1,7 @@
 const numbers = '0123456789';
 
 const getRandomNumberAsString = (): string => {
-    const length = numbers.length;
+    const { length } = numbers;
 
     return numbers.charAt(Math.floor(Math.random() * length));
 };

@@ -6,7 +6,7 @@ import db from '../../models';
 import {
     addNewNotification,
     NotificationType,
-} from './../notification.controller';
+} from '../notification.controller';
 
 const Order = db.order;
 const OrderStatus = db.orderStatus;
@@ -61,7 +61,7 @@ export const suggestChangesByCarrier = async (req: Request, res: Response) => {
 
         const payment = await Payment.findById(order.paymentId);
 
-        if (!payment) {
+        if (payment == null) {
             return res.status(404).send({ message: 'Payment not found!' });
         }
 

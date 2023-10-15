@@ -1,13 +1,12 @@
 import { getGoogleLozalizedName } from '../helpers/getLocalizedPlace';
-import { getOrderPaymentSum } from '../helpers/getOrderPaymentSum';
-import { getFee } from './../helpers/getOrderPaymentSum';
+import { getFee, getOrderPaymentSum } from '../helpers/getOrderPaymentSum';
 
-export const getOrdersOutput = (
+export const getOrdersOutput = async (
     orders: any[],
     language: string,
     addFullInfo?: true
-) => {
-    return Promise.all(
+) =>
+    await Promise.all(
         orders.map(async order => {
             const fullInfo = addFullInfo
                 ? {
@@ -24,7 +23,7 @@ export const getOrdersOutput = (
                       paymentOperationId: order.payment.paymentOperationId,
                       payoutOrderId: order.payment.payoutOrderId,
                       sdRef: order.payment.sdRef,
-
+                      paymentUrl: order.payment.paymentUrl,
                       totalPaymentAmount:
                           order.payment.rewardAmount !== undefined &&
                           order.payment.productAmount !== undefined
@@ -102,4 +101,3 @@ export const getOrdersOutput = (
             };
         })
     );
-};

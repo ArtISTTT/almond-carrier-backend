@@ -12,7 +12,7 @@ const Order = db.order;
 const OrderStatus = db.orderStatus;
 
 export const beforePurchase = async (req: Request, res: Response) => {
-    const files = req.files;
+    const { files } = req;
 
     if (Array.isArray(files)) {
         const uploadedFiles = await Promise.all(
@@ -47,7 +47,7 @@ export const beforePurchase = async (req: Request, res: Response) => {
             name: 'awaitingRecieverItemBeforePurchasePhotosConfirmation',
         });
 
-        if (!status) {
+        if (status == null) {
             return res.status(404).send({ message: 'Status not found' });
         }
 
@@ -62,7 +62,7 @@ export const beforePurchase = async (req: Request, res: Response) => {
             { new: true, lean: true }
         );
 
-        if (!order) {
+        if (order == null) {
             return res.status(500).send({ ok: false });
         }
 

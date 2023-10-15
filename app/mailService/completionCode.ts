@@ -9,7 +9,7 @@ export const sendCompletionCodeEmail = (code: string, email: string) => {
             text: `Your confirmation code: ${code}`,
         },
         (err, info) => {
-            if (err) {
+            if (err != null) {
                 console.log(err);
             } else {
                 console.log(info);

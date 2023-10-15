@@ -2,14 +2,12 @@ import db from '../../models';
 
 const Status = db.orderStatus;
 
-const handleSave = (name: string) => {
-    return (err: any) => {
-        if (err) {
-            console.log('error', err);
-        }
+const handleSave = (name: string) => (err: any) => {
+    if (err) {
+        console.log('error', err);
+    }
 
-        console.log(`added ${name} to status collection`);
-    };
+    console.log(`added ${name} to status collection`);
 };
 
 export const initializeOrderStatuses = () => {

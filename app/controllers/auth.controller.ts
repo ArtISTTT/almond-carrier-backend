@@ -28,7 +28,7 @@ export const signup = (req: Request, res: Response) => {
     });
 
     user.save((err, user) => {
-        if (err) {
+        if (err != null) {
             res.status(500).send({ message: err });
             return;
         }
@@ -79,9 +79,11 @@ export const signup = (req: Request, res: Response) => {
                     return;
                 }
 
-                let token = await Token.findOne({ userId: user._id });
-                if (token) await token.deleteOne();
-                let verificationToken = crypto.randomBytes(32).toString('hex');
+                const token = await Token.findOne({ userId: user._id });
+                if (token != null) await token.deleteOne();
+                const verificationToken = crypto
+                    .randomBytes(32)
+                    .toString('hex');
                 const hash = await bcrypt.hash(
                     verificationToken,
                     Number(BRYPTO_KEY)
@@ -108,9 +110,9 @@ export const signup = (req: Request, res: Response) => {
 };
 
 export const verify = async (req: Request, res: Response) => {
-    let verificationToken = await Token.findOne({ userId: req.body.userId });
+    const verificationToken = await Token.findOne({ userId: req.body.userId });
 
-    if (!verificationToken) {
+    if (verificationToken == null) {
         return res.status(404).send({ message: 'invalidOrExpiredToken' });
     }
 
@@ -129,7 +131,7 @@ export const verify = async (req: Request, res: Response) => {
         { new: true }
     );
 
-    if (!user) {
+    if (user == null) {
         return res.status(404).send({
             ok: false,
         });
@@ -164,7 +166,7 @@ export const signin = (req: Request, res: Response) => {
                 return;
             }
 
-            if (!user) {
+            if (user == null) {
                 return res.status(404).send({ message: 'User Not found.' });
             }
 
@@ -213,7 +215,7 @@ export const recover = async (req: Request, res: Response) => {
         email: req.body.email,
     });
 
-    if (!user) {
+    if (user == null) {
         return res.status(404).send({ message: 'User Not found.' });
     }
 
@@ -221,9 +223,9 @@ export const recover = async (req: Request, res: Response) => {
         return res.status(500).send({ notVerified: true });
     }
 
-    let token = await Token.findOne({ userId: user._id });
-    if (token) await token.deleteOne();
-    let resetToken = crypto.randomBytes(32).toString('hex');
+    const token = await Token.findOne({ userId: user._id });
+    if (token != null) await token.deleteOne();
+    const resetToken = crypto.randomBytes(32).toString('hex');
     const hash = await bcrypt.hash(resetToken, Number(BRYPTO_KEY));
 
     await new Token({
@@ -242,9 +244,9 @@ export const recover = async (req: Request, res: Response) => {
 };
 
 export const processRecover = async (req: Request, res: Response) => {
-    let passwordResetToken = await Token.findOne({ userId: req.body.userId });
+    const passwordResetToken = await Token.findOne({ userId: req.body.userId });
 
-    if (!passwordResetToken) {
+    if (passwordResetToken == null) {
         return res
             .status(404)
             .send({ message: 'Invalid or expired password reset token.' });
@@ -273,7 +275,7 @@ export const processRecover = async (req: Request, res: Response) => {
     );
     const user = await User.findById({ _id: req.body.userId });
 
-    if (!user) {
+    if (user == null) {
         return res.status(404).send({
             message: 'User Not found!',
         });

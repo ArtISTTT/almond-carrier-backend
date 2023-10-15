@@ -11,7 +11,7 @@ export const sendRecoverPasswordEmail = (link: string, email: string) => {
         (err, info) => {
             console.log('SENDED', err, info);
 
-            if (err) {
+            if (err != null) {
                 console.log(err);
             } else {
                 console.log(info);
@@ -34,7 +34,7 @@ export const sendRecoverPasswordSuccessfullyEmail = (
         (err, info) => {
             console.log('SENDED', err, info);
 
-            if (err) {
+            if (err != null) {
                 console.log(err);
             } else {
                 console.log(info);

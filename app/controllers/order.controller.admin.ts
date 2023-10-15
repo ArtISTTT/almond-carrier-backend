@@ -15,7 +15,7 @@ const Review = db.review;
 export const isConfirmPaymentByAdminAccessible = async (record: BaseRecord) => {
     const status = await OrderStatus.findById(record.params.statusId);
 
-    return status && status.name === 'waitingForPaymentVerification';
+    return status != null && status.name === 'waitingForPaymentVerification';
 };
 
 export const confirmPaymentByAdmin = async (record: BaseRecord) => {
@@ -23,7 +23,7 @@ export const confirmPaymentByAdmin = async (record: BaseRecord) => {
         name: 'awaitingBeforePurchaseItemsFiles',
     });
 
-    if (!status) {
+    if (status == null) {
         return;
     }
 
@@ -61,7 +61,7 @@ export const confirmPayoutByAdmin = async (record: BaseRecord) => {
         name: 'success',
     });
 
-    if (!status) {
+    if (status == null) {
         return;
     }
 

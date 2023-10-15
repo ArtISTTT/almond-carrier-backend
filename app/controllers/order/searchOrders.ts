@@ -11,7 +11,7 @@ enum OrderSeachType {
     carriers = 'carriers',
 }
 
-type Filter = {
+interface Filter {
     fromLocation_placeId?: string;
     toLocation_placeId?: string;
     fromLocationBounds: IBounds;
@@ -20,7 +20,7 @@ type Filter = {
     minBenefit?: number;
     maxWeight?: number;
     maxPrice?: number;
-};
+}
 
 type IReqSearchOrders = Request<
     core.ParamsDictionary,

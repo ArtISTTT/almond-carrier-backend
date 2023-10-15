@@ -1,6 +1,27 @@
-import mongoose from 'mongoose';
+import mongoose, { Document, Types } from 'mongoose';
 
-export const UserModel = mongoose.model(
+interface IDVerification {
+    isVerificated: boolean;
+    // If there are more fields in the idVerification object, add them here
+}
+
+export interface IUser extends Document {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+    gender?: string;
+    phoneNumber?: string;
+    dateOfBirth?: Date;
+    roles: Types.ObjectId[]; // This assumes that roles are an array of ObjectIDs referring to 'Role'
+    avatarImage?: string;
+    verificated: boolean;
+    idVerification?: IDVerification;
+    createdAt?: Date; // Added due to `timestamps: true`
+    updatedAt?: Date; // Added due to `timestamps: true`
+}
+
+export const UserModel = mongoose.model<IUser>(
     'User',
     new mongoose.Schema(
         {

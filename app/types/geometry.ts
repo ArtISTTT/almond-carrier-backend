@@ -1,4 +1,4 @@
-export type IBounds = {
+export interface IBounds {
     northeast: {
         lat: number;
         lng: number;
@@ -7,6 +7,6 @@ export type IBounds = {
         lat: number;
         lng: number;
     };
-};
+}
 
-export type IPolygon = [number, number][][];
+export type IPolygon = Array<Array<[number, number]>>;

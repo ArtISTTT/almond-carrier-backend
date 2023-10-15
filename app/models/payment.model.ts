@@ -1,6 +1,25 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
-export const PaymentModel = mongoose.model(
+export interface IPayment extends Document {
+    rewardAmount: number;
+    productAmount?: number;
+    paymentPaySystemComission: number;
+    ourPaymentComission: number;
+    isPayed: boolean;
+    paymentDate?: Date;
+    currency: string;
+    paymentOrderId?: string;
+    payoutOrderId?: string;
+    paymentOperationId?: string;
+    isPayedOut?: boolean;
+    payOutDate?: Date;
+    payOutOperationId?: string;
+    createdAt?: Date; // Added due to `timestamps: true`
+    updatedAt?: Date; // Added due to `timestamps: true`
+    paymentUrl?: string;
+}
+
+export const PaymentModel = mongoose.model<IPayment>(
     'Payment',
     new mongoose.Schema(
         {
@@ -45,10 +64,6 @@ export const PaymentModel = mongoose.model(
                 type: String,
                 required: false,
             },
-            sdRef: {
-                type: String,
-                required: false,
-            },
             isPayedOut: {
                 type: Boolean,
                 required: false,
@@ -59,6 +74,10 @@ export const PaymentModel = mongoose.model(
                 require: false,
             },
             payOutOperationId: {
+                type: String,
+                required: false,
+            },
+            paymentUrl: {
                 type: String,
                 required: false,
             },

@@ -24,7 +24,7 @@ export const sendCompletionCode = async (req: Request, res: Response) => {
 
     const user = await User.findById(req.body.userId);
 
-    if (!order || !user) {
+    if (order == null || user == null) {
         return res.status(404).send({ message: 'orderIsNotFound' });
     }
 

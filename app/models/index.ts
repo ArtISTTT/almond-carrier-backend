@@ -1,18 +1,17 @@
-import { TokenModel } from './token.model';
 import mongoose from 'mongoose';
-import { RoleModel } from './role.model';
-import { UserModel } from './user.model';
+import { ImageModel } from './image.model';
+import { NotificationModel } from './notification.model';
 import { OrderModel } from './order.model';
 import { OrderStatusModel } from './orderStatus.model';
 import { PaymentModel } from './payment.model';
 import { ReviewModel } from './review.model';
-import { ImageModel } from './image.model';
-import { ChatMessageModel } from './chatMessage.model';
-import { NotificationModel } from './notification.model';
+import { RoleModel } from './role.model';
+import { TokenModel, TokenModel } from './token.model';
+import { UserModel } from './user.model';
 
 mongoose.Promise = global.Promise;
 
-type IDB = {
+interface IDB {
     mongoose: typeof mongoose;
     user: typeof UserModel;
     token: typeof TokenModel;
@@ -25,7 +24,7 @@ type IDB = {
     notification: typeof NotificationModel;
     chatMessage: typeof ChatMessageModel;
     ROLES: ['user', 'admin', 'moderator'];
-};
+}
 
 const db: any = {};
 

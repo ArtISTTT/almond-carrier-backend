@@ -9,7 +9,7 @@ const OrderStatus = db.orderStatus;
 const Payment = db.payment;
 const Review = db.review;
 
-type IPayout = {
+interface IPayout {
     id: string;
     completedDate: Date;
     productName: string;
@@ -17,7 +17,7 @@ type IPayout = {
     bank: string;
     phoneNumber: string;
     status: string;
-};
+}
 
 const getPayoutsOutput = (orders: any[]): IPayout[] =>
     orders.map(order => ({

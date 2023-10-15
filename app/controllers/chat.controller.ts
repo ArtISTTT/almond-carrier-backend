@@ -1,12 +1,12 @@
-import mongoose from 'mongoose';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import mongoose from 'mongoose';
+import { notificationText } from '../frontendTexts/notifications';
 import db from '../models';
 import {
     addNewNotification,
     NotificationType,
 } from './notification.controller';
-import { notificationText } from '../frontendTexts/notifications';
 
 const User = db.user;
 const Role = db.role;
@@ -44,7 +44,7 @@ export const postMessage = async (req: Request, res: Response) => {
 
         const message = await Message.create({
             orderId,
-            messageText: messageText,
+            messageText,
             postedUserId: userId,
             readByRecipients: false,
         });
@@ -66,7 +66,7 @@ export const postMessage = async (req: Request, res: Response) => {
 
         await addNewNotification({
             text: notificationText.newMessage,
-            orderId: orderId,
+            orderId,
             userForId: String(
                 String(order?.carrierId) === userId
                     ? order?.recieverId
@@ -77,6 +77,6 @@ export const postMessage = async (req: Request, res: Response) => {
 
         return res.status(200).json({ ok: true, message: parsedMessage });
     } catch (error) {
-        return res.status(500).json({ ok: false, error: error });
+        return res.status(500).json({ ok: false, error });
     }
 };

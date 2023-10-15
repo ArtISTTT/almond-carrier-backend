@@ -10,19 +10,16 @@ export enum NotificationType {
     newMessage = 'newMessage',
 }
 
-const getNotificationsOutput = (notifications: any[]) => {
-    return notifications.map(notification => {
-        return {
-            id: notification._id,
-            type: notification.notificationType,
-            text: notification.text,
-            read: notification.read,
-            productName: notification.order.productName,
-            orderId: notification.orderId,
-            createdDate: notification.createdAt,
-        };
-    });
-};
+const getNotificationsOutput = (notifications: any[]) =>
+    notifications.map(notification => ({
+        id: notification._id,
+        type: notification.notificationType,
+        text: notification.text,
+        read: notification.read,
+        productName: notification.order.productName,
+        orderId: notification.orderId,
+        createdDate: notification.createdAt,
+    }));
 
 export const addNewNotification = async ({
     text,
@@ -44,7 +41,7 @@ export const addNewNotification = async ({
             userForId,
         });
 
-        if (notification) {
+        if (notification != null) {
             able = false;
         }
     }

@@ -8,14 +8,14 @@ import {
 } from '../controllers/order.controller.admin';
 import db from '../models';
 
-const order = db.order;
-const user = db.user;
-const orderStatus = db.orderStatus;
-const payment = db.payment;
-const review = db.review;
-const role = db.role;
-const chatMessage = db.chatMessage;
-const image = db.image;
+const { order } = db;
+const { user } = db;
+const { orderStatus } = db;
+const { payment } = db;
+const { review } = db;
+const { role } = db;
+const { chatMessage } = db;
+const { image } = db;
 
 const DEFAULT_ADMIN = {
     email: 'admin@mail.ru',
@@ -45,7 +45,7 @@ export const getAdminJs = () => {
                             ) => {
                                 const { record, currentAdmin } = context;
 
-                                if (record) {
+                                if (record != null) {
                                     confirmPaymentByAdmin(record);
                                 }
 
@@ -66,7 +66,7 @@ export const getAdminJs = () => {
                             ) => {
                                 const { record, currentAdmin } = context;
 
-                                if (record) {
+                                if (record != null) {
                                     confirmPayoutByAdmin(record);
                                 }
 
@@ -94,7 +94,7 @@ export const getAdminJs = () => {
                             ) => {
                                 const { record, currentAdmin } = context;
 
-                                if (record) {
+                                if (record != null) {
                                     confirmVerificationByAdmin(record);
                                 }
 
@@ -118,7 +118,7 @@ export const getAdminJs = () => {
 
     const adminRouter = AdminJSExpress.buildAuthenticatedRouter(admin, {
         authenticate: async (email, password) => {
-            if ('adminpassword' === password && 'admin@admin.com' === email) {
+            if (password === 'adminpassword' && email === 'admin@admin.com') {
                 return true;
             }
             return null;

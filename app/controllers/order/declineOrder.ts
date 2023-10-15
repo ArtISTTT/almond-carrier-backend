@@ -4,7 +4,7 @@ import db from '../../models';
 import {
     addNewNotification,
     NotificationType,
-} from './../notification.controller';
+} from '../notification.controller';
 
 const Order = db.order;
 const OrderStatus = db.orderStatus;
@@ -15,7 +15,7 @@ const OrderStatus = db.orderStatus;
 export const declineOrder = async (req: Request, res: Response) => {
     const order = await Order.findById(req.body.orderId);
 
-    if (!order) {
+    if (order == null) {
         return res.status(404).send({ message: 'Order not found!' });
     }
 
@@ -25,7 +25,7 @@ export const declineOrder = async (req: Request, res: Response) => {
         name: isCarrierCreator ? 'waitingReviever' : 'waitingCarrier',
     });
 
-    if (!status) {
+    if (status == null) {
         return res.status(404).send({ message: 'Status not found' });
     }
 

@@ -7,7 +7,7 @@ import { IBounds } from '../../types/geometry';
 import {
     addNewNotification,
     NotificationType,
-} from './../notification.controller';
+} from '../notification.controller';
 
 const Order = db.order;
 const OrderStatus = db.orderStatus;
@@ -31,12 +31,12 @@ export const applyOrderAsCarrier = async (
 ) => {
     const status = await OrderStatus.findOne({ name: 'inDiscussion' });
 
-    if (!status) {
+    if (status == null) {
         return res.status(404).send({ message: 'Status not found!' });
     }
 
-    let fromLocationData =
-        req.body.fromLocation && req.body.fromLocationBounds
+    const fromLocationData =
+        req.body.fromLocation && req.body.fromLocationBounds != null
             ? {
                   fromLocation: req.body.fromLocation,
                   fromLocation_placeId: req.body.fromLocation_placeId,
@@ -62,7 +62,7 @@ export const applyOrderAsCarrier = async (
         { new: true, lean: true }
     );
 
-    if (!order) {
+    if (order == null) {
         return res.status(404).send({ message: 'Order to apply not found!' });
     }
 

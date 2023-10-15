@@ -5,7 +5,7 @@ import db from '../../models';
 import {
     addNewNotification,
     NotificationType,
-} from './../notification.controller';
+} from '../notification.controller';
 
 const Order = db.order;
 const Payment = db.payment;
@@ -13,21 +13,21 @@ const Payment = db.payment;
 export const agreeWithChanges = async (req: Request, res: Response) => {
     const order = await Order.findById(req.body.orderId);
 
-    if (!order) {
+    if (order == null) {
         return res.status(404).send({ message: 'Order not found!' });
     }
 
-    const notificationUserForId = order.byReceiverSuggestedChanges
-        ? order.recieverId
-        : order.carrierId;
+    const notificationUserForId =
+        order.byReceiverSuggestedChanges != null
+            ? order.recieverId
+            : order.carrierId;
 
     const payment = await Payment.findById(order.paymentId);
 
-    if (!payment) {
+    if (payment == null) {
         return res.status(404).send({ message: 'Payment not found!' });
     }
 
-    // Inserting changes from suggested to root of Document
     await payment.updateOne(
         {
             $set: {

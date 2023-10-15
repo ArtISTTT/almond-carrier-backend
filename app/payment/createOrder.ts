@@ -9,12 +9,12 @@ const instance = axios.create({
     },
 });
 
-type ICreateOrderForPayment = {
+interface ICreateOrderForPayment {
     amount: number;
     orderId: string;
     productName: string;
     fee: number;
-};
+}
 
 export const createOrderForPayment = async ({
     amount,
@@ -36,7 +36,7 @@ export const createOrderForPayment = async ({
 
     try {
         const data = await axios.post(
-            process.env.PAYGINE_URI + 'webapi/Register',
+            `${process.env.PAYGINE_URI}webapi/Register`,
             undefined,
             {
                 params: {
@@ -61,11 +61,11 @@ export const createOrderForPayment = async ({
     }
 };
 
-type ICompleteOrderForPayment = {
+interface ICompleteOrderForPayment {
     paymentOperationId: string;
     sdRef: string;
     paymentOrderId: string;
-};
+}
 
 export const completeOrderForPayment = async ({
     paymentOperationId,
@@ -82,7 +82,7 @@ export const completeOrderForPayment = async ({
 
     try {
         const data = await axios.post(
-            process.env.PAYGINE_URI + 'webapi/b2puser/sd-services/SDComplete',
+            `${process.env.PAYGINE_URI}webapi/b2puser/sd-services/SDComplete`,
             undefined,
             {
                 params: {
@@ -105,12 +105,12 @@ export const completeOrderForPayment = async ({
     }
 };
 
-type ICreateOrderForPayout = {
+interface ICreateOrderForPayout {
     amount: number;
     orderId: string;
     productName: string;
     sdRef: string;
-};
+}
 
 export const createOrderForPayout = async ({
     amount,
@@ -132,7 +132,7 @@ export const createOrderForPayout = async ({
 
     try {
         const data = await axios.post(
-            process.env.PAYGINE_URI + 'webapi/Register',
+            `${process.env.PAYGINE_URI}webapi/Register`,
             undefined,
             {
                 params: {

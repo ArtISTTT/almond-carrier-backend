@@ -13,7 +13,7 @@ export const completeOrder = async (req: Request, res: Response) => {
         name: 'itemRecieved',
     });
 
-    if (!status) {
+    if (status == null) {
         return res.status(404).send({ message: 'Status not found' });
     }
 
@@ -39,37 +39,35 @@ export const completeOrder = async (req: Request, res: Response) => {
         { new: true, lean: true }
     );
 
-    if (!order) {
+    if (order == null) {
         return res.status(404).send({ message: 'incorrectCompletionCode' });
     }
 
     const payment = await Payment.findById(order.paymentId);
 
     if (
-        !payment ||
+        payment == null ||
         !payment.productAmount ||
         !payment.rewardAmount ||
-        !payment.sdRef ||
         !order.productName
     ) {
         return res.status(404).send({ message: 'payoutError' });
     }
 
-    const payoutOrderId = await createOrderForPayout({
-        amount: getPureSummary({
-            productAmount: payment.productAmount,
-            rewardAmount: payment.rewardAmount,
-        }),
-        orderId: req.body.orderId,
-        productName: order.productName,
-        sdRef: payment.sdRef,
-    });
+    // const payoutOrderId = await createOrderForPayout({
+    //     amount: getPureSummary({
+    //         productAmount: payment.productAmount,
+    //         rewardAmount: payment.rewardAmount,
+    //     }),
+    //     orderId: req.body.orderId,
+    //     productName: order.productName,
+    // });
 
-    if (!payoutOrderId) {
-        return res.status(404).send({ message: 'payoutError' });
-    }
+    // if (!payoutOrderId) {
+    //     return res.status(404).send({ message: 'payoutError' });
+    // }
 
-    payment.payoutOrderId = payoutOrderId;
+    // payment.payoutOrderId = payoutOrderId;
 
     await payment.save();
 

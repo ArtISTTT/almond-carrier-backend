@@ -5,7 +5,7 @@ import db from '../../models';
 import {
     addNewNotification,
     NotificationType,
-} from './../notification.controller';
+} from '../notification.controller';
 
 const Order = db.order;
 const OrderStatus = db.orderStatus;
@@ -31,7 +31,7 @@ export const applyOrderAsReceiver = async (
 ) => {
     const status = await OrderStatus.findOne({ name: 'inDiscussion' });
 
-    if (!status) {
+    if (status == null) {
         return res.status(404).send({ message: 'Status not found!' });
     }
 
@@ -50,7 +50,7 @@ export const applyOrderAsReceiver = async (
         { new: true, lean: true }
     );
 
-    if (!order) {
+    if (order == null) {
         return res.status(404).send({ message: 'Order to apply not found!' });
     }
 

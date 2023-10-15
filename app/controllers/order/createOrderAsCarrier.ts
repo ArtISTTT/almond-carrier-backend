@@ -33,7 +33,7 @@ export const createOrderAsCarrier = async (
 ) => {
     const status = await OrderStatus.findOne({ name: 'waitingReciever' });
 
-    if (!status) {
+    if (status == null) {
         res.status(404).send({ message: 'Status not found' });
         return;
     }
@@ -46,9 +46,8 @@ export const createOrderAsCarrier = async (
     });
 
     payment.save(err => {
-        if (err) {
+        if (err != null) {
             res.status(500).send({ message: err });
-            return;
         }
     });
 

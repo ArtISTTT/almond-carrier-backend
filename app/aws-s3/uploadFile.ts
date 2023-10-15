@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import fs from 'fs';
 import { s3 } from '.';
 import db from '../models';
+
 const User = db.user;
 
 export const uploadFile = async (
