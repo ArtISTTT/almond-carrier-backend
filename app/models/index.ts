@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { ChatMessageModel } from './chatMessage.model';
 import { ImageModel } from './image.model';
 import { NotificationModel } from './notification.model';
 import { OrderModel } from './order.model';
@@ -6,7 +7,7 @@ import { OrderStatusModel } from './orderStatus.model';
 import { PaymentModel } from './payment.model';
 import { ReviewModel } from './review.model';
 import { RoleModel } from './role.model';
-import { TokenModel, TokenModel } from './token.model';
+import { TokenModel } from './token.model';
 import { UserModel } from './user.model';
 
 mongoose.Promise = global.Promise;

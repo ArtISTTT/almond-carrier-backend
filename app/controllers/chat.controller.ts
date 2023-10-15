@@ -29,7 +29,7 @@ export const getConversationByOrderId = async (req: Request, res: Response) => {
 
     return res.status(200).json({
         ok: true,
-        messages: messages.map(message => ({
+        messages: messages.map((message: any) => ({
             createdAt: message.createdAt,
             messageText: message.messageText,
             postedUserId: message.postedUserId,

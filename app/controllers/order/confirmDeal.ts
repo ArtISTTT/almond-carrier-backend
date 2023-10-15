@@ -46,10 +46,11 @@ export const confirmDeal = async (req: Request, res: Response) => {
 
         order.statusId = status._id;
 
-        const paymentUrl = await getPaymentUrl(order, payment, receiver);
+        const url = await getPaymentUrl(order, payment, receiver);
 
-        if (paymentUrl) {
-            payment.paymentUrl = paymentUrl;
+        if (url != null && url.paymentUrl) {
+            payment.paymentUrl = url.paymentUrl;
+            payment.paymentExpire = url.paymentExpire;
         }
 
         await payment.save();

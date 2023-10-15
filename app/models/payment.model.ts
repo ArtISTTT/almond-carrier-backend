@@ -3,8 +3,6 @@ import mongoose, { Document } from 'mongoose';
 export interface IPayment extends Document {
     rewardAmount: number;
     productAmount?: number;
-    paymentPaySystemComission: number;
-    ourPaymentComission: number;
     isPayed: boolean;
     paymentDate?: Date;
     currency: string;
@@ -17,6 +15,7 @@ export interface IPayment extends Document {
     createdAt?: Date; // Added due to `timestamps: true`
     updatedAt?: Date; // Added due to `timestamps: true`
     paymentUrl?: string;
+    paymentExpire?: Date;
 }
 
 export const PaymentModel = mongoose.model<IPayment>(
@@ -31,20 +30,16 @@ export const PaymentModel = mongoose.model<IPayment>(
                 type: Number,
                 require: false,
             },
-            paymentPaySystemComission: {
-                type: Number,
-                required: true,
-            },
-            ourPaymentComission: {
-                type: Number,
-                required: true,
-            },
             isPayed: {
                 type: Boolean,
                 require: true,
                 default: false,
             },
             paymentDate: {
+                type: Date,
+                require: false,
+            },
+            paymentExpire: {
                 type: Date,
                 require: false,
             },

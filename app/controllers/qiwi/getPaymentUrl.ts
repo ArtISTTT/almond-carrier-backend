@@ -44,7 +44,7 @@ const getRedirectedUrl = async (
 const getCurrentDatePlusTwoDays = () => {
     const date = new Date();
     date.setDate(date.getDate() + 2);
-    return date.toISOString();
+    return { date, stringDate: date.toISOString() };
 };
 
 /**
@@ -80,16 +80,14 @@ export const getPaymentUrl = async (
     const orderPaymentSum = getOrderPaymentSum({
         rewardAmount: payment.rewardAmount,
         productAmount: payment.productAmount,
-        paymentPaySystemComission: payment.paymentPaySystemComission,
-        ourPaymentComission: payment.ourPaymentComission,
     });
 
     const totalPaymentFee = getFee({
         rewardAmount: payment.rewardAmount,
         productAmount: payment.productAmount,
-        paymentPaySystemComission: payment.paymentPaySystemComission,
-        ourPaymentComission: payment.ourPaymentComission,
     });
+
+    const paymentExpire = getCurrentDatePlusTwoDays();
 
     const data = {
         // amount: orderPaymentSum + '.00',
@@ -103,7 +101,7 @@ export const getPaymentUrl = async (
         email: user.email,
         merchant_site: process.env.QIWI_MERCHANT_SITE as string,
         opcode: '3',
-        order_expire: getCurrentDatePlusTwoDays(),
+        order_expire: paymentExpire.stringDate,
         order_id: '123456774',
         product_name: order.productName,
         success_url: `${process.env.CALLBACK_URI as string}payment-callback`,
@@ -123,5 +121,5 @@ export const getPaymentUrl = async (
 
     const paymentUrl = await getRedirectedUrl(url);
 
-    return paymentUrl;
+    return { paymentUrl, paymentExpire: paymentExpire.date };
 };

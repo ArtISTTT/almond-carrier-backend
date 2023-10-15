@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import { XMLParser } from 'fast-xml-parser';
 import mongoose from 'mongoose';
 import { notificationText } from '../../frontendTexts/notifications';
 import db from '../../models';
@@ -16,7 +15,7 @@ export const paymentWebHook = async (req: Request, res: Response) => {
     const data = req.body.operation;
     console.log('NEW PAY: ', req.body.operation);
 
-    if (!data) {
+    if (data === undefined) {
         return res.status(200).send();
     }
 
@@ -25,9 +24,12 @@ export const paymentWebHook = async (req: Request, res: Response) => {
     });
 
     if (paymentForPayStage != null && data.order_state[0] === 'AUTHORIZED') {
+        const [date] = data.date;
+        const [id] = data.id;
+
         paymentForPayStage.isPayed = true;
-        paymentForPayStage.paymentDate = new Date(data.date[0]);
-        paymentForPayStage.paymentOperationId = data.id[0];
+        paymentForPayStage.paymentDate = new Date(date);
+        paymentForPayStage.paymentOperationId = id;
 
         await paymentForPayStage.save();
 
@@ -77,9 +79,12 @@ export const paymentWebHook = async (req: Request, res: Response) => {
             paymentForPayoutStage != null &&
             data.order_state[0] === 'COMPLETED'
         ) {
+            const [date] = data.date;
+            const [id] = data.id;
+
             paymentForPayoutStage.isPayedOut = true;
-            paymentForPayoutStage.payOutDate = new Date(data.date[0]);
-            paymentForPayoutStage.payOutOperationId = data.id[0];
+            paymentForPayoutStage.payOutDate = new Date(date);
+            paymentForPayoutStage.payOutOperationId = id;
 
             await paymentForPayoutStage.save();
 

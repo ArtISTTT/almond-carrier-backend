@@ -11,7 +11,6 @@ import {
 
 const User = db.user;
 const Order = db.order;
-const OrderStatus = db.orderStatus;
 const Payment = db.payment;
 const Review = db.review;
 

@@ -45,8 +45,6 @@ export const createOrderAsReceiver = async (
         rewardAmount: req.body.rewardAmount,
         productAmount: req.body.productAmount,
         currency: req.body.currency,
-        paymentPaySystemComission: COMISSIONS.PAYMENT_CP_COMISSION,
-        ourPaymentComission: COMISSIONS.DUE_OUR_COMISSION,
     });
 
     await Order.create({

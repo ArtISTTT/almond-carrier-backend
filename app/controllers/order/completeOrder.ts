@@ -1,8 +1,6 @@
 import { Request, Response } from 'express';
 import mongoose from 'mongoose';
-import { getPureSummary } from '../../helpers/getOrderPaymentSum';
 import db from '../../models';
-import { createOrderForPayout } from '../../payment/createOrder';
 
 const Order = db.order;
 const Payment = db.payment;

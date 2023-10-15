@@ -24,16 +24,13 @@ export const getOrdersOutput = async (
                       payoutOrderId: order.payment.payoutOrderId,
                       sdRef: order.payment.sdRef,
                       paymentUrl: order.payment.paymentUrl,
+                      paymentExpire: order.payment.paymentExpire,
                       totalPaymentAmount:
                           order.payment.rewardAmount !== undefined &&
                           order.payment.productAmount !== undefined
                               ? getOrderPaymentSum({
                                     rewardAmount: order.payment.rewardAmount,
                                     productAmount: order.payment.productAmount,
-                                    paymentPaySystemComission:
-                                        order.payment.paymentPaySystemComission,
-                                    ourPaymentComission:
-                                        order.payment.ourPaymentComission,
                                 })
                               : undefined,
                       totalPaymentFee:
@@ -42,10 +39,6 @@ export const getOrdersOutput = async (
                               ? getFee({
                                     rewardAmount: order.payment.rewardAmount,
                                     productAmount: order.payment.productAmount,
-                                    paymentPaySystemComission:
-                                        order.payment.paymentPaySystemComission,
-                                    ourPaymentComission:
-                                        order.payment.ourPaymentComission,
                                 })
                               : undefined,
                   }

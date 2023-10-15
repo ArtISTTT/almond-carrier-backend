@@ -1,8 +1,7 @@
 import { Express } from 'express';
 import {
+    getNotifications,
     removeAllNotifications,
-    removeAllNotifications,
-    removeNotification,
     removeNotification,
 } from '../controllers/notification.controller';
 import middlewares from '../middlewares';
