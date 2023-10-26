@@ -150,37 +150,48 @@ const generateRandom12DigitsId = () => {
 };
 
 export const getCardSaveUrl = async (user: IUser) => {
-    const paymentExpire = getCurrentDatePlusSixHours();
+    try {
+        const paymentExpire = getCurrentDatePlusSixHours();
 
-    const data = {
-        amount: `10.00`,
-        callback_url: `${process.env.CALLBACK_URI as string}payment-callback`,
-        cf2: '7.00;3.00',
-        cf4: 'CARD_SAVE',
-        cf5: String(user._id),
-        currency: '643',
-        email: user.email,
-        merchant_site: process.env.QIWI_MERCHANT_SITE as string,
-        merchant_uid: String(user._id),
-        opcode: '3',
-        order_expire: paymentExpire.stringDate,
-        order_id: generateRandom12DigitsId().toString(),
-        success_url: `https://friendlycarrier.com/payouts`,
-    };
+        const data = {
+            amount: `10.00`,
+            callback_url: `${
+                process.env.CALLBACK_URI as string
+            }payment-callback`,
+            cf2: '7.00;3.00',
+            cf4: 'CARD_SAVE',
+            cf5: String(user._id),
+            currency: '643',
+            email: user.email,
+            merchant_site: process.env.QIWI_MERCHANT_SITE as string,
+            merchant_uid: String(user._id),
+            opcode: '3',
+            order_expire: paymentExpire.stringDate,
+            order_id: generateRandom12DigitsId().toString(),
+            success_url: `https://friendlycarrier.com/payouts`,
+        };
 
-    const signature = generateHMACSignature(
-        data,
-        process.env.QIWI_SECRET_KEY as string
-    );
+        const signature = generateHMACSignature(
+            data,
+            process.env.QIWI_SECRET_KEY as string
+        );
 
-    const urlParams = new URLSearchParams({
-        ...data,
-        sign: signature,
-    });
+        const urlParams = new URLSearchParams({
+            ...data,
+            sign: signature,
+        });
 
-    const url = `${`${process.env.QIWI_PAY_API}paypage/initial?`}${urlParams.toString()}`;
+        const url = `${`${process.env.QIWI_PAY_API}paypage/initial?`}${urlParams.toString()}`;
 
-    const paymentUrl = await getRedirectedUrl(url);
+        const paymentUrl = await getRedirectedUrl(url);
 
-    return paymentUrl;
+        return paymentUrl;
+    } catch (error) {
+        logger.error(
+            '[getCardSaveUrl]: Error while trying to get card save url: ',
+            error
+        );
+
+        return undefined;
+    }
 };

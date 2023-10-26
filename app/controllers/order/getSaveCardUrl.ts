@@ -17,7 +17,13 @@ export const getSaveCardUrl = async (req: Request, res: Response) => {
 
     const url = await getCardSaveUrl(user);
 
-    return res.status(200).send({
-        url,
+    if (url) {
+        return res.status(200).send({
+            url,
+        });
+    }
+
+    return res.status(401).send({
+        message: 'errorWhileGettingUrl',
     });
 };
