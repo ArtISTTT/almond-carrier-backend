@@ -15,7 +15,7 @@ export const getSaveCardUrl = async (req: Request, res: Response) => {
         return res.status(404).send({ message: 'userNotFound' });
     }
 
-    const url = getCardSaveUrl(user);
+    const url = await getCardSaveUrl(user);
 
     return res.status(200).send({
         url,
