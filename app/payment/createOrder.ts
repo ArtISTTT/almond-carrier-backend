@@ -57,33 +57,4 @@ export const createOrderForPayout = async ({
     orderId,
     productName,
     sdRef,
-}: ICreateOrderForPayout): Promise<string | undefined> => {
-    // const currency = 643;
-    // const resAmount = amount * 100;
-
-    // try {
-    //     const data = await axios.post(
-    //         `${}webapi/Register`,
-    //         undefined,
-    //         {
-    //             params: {
-    //                 signature,
-    //                 sector,
-    //                 amount: resAmount,
-    //                 reference: orderId,
-    //                 currency,
-    //                 description: productName,
-    //                 mode: 1,
-    //                 sd_ref: sdRef,
-    //             },
-    //             headers: {
-    //                 'Content-Type': 'application/x-www-form-urlencoded',
-    //             },
-    //         }
-    //     );
-
-        return data.data;
-    } catch (e) {
-        console.log(e);
-    }
-};
+}: ICreateOrderForPayout): Promise<undefined> => {};
