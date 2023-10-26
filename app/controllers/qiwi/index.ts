@@ -60,7 +60,11 @@ const CARD_SAVE = 'CARD_SAVE';
 
 export const paymentWebHook = async (req: Request, res: Response) => {
     const data = req.body as ITransaction;
-    logger.info(`NEW PAY: ${JSON.stringify(data)}`);
+
+    // replace "\" to ""
+    const stringifyData = JSON.stringify(data).replace(/\\/g, '');
+
+    logger.info(`NEW PAY: ${stringifyData}`);
 
     if (data.txn_status === TxnStatuses.Authorized) {
         if (data.cf4 === CARD_SAVE) {
