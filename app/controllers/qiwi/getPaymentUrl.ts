@@ -69,6 +69,7 @@ const getCurrentDatePlusSixHours = (): {
  * Генерирует HMAC SHA256 подпись для данных.
  */
 function generateHMACSignature(params: Params | any, secretKey: string) {
+    logger.info('[generateHMACSignature]: params: ', params);
     const sortedValues = Object.entries(params)
         .sort(([keyA], [keyB]) => keyA.localeCompare(keyB)) // Сортируем по ключам
         .filter(
