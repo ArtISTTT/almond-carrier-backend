@@ -69,13 +69,17 @@ export const paymentWebHook = async (req: Request, res: Response) => {
     if (data.txn_status === TxnStatuses.Authorized) {
         if (data.cf4 === CARD_SAVE) {
             // Create card token in db for user
-            await Card.create({
+            const card = await Card.create({
                 userId: data.cf5,
                 number: data.pan,
                 token: data.card_token,
                 name: data.card_name,
                 bankName: data.issuer_name,
             });
+
+            logger.info(
+                `[paymentWebHook]: Card saved [${card._id} - ${card.userId} - ${card.number} - ${card.token} - ${card.name} - ${card.bankName}]`
+            );
 
             // Just card saving
             const returned = returnAuthorizedPayment({ txnId: data.txn_id });

@@ -143,21 +143,28 @@ export const getPaymentUrl = async (
     return { paymentUrl, paymentExpire: paymentExpire.date };
 };
 
+const generateRandom12DigitsId = () => {
+    const id = Math.floor(Math.random() * 1000000000000);
+
+    return id;
+};
+
 export const getCardSaveUrl = async (user: IUser) => {
     const paymentExpire = getCurrentDatePlusSixHours();
 
     const data = {
-        amount: `35.00`,
+        amount: `10.00`,
         callback_url: `${process.env.CALLBACK_URI as string}payment-callback`,
+        cf2: '7.00;3.00',
+        cf4: 'CARD_SAVE',
+        cf5: String(user._id),
         currency: '643',
-        cf2: '34.00;1.00',
         email: user.email,
         merchant_site: process.env.QIWI_MERCHANT_SITE as string,
         merchant_uid: String(user._id),
         opcode: '3',
-        cf4: 'CARD_SAVE',
-        cf5: user._id,
         order_expire: paymentExpire.stringDate,
+        order_id: generateRandom12DigitsId().toString(),
         success_url: `https://friendlycarrier.com/payouts`,
     };
 
