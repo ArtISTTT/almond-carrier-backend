@@ -66,7 +66,7 @@ export const paymentWebHook = async (req: Request, res: Response) => {
 
     logger.info(`NEW PAY: ${stringifyData}`);
 
-    if (data.txn_status === TxnStatuses.Authorized) {
+    if (Number(data.txn_status) === TxnStatuses.Authorized) {
         logger.info(
             '!!!: ' + data.txn_status + ' ' + data.cf4 + ' ' + data.cf4 ===
                 CARD_SAVE
