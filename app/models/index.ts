@@ -1,4 +1,5 @@
 import mongoose from 'mongoose';
+import { CardModel } from './card.model';
 import { ChatMessageModel } from './chatMessage.model';
 import { ImageModel } from './image.model';
 import { NotificationModel } from './notification.model';
@@ -24,6 +25,7 @@ interface IDB {
     image: typeof ImageModel;
     notification: typeof NotificationModel;
     chatMessage: typeof ChatMessageModel;
+    card: typeof CardModel;
     ROLES: ['user', 'admin', 'moderator'];
 }
 
@@ -44,6 +46,7 @@ db.review = ReviewModel;
 db.image = ImageModel;
 db.chatMessage = ChatMessageModel;
 db.notification = NotificationModel;
+db.card = CardModel;
 
 db.ROLES = ['user', 'admin', 'moderator'];
 

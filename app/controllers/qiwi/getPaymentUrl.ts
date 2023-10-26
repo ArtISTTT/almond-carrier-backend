@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { createHmac } from 'crypto';
+import moment from 'moment';
 import { ObjectId } from 'mongoose';
 import { getFee, getOrderPaymentSum } from '../../helpers/getOrderPaymentSum';
 import { IOrder, OrderModel } from '../../models/order.model';
@@ -13,6 +14,7 @@ interface Params {
     currency: string;
     email: string;
     merchant_site: string;
+    merchant_uid: string;
     opcode: string;
     order_id: string;
     success_url: string;
@@ -41,23 +43,39 @@ const getRedirectedUrl = async (
     }
 };
 
-const getCurrentDatePlusTwoDays = () => {
-    const date = new Date();
-    date.setDate(date.getDate() + 2);
+const getCurrentDatePlusTwoDays = (): {
+    date: Date;
+    stringDate: string;
+} => {
+    const now = moment();
+
+    const date = now.add(2, 'days').toDate();
+
+    return { date, stringDate: date.toISOString() };
+};
+
+const getCurrentDatePlusSixHours = (): {
+    date: Date;
+    stringDate: string;
+} => {
+    const now = moment();
+
+    const date = now.add(6, 'hours').toDate();
+
     return { date, stringDate: date.toISOString() };
 };
 
 /**
  * Генерирует HMAC SHA256 подпись для данных.
  */
-function generateHMACSignature(params: Params, secretKey: string) {
+function generateHMACSignature(params: Params | any, secretKey: string) {
     const sortedValues = Object.entries(params)
         .sort(([keyA], [keyB]) => keyA.localeCompare(keyB)) // Сортируем по ключам
         .filter(
             ([_, value]) =>
                 value !== null && value !== undefined && value !== ''
         )
-        .map(([_, value]) => value.toString()); // Приводим все значения к строкам
+        .map(([_, value]) => (value as any).toString()); // Приводим все значения к строкам
 
     // Объединяем значения с использованием разделителя '|'
     const dataToSign = sortedValues.join('|');
@@ -87,12 +105,12 @@ export const getPaymentUrl = async (
         productAmount: payment.productAmount,
     });
 
-    const paymentExpire = getCurrentDatePlusTwoDays();
+    const paymentExpire = getCurrentDatePlusSixHours();
 
     const data = {
         // amount: orderPaymentSum + '.00',
         // cf2: `${orderPaymentSum - totalPaymentFee}.00; ${
-        //                 totalPaymentFee
+        //                                 totalPaymentFee
         // }.00`,
         amount: `${10}.00`,
         callback_url: `${process.env.CALLBACK_URI as string}payment-callback`,
@@ -100,11 +118,12 @@ export const getPaymentUrl = async (
         currency: '643',
         email: user.email,
         merchant_site: process.env.QIWI_MERCHANT_SITE as string,
+        merchant_uid: user._id,
         opcode: '3',
         order_expire: paymentExpire.stringDate,
-        order_id: '123456774',
+        order_id: '123456773',
         product_name: order.productName,
-        success_url: `${process.env.CALLBACK_URI as string}payment-callback`,
+        success_url: `https://friendlycarrier.com/order/${order._id}`,
     };
 
     const signature = generateHMACSignature(
@@ -122,4 +141,38 @@ export const getPaymentUrl = async (
     const paymentUrl = await getRedirectedUrl(url);
 
     return { paymentUrl, paymentExpire: paymentExpire.date };
+};
+
+export const getCardSaveUrl = async (user: IUser) => {
+    const paymentExpire = getCurrentDatePlusSixHours();
+
+    const data = {
+        amount: `35.00`,
+        callback_url: `${process.env.CALLBACK_URI as string}payment-callback`,
+        currency: '643',
+        email: user.email,
+        merchant_site: process.env.QIWI_MERCHANT_SITE as string,
+        merchant_uid: user._id,
+        opcode: '3',
+        cf4: 'CARD_SAVE',
+        cf5: user._id,
+        order_expire: paymentExpire.stringDate,
+        success_url: `https://friendlycarrier.com/payouts`,
+    };
+
+    const signature = generateHMACSignature(
+        data,
+        process.env.QIWI_SECRET_KEY as string
+    );
+
+    const urlParams = new URLSearchParams({
+        ...data,
+        sign: signature,
+    });
+
+    const url = `${`${process.env.QIWI_PAY_API}paypage/initial?`}${urlParams.toString()}`;
+
+    const paymentUrl = await getRedirectedUrl(url);
+
+    return paymentUrl;
 };

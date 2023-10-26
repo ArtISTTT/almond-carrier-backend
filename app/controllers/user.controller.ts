@@ -7,6 +7,7 @@ import { uploadFile } from '../aws-s3/uploadFile';
 import db from '../models';
 import { getFullUri } from '../services/getFullUri';
 import { getOrdersOutput } from '../services/getOrdersOutput';
+import logger from '../services/logger';
 
 export const allAccess = (req: Request, res: Response) => {
     res.status(200).send('Public Content.');
@@ -20,6 +21,7 @@ const Order = db.order;
 const OrderStatus = db.orderStatus;
 const Payment = db.payment;
 const Review = db.review;
+const Card = db.card;
 
 export const getUserProfile = async (req: Request, res: Response) => {
     const { userId } = req.query;
@@ -354,6 +356,26 @@ export const getUserProfile = async (req: Request, res: Response) => {
         verifiedByPhone: false,
         fromLocation: 'Moscow',
         idVerificationCompleted: user.idVerification?.isVerificated,
+    });
+};
+
+export const getSavedCards = async (req: Request, res: Response) => {
+    const { userId } = req.body;
+
+    if (!userId) {
+        logger.error(`getSavedCards: User ${userId} not found!`);
+        return res.status(404).send({ message: 'User Not found.' });
+    }
+
+    const cards = await Card.find({ userId });
+
+    return res.status(200).send({
+        cards: cards.map(card => ({
+            id: card._id,
+            name: card.name,
+            number: card.number,
+            bankName: card.bankName,
+        })),
     });
 };
 

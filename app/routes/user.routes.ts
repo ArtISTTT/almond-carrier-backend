@@ -2,6 +2,7 @@ import { Express } from 'express';
 import {
     adminBoard,
     allAccess,
+    getSavedCards,
     getUserProfile,
     moderatorBoard,
     updateAvatar,
@@ -11,6 +12,7 @@ import {
 } from '../controllers/user.controller';
 
 import { upload } from '../aws-s3';
+import { getSaveCardUrl } from '../controllers/order.controller';
 import middlewares from '../middlewares';
 
 export default (app: Express) => {
@@ -54,6 +56,18 @@ export default (app: Express) => {
         '/api/update-user-password',
         [middlewares.authJwt.verifyToken],
         updateUserPassword
+    );
+
+    app.get(
+        '/api/get-save-card-url',
+        [middlewares.authJwt.verifyToken],
+        getSaveCardUrl
+    );
+
+    app.get(
+        '/api/get-saved-cards',
+        [middlewares.authJwt.verifyToken],
+        getSavedCards
     );
 
     app.post(

@@ -12,6 +12,7 @@ import { disagreeWithChanges } from './order/disagreeWithChanges';
 import { getMyOrders } from './order/getMyOrders';
 import { getOrderById } from './order/getOrderById';
 import { getPayouts } from './order/getPayouts';
+import { getSaveCardUrl } from './order/getSaveCardUrl';
 import { searchOrders } from './order/searchOrders';
 import { startPayout } from './order/startPayout';
 import { suggestChangesByCarrier } from './order/suggestChangesByCarrier';
@@ -36,4 +37,5 @@ export {
     startPayout,
     suggestChangesByCarrier,
     suggestChangesByReceiver,
+    getSaveCardUrl,
 };
