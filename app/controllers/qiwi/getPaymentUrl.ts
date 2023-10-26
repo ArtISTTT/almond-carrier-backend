@@ -152,7 +152,7 @@ export const getCardSaveUrl = async (user: IUser) => {
         currency: '643',
         email: user.email,
         merchant_site: process.env.QIWI_MERCHANT_SITE as string,
-        merchant_uid: user._id,
+        merchant_uid: String(user._id),
         opcode: '3',
         cf4: 'CARD_SAVE',
         cf5: user._id,
