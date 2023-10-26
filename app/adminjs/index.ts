@@ -18,6 +18,7 @@ const { review } = db;
 const { role } = db;
 const { chatMessage } = db;
 const { image } = db;
+const { card } = db;
 
 const DEFAULT_ADMIN = {
     email: 'admin@mail.ru',
@@ -119,6 +120,7 @@ export const getAdminJs = () => {
             { resource: role },
             { resource: chatMessage },
             { resource: image },
+            { resource: card },
         ],
         componentLoader,
     });

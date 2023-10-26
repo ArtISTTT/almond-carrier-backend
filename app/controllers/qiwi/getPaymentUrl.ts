@@ -150,6 +150,7 @@ export const getCardSaveUrl = async (user: IUser) => {
         amount: `35.00`,
         callback_url: `${process.env.CALLBACK_URI as string}payment-callback`,
         currency: '643',
+        cf2: '34.00;1.00',
         email: user.email,
         merchant_site: process.env.QIWI_MERCHANT_SITE as string,
         merchant_uid: String(user._id),
