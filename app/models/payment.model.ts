@@ -18,6 +18,7 @@ export interface IPayment extends Document {
     paymentExpire?: Date;
     txnId?: string;
     sign?: string;
+    txnStatus?: number;
 }
 
 export const PaymentModel = mongoose.model<IPayment>(
@@ -29,6 +30,18 @@ export const PaymentModel = mongoose.model<IPayment>(
                 require: true,
             },
             productAmount: {
+                type: Number,
+                require: false,
+            },
+            txnId: {
+                type: String,
+                require: false,
+            },
+            sign: {
+                type: String,
+                require: false,
+            },
+            txnStatus: {
                 type: Number,
                 require: false,
             },

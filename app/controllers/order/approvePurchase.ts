@@ -28,14 +28,17 @@ export const approvePurchase = async (req: Request, res: Response) => {
         return res.status(404).send({ message: 'paymentNotFound' });
     }
 
-    // const paymentCompleted = await completeOrderForPayment({
-    //     paymentOperationId: payment.paymentOperationId,
-    //     paymentOrderId: payment.paymentOrderId,
-    // });
+    if (!payment.txnId) {
+        return res.status(404).send({ message: 'paymentNotCompleted' });
+    }
 
-    // if (!paymentCompleted) {
-    //     return res.status(404).send({ message: 'couldNotCompletePayment' });
-    // }
+    const paymentCompleted = await completeOrderForPayment({
+        txnId: payment.txnId,
+    });
+
+    if (!paymentCompleted) {
+        return res.status(404).send({ message: 'couldNotCompletePayment' });
+    }
 
     const status = await OrderStatus.findOne({
         name: 'awaitingDelivery',
@@ -46,7 +49,9 @@ export const approvePurchase = async (req: Request, res: Response) => {
     }
 
     order.statusId = status._id;
+    payment.txnStatus = 3;
 
+    await payment.save();
     await order.save();
 
     global.io.sockets.in(req.body.orderId).emit('new-status');
