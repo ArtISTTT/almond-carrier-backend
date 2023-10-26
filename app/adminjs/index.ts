@@ -7,6 +7,8 @@ import {
     confirmVerificationByAdmin,
 } from '../controllers/order.controller.admin';
 import db from '../models';
+import { componentLoader, Components } from './components';
+import { default as dashboardHandler, default as logRoutes } from './logRoutes';
 
 const { order } = db;
 const { user } = db;
@@ -28,6 +30,10 @@ export const getAdminJs = () => {
     const admin = new AdminJS({
         branding: {
             companyName: 'Friednly Carrier',
+        },
+        dashboard: {
+            component: Components.LogViewer,
+            handler: dashboardHandler,
         },
         resources: [
             {
@@ -114,6 +120,7 @@ export const getAdminJs = () => {
             { resource: chatMessage },
             { resource: image },
         ],
+        componentLoader,
     });
 
     const adminRouter = AdminJSExpress.buildAuthenticatedRouter(admin, {
@@ -126,6 +133,8 @@ export const getAdminJs = () => {
         cookieName: 'adminJs',
         cookiePassword: 'cookiePassword000',
     });
+
+    adminRouter.use(logRoutes);
 
     return { rootPath: admin.options.rootPath, adminRouter };
 };
