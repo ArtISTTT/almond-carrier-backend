@@ -11,7 +11,6 @@ const Payment = db.payment;
 const Review = db.review;
 
 export const getOrderById = async (req: Request, res: Response) => {
-    logger.info('GETTING ORDER BY ID');
     const orders = await Order.aggregate([
         {
             $match: {

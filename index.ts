@@ -21,6 +21,7 @@ import paymentWebHookRouter from './app/routes/paymentWebHook.routes';
 import reviewRoutes from './app/routes/review.routes';
 import userRoutes from './app/routes/user.routes';
 import verificationWebHooksRouter from './app/routes/verificationWebHook.routes';
+import logger from './app/services/logger';
 import WebSockets from './app/socketio/index';
 
 dotenv.config();
@@ -105,6 +106,22 @@ reviewRoutes(app);
 notificationRoutes(app);
 verificationWebHooksRouter(app);
 paymentWebHookRouter(app);
+
+app.use((err: Error, req: Request, res: Response) => {
+    logger.error('app.use(): ' + err.stack);
+    res.status(500).send('Something failed');
+});
+
+process.on('uncaughtException', (err: Error) => {
+    console.error('uncaughtException: ' + err, err);
+});
+
+process.on(
+    'unhandledRejection',
+    (reason: {} | null | undefined, promise: Promise<any>) => {
+        console.error('unhandledRejection: ' + JSON.stringify(reason));
+    }
+);
 
 const start = async () => {
     initializeInstance();
