@@ -87,7 +87,12 @@ app.get('/', (req, res) => {
 });
 
 const server = http.createServer(app);
-global.io = new socketio.Server(server);
+global.io = new socketio.Server(server, {
+    cors: {
+        origin: '*',
+        methods: ['GET', 'POST'],
+    },
+});
 global.io.on('connection', WebSockets.connection);
 
 authRoutes(app);
