@@ -12,6 +12,7 @@ import { getAdminJs } from './app/adminjs/index';
 import { updateAWSConfig } from './app/aws-s3';
 import { initializeDB } from './app/helpers/initialize';
 import db from './app/models';
+import { initializeInstance } from './app/payment/qiwiInstance';
 import authRoutes from './app/routes/auth.routes';
 import chatRoutes from './app/routes/chat.routes';
 import notificationRoutes from './app/routes/notification.routes';
@@ -106,6 +107,7 @@ verificationWebHooksRouter(app);
 paymentWebHookRouter(app);
 
 const start = async () => {
+    initializeInstance();
     await db.mongoose
         .connect(connectionString, {
             useNewUrlParser: true,

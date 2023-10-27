@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { encodeBase64 } from 'bcryptjs';
 import fs from 'fs';
 import { Agent } from 'https';
@@ -9,19 +9,11 @@ import { ICard } from '../models/card.model';
 import { IOrder } from '../models/order.model';
 import { IPayment } from '../models/payment.model';
 import logger from '../services/logger';
+import { initializeInstance, qiwiInstance } from './qiwiInstance';
 
 interface ICompleteOrderForPayment {
     txnId: string;
 }
-
-const CSR_PATH = process.env.CSR_PATH as string;
-
-const instance = axios.create({
-    httpsAgent: new Agent({
-        key: fs.readFileSync(CSR_PATH + 'qiwi.key'),
-        cert: fs.readFileSync(CSR_PATH + 'qiwi.csr'),
-    }),
-});
 
 export const completeOrderForPayment = async ({
     txnId,
@@ -37,11 +29,18 @@ export const completeOrderForPayment = async ({
         process.env.QIWI_SECRET_KEY as string
     );
 
+    if (!qiwiInstance) {
+        initializeInstance();
+    }
+
     try {
-        const data = await instance.post(`${process.env.QIWI_POST_PAY_API}`, {
-            ...initialData,
-            sign,
-        });
+        const data = await (qiwiInstance as AxiosInstance).post(
+            `${process.env.QIWI_POST_PAY_API}`,
+            {
+                ...initialData,
+                sign,
+            }
+        );
 
         logger.info(
             'Completed authorized payment data: ' + JSON.stringify(data.data)
@@ -100,11 +99,18 @@ export const createOrderForPayout = async ({
         process.env.QIWI_SECRET_KEY as string
     );
 
+    if (!qiwiInstance) {
+        initializeInstance();
+    }
+
     try {
-        const data = await instance.post(`${process.env.QIWI_POST_PAY_API}`, {
-            ...initialData,
-            sign,
-        });
+        const data = await (qiwiInstance as AxiosInstance).post(
+            `${process.env.QIWI_POST_PAY_API}`,
+            {
+                ...initialData,
+                sign,
+            }
+        );
 
         logger.info('PAYOUT RETURN DATA: ', data.data);
 
