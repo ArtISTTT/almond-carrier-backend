@@ -126,7 +126,7 @@ export const getPaymentUrl = async (
         merchant_uid: user._id,
         opcode: '3',
         order_expire: paymentExpire.stringDate,
-        order_id: '123456773',
+        order_id: order._id,
         product_name: order.productName,
         success_url: `https://friendlycarrier.com/order/${order._id}`,
     };
