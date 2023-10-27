@@ -34,6 +34,7 @@
     "@types/winston": "^2.4.4",
     "@typescript-eslint/parser": "^5.47.0",
     "adminjs": "^6.8.6",
+    "agenda": "^5.0.0",
     "aws-sdk": "^2.1326.0",
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.1",

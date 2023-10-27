@@ -1,3 +1,4 @@
+import Agenda from 'agenda';
 import compression from 'compression';
 import cookieSession from 'cookie-session';
 import cors from 'cors';
@@ -9,6 +10,7 @@ import { ConnectOptions } from 'mongoose';
 import * as socketio from 'socket.io';
 import { getAdminJs } from './app/adminjs/index';
 import { updateAWSConfig } from './app/aws-s3';
+import { agendaInstance } from './app/db/agenda';
 import { initializeDB } from './app/helpers/initialize';
 import db from './app/models';
 import authRoutes from './app/routes/auth.routes';
@@ -113,6 +115,11 @@ const start = async () => {
         .then(() => {
             console.log('Successfully connect to MongoDB.');
             initializeDB();
+
+            (async function () {
+                await agendaInstance.start();
+                console.log('Successfully connect to Agenda.');
+            })();
         })
         .catch((err: any) => {
             console.error('Connection error', err);
