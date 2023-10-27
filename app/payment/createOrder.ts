@@ -48,6 +48,7 @@ export const completeOrderForPayment = async ({
 
         return false;
     } catch (e) {
+        logger.error('Could not complete payment error: ' + e);
         console.log(e);
 
         return false;
