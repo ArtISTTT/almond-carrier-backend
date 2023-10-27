@@ -104,7 +104,11 @@ export const createOrderForPayout = async ({
 
         logger.info('PAYOUT RETURN DATA: ', data.data);
 
-        return true;
+        if (data.data.txn_status === 3) {
+            return true;
+        }
+
+        return false;
     } catch (e) {
         console.log(e);
 

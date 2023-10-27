@@ -25,6 +25,23 @@ enum TxnStatuses {
     Refunded = 6, // Операция отменена, средства возвращены плательщику
 }
 
+// types
+// 1	Purchase	Одношаговая операция оплаты
+// 2	Purchase	Операция авторизации при двухшаговом сценарии платежа
+// 4	Reversal	Операция отмены
+// 3	Refund	Операция возврата
+// 8	Payout	Операция выплаты (OCT)
+// 0	Unknown	Неизвестный тип операции
+
+enum TxnType {
+    Purchase = 1,
+    PurchaseTwoStep = 2,
+    Reversal = 4,
+    Refund = 3,
+    Payout = 8,
+    Unknown = 0,
+}
+
 interface ITransaction {
     txn_id: string;
     pan: string;
@@ -66,7 +83,10 @@ export const paymentWebHook = async (req: Request, res: Response) => {
 
     logger.info(`NEW PAY: ${stringifyData}`);
 
-    if (Number(data.txn_status) === TxnStatuses.Authorized) {
+    if (
+        Number(data.txn_type) === TxnType.PurchaseTwoStep &&
+        Number(data.txn_status) === TxnStatuses.Authorized
+    ) {
         logger.info(
             '!!!: ' + data.txn_status + ' ' + data.cf4 + ' ' + data.cf4 ===
                 CARD_SAVE

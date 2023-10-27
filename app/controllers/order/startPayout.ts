@@ -11,7 +11,7 @@ const User = db.user;
 
 export const startPayout = async (req: Request, res: Response) => {
     const status = await OrderStatus.findOne({
-        name: 'awaitingPayout',
+        name: 'success',
     });
 
     const { cardId, userId, orderId } = req.body;
