@@ -108,7 +108,7 @@ verificationWebHooksRouter(app);
 paymentWebHookRouter(app);
 
 app.use((err: Error, req: Request, res: Response) => {
-    logger.error('app.use(): ' + err.stack);
+    logger.error('app.use(): ' + err);
     res.status(500).send('Something failed');
 });
 
