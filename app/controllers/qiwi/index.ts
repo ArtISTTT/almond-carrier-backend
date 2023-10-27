@@ -115,9 +115,13 @@ export const paymentWebHook = async (req: Request, res: Response) => {
                 return res.status(200).send();
             }
         } else {
-            const payment = await Payment.findOne({
-                paymentOrderId: data.order_id[0],
-            });
+            const order = await Order.findById(data.order_id);
+
+            if (order == null) {
+                return res.status(200).send();
+            }
+
+            const payment = await Payment.findById(order.paymentId);
 
             if (payment == null) {
                 logger.error('[paymentWebHook]: Payment not found');
@@ -140,8 +144,7 @@ export const paymentWebHook = async (req: Request, res: Response) => {
                 return res.status(200).send();
             }
 
-            const order = await Order.findByIdAndUpdate(
-                { _id: data.order_id },
+            await order.update(
                 {
                     $set: {
                         statusId: status._id,
@@ -150,9 +153,7 @@ export const paymentWebHook = async (req: Request, res: Response) => {
                 { new: true, lean: true }
             );
 
-            if (order == null) {
-                return res.status(200).send();
-            }
+            await order.save();
 
             global.io.sockets.in(data.order_id).emit('new-status');
 
