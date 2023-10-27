@@ -38,6 +38,10 @@ export const completeOrderForPayment = async ({
             }
         );
 
+        logger.info(
+            'Completed authorized payment data: ' + JSON.stringify(data.data)
+        );
+
         if (data.data.txn_status === 3) {
             return true;
         }
