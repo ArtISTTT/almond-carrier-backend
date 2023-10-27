@@ -26,6 +26,10 @@ export const startPayout = async (req: Request, res: Response) => {
         return res.status(404).send({ message: 'Order not found!' });
     }
 
+    if (order.payoutInfo?.isPayedOut === true) {
+        return res.status(404).send({ message: 'Already payed out' });
+    }
+
     const payment = await Payment.findById(order.paymentId);
 
     if (payment == null) {
@@ -56,6 +60,7 @@ export const startPayout = async (req: Request, res: Response) => {
                 payoutInfo: {
                     cardId: cardId,
                     payoutDate: new Date(),
+                    isPayedOut: true,
                 },
             },
         },
