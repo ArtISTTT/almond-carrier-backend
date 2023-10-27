@@ -16,6 +16,8 @@ interface PayoutInfo {
     isPayedOut: boolean;
     phoneNumber?: string;
     bank?: string;
+    payoutDate?: Date;
+    cardId?: Types.ObjectId;
 }
 
 interface PolygonSchema {
@@ -164,12 +166,13 @@ const OrderSchema = new mongoose.Schema<IOrder>(
                 type: Boolean,
                 default: false,
             },
-            phoneNumber: {
-                type: String,
+            payoutDate: {
+                type: Date,
                 required: false,
             },
-            bank: {
-                type: String,
+            cardId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Payment',
                 required: false,
             },
         },

@@ -2,6 +2,11 @@ import axios from 'axios';
 import { encodeBase64 } from 'bcryptjs';
 import md5 from 'md5';
 import { generateHMACSignature } from '../helpers/generateHMACSignature';
+import { getFee, getOrderPaymentSum } from '../helpers/getOrderPaymentSum';
+import { ICard } from '../models/card.model';
+import { IOrder } from '../models/order.model';
+import { IPayment } from '../models/payment.model';
+import logger from '../services/logger';
 
 interface ICompleteOrderForPayment {
     txnId: string;
@@ -46,15 +51,63 @@ export const completeOrderForPayment = async ({
 };
 
 interface ICreateOrderForPayout {
-    amount: number;
-    orderId: string;
-    productName: string;
-    sdRef: string;
+    order: IOrder;
+    payment: IPayment;
+    card: ICard;
 }
 
 export const createOrderForPayout = async ({
-    amount,
-    orderId,
-    productName,
-    sdRef,
-}: ICreateOrderForPayout): Promise<undefined> => {};
+    order,
+    payment,
+    card,
+}: ICreateOrderForPayout): Promise<boolean> => {
+    if (!payment.productAmount || !order.productName || !payment.txnId) {
+        return false;
+    }
+
+    const orderPaymentSum = getOrderPaymentSum({
+        rewardAmount: payment.rewardAmount,
+        productAmount: payment.productAmount,
+    });
+
+    const totalPaymentFee = getFee({
+        rewardAmount: payment.rewardAmount,
+        productAmount: payment.productAmount,
+    });
+
+    const initialData = {
+        opcode: 20,
+        merchant_site: process.env.QIWI_MERCHANT_SITE,
+        txn_id: payment.txnId,
+        currency: '643',
+        card_token: card.token,
+        order_id: order._id,
+        amount: orderPaymentSum - totalPaymentFee + '.00',
+    };
+
+    const sign = generateHMACSignature(
+        initialData,
+        process.env.QIWI_SECRET_KEY as string
+    );
+
+    try {
+        const data = await axios.post(
+            `${process.env.QIWI_POST_PAY_API}`,
+            undefined,
+            {
+                params: {
+                    ...initialData,
+                    sign,
+                },
+            }
+        );
+
+        logger.info('PAYOUT RETURN DATA: ', data.data);
+
+        return true;
+    } catch (e) {
+        console.log(e);
+
+        return false;
+    }
+};
