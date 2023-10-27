@@ -2,7 +2,6 @@ import axios from 'axios';
 import { createHmac } from 'crypto';
 import moment from 'moment';
 import { ObjectId } from 'mongoose';
-import { agendaInstance } from '../../db/agenda';
 import { getFee, getOrderPaymentSum } from '../../helpers/getOrderPaymentSum';
 import { IOrder, OrderModel } from '../../models/order.model';
 import { IPayment } from '../../models/payment.model';
@@ -109,9 +108,9 @@ export const getPaymentUrl = async (
 
     const paymentExpire = getCurrentDatePlusSixHours();
 
-    agendaInstance.schedule('in 6 hours', 'cancelOrder', {
-        orderId: order._id,
-    });
+    // agendaInstance.schedule('in 6 hours', 'cancelOrder', {
+    //     orderId: order._id,
+    // });
 
     const data = {
         // amount: orderPaymentSum + '.00',
