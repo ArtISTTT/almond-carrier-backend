@@ -1,5 +1,7 @@
 import axios from 'axios';
 import { encodeBase64 } from 'bcryptjs';
+import fs from 'fs';
+import { Agent } from 'https';
 import md5 from 'md5';
 import { generateHMACSignature } from '../helpers/generateHMACSignature';
 import { getFee, getOrderPaymentSum } from '../helpers/getOrderPaymentSum';
@@ -11,6 +13,15 @@ import logger from '../services/logger';
 interface ICompleteOrderForPayment {
     txnId: string;
 }
+
+const CSR_PATH = process.env.CSR_PATH as string;
+
+const instance = axios.create({
+    httpsAgent: new Agent({
+        key: fs.readFileSync(CSR_PATH + 'qiwi.key'),
+        cert: fs.readFileSync(CSR_PATH + 'qiwi.csr'),
+    }),
+});
 
 export const completeOrderForPayment = async ({
     txnId,
@@ -27,7 +38,7 @@ export const completeOrderForPayment = async ({
     );
 
     try {
-        const data = await axios.post(`${process.env.QIWI_POST_PAY_API}`, {
+        const data = await instance.post(`${process.env.QIWI_POST_PAY_API}`, {
             ...initialData,
             sign,
         });
@@ -90,16 +101,10 @@ export const createOrderForPayout = async ({
     );
 
     try {
-        const data = await axios.post(
-            `${process.env.QIWI_POST_PAY_API}`,
-            undefined,
-            {
-                params: {
-                    ...initialData,
-                    sign,
-                },
-            }
-        );
+        const data = await instance.post(`${process.env.QIWI_POST_PAY_API}`, {
+            ...initialData,
+            sign,
+        });
 
         logger.info('PAYOUT RETURN DATA: ', data.data);
 
