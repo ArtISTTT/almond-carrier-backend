@@ -20,11 +20,7 @@ export const approvePurchase = async (req: Request, res: Response) => {
 
     const payment = await Payment.findById(order.paymentId);
 
-    if (
-        payment == null ||
-        !payment.paymentOperationId ||
-        !payment.paymentOrderId
-    ) {
+    if (payment == null || !payment.paymentOrderId) {
         return res.status(404).send({ message: 'paymentNotFound' });
     }
 
