@@ -1,28 +1,37 @@
 import Agenda, { Job } from 'agenda';
 import db from '../models';
 
-const connectionString = process.env.MONGO_URL as string;
+export const agendaInstance = new Agenda({ mongo: db.mongoose.connection.db });
 
-// export const agendaInstance = new Agenda({ db: { address: connectionString } });
+const Order = db.order;
+const OrderStatus = db.orderStatus;
 
-// const Order = db.order;
-// const OrderStatus = db.orderStatus;
+agendaInstance.define('cancelOrder', async (job: Job) => {
+    const status = await OrderStatus.findOne({ name: 'cancelled' });
+    const waitingPaymentStatus = await OrderStatus.findOne({
+        name: 'waitingForPayment',
+    });
 
-// agendaInstance.define('cancelOrder', async (job: Job) => {
-//     const status = await OrderStatus.findOne({ name: 'cancelled' });
+    const orderId = job.attrs.data.orderId;
+    const order = await Order.findById(orderId);
 
-//     if (status == null) {
-//         return;
-//     }
+    if (
+        status == null ||
+        waitingPaymentStatus === null ||
+        order == null ||
+        order.statusId.toString() !== waitingPaymentStatus._id.toString()
+    ) {
+        return;
+    }
 
-//     const orderId = job.attrs.data.orderId;
-//     await Order.findByIdAndUpdate(
-//         { _id: orderId },
-//         {
-//             $set: {
-//                 statusId: status._id,
-//             },
-//         },
-//         { new: true, lean: true }
-//     );
-// });
+    await order.update(
+        {
+            $set: {
+                statusId: status._id,
+            },
+        },
+        { new: true, lean: true }
+    );
+
+    await order.save();
+});
