@@ -34,13 +34,10 @@ export const completeOrderForPayment = async ({
     }
 
     try {
-        const data = await (qiwiInstance as AxiosInstance).post(
-            `${process.env.QIWI_POST_PAY_API}`,
-            {
-                ...initialData,
-                sign,
-            }
-        );
+        const data = await axios.post(`${process.env.QIWI_POST_PAY_API}`, {
+            ...initialData,
+            sign,
+        });
 
         logger.info(
             'Completed authorized payment data: ' + JSON.stringify(data.data)
@@ -104,13 +101,10 @@ export const createOrderForPayout = async ({
     }
 
     try {
-        const data = await (qiwiInstance as AxiosInstance).post(
-            `${process.env.QIWI_POST_PAY_API}`,
-            {
-                ...initialData,
-                sign,
-            }
-        );
+        const data = await axios.post(`${process.env.QIWI_POST_PAY_API}`, {
+            ...initialData,
+            sign,
+        });
 
         logger.info('PAYOUT RETURN DATA: ', data.data);
 
