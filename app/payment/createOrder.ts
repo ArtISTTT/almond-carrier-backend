@@ -1,4 +1,4 @@
-import axios, { AxiosInstance } from 'axios';
+import axios, { AxiosError, AxiosInstance, AxiosResponse } from 'axios';
 import { encodeBase64 } from 'bcryptjs';
 import fs from 'fs';
 import { Agent } from 'https';
@@ -48,9 +48,13 @@ export const completeOrderForPayment = async ({
         }
 
         return false;
-    } catch (e) {
-        logger.error('Could not complete payment error: ' + e);
-        console.log(e);
+    } catch (e: any) {
+        const response = (e as AxiosError).response as AxiosResponse;
+        logger.error(
+            'Could not complete payment error: ' + 'data: ' + response.data,
+            'status: ' + response.status,
+            'headers: ' + response.headers
+        );
 
         return false;
     }
