@@ -34,6 +34,11 @@ export const completeOrderForPayment = async ({
     }
 
     try {
+        logger.info(
+            'Before authorized payment data: ' +
+                JSON.stringify({ ...initialData, sign })
+        );
+
         const data = await axios.post(`${process.env.QIWI_POST_PAY_API}`, {
             ...initialData,
             sign,
@@ -51,9 +56,13 @@ export const completeOrderForPayment = async ({
     } catch (e: any) {
         const response = (e as AxiosError).response as AxiosResponse;
         logger.error(
-            'Could not complete payment error: ' + 'data: ' + response.data,
-            'status: ' + response.status,
-            'headers: ' + response.headers
+            'Could not complete payment error: ' +
+                'data: ' +
+                response.data +
+                'status: ' +
+                response.status +
+                'headers: ' +
+                response.headers
         );
 
         return false;
