@@ -33,38 +33,6 @@ export const signup = (req: Request, res: Response) => {
             return;
         }
 
-        // if (req.body.roles) {
-        //     Role.find(
-        //         {
-        //             name: { $in: req.body.roles },
-        //         },
-        //         (err: any, roles: any) => {
-        //             if (err) {
-        //                 res.status(500).send({ message: err });
-        //                 return;
-        //             }
-
-        //             user.roles = roles.map((role: any) => role._id);
-
-        //             user.save(async (err: any) => {
-        //                 if (err) {
-        //                     res.status(500).send({ message: err });
-        //                     return;
-        //                 }
-
-        //                 sendVerificationCode(verificationCode, user.email);
-
-        //                 res.status(200).send({
-        //                     id: user._id,
-        //                     verificationCode,
-        //                 });
-        //             });
-        //         }
-        //     );
-        // } else {
-
-        // }
-
         Role.findOne({ name: 'user' }, (err: any, role: any) => {
             if (err) {
                 res.status(500).send({ message: err });

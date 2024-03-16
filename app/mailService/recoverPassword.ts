@@ -3,7 +3,7 @@ import { transporter } from './transporter';
 export const sendRecoverPasswordEmail = (link: string, email: string) => {
     transporter.sendMail(
         {
-            from: 'support@friendlycarrier.com',
+            from: 'noreply@friendlycarrier.com',
             to: email,
             subject: 'Recover password',
             text: `To recover password, please follow the link: ${link}`,
@@ -26,7 +26,7 @@ export const sendRecoverPasswordSuccessfullyEmail = (
 ) => {
     transporter.sendMail(
         {
-            from: 'support@friendlycarrier.com',
+            from: 'noreply@friendlycarrier.com',
             to: email,
             subject: 'Recover password',
             text: `${name}, password successfully updated! Login: https://friendlycarrier.com/signin`,

@@ -4,7 +4,7 @@ export const sendVerification = (link: string, email: string) => {
     try {
         transporter.sendMail(
             {
-                from: 'support@friendlycarrier.com',
+                from: 'noreply@friendlycarrier.com',
                 to: email,
                 subject: 'Account verification code',
                 text: `Your account verification link: ${link}`,

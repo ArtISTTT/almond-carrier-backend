@@ -3,7 +3,7 @@ import { transporter } from './transporter';
 export const sendCompletionCodeEmail = (code: string, email: string) => {
     transporter.sendMail(
         {
-            from: 'support@friendlycarrier.com',
+            from: 'noreply@friendlycarrier.com',
             to: email,
             subject: 'Recover password',
             text: `Your confirmation code: ${code}`,

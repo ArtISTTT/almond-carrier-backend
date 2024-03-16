@@ -11,8 +11,6 @@ import { RoleModel } from './role.model';
 import { TokenModel } from './token.model';
 import { UserModel } from './user.model';
 
-mongoose.Promise = global.Promise;
-
 interface IDB {
     mongoose: typeof mongoose;
     user: typeof UserModel;
@@ -29,25 +27,24 @@ interface IDB {
     ROLES: ['user', 'admin', 'moderator'];
 }
 
-const db: any = {};
+mongoose.Promise = global.Promise;
 
-db.mongoose = mongoose;
+const db: IDB = {
+    mongoose,
+    ROLES: ['user', 'admin', 'moderator'],
+    user: UserModel,
+    token: TokenModel,
+    role: RoleModel,
+    order: OrderModel,
+    orderStatus: OrderStatusModel,
+    payment: PaymentModel,
+    review: ReviewModel,
+    image: ImageModel,
+    chatMessage: ChatMessageModel,
+    notification: NotificationModel,
+    card: CardModel,
+};
 
 db.mongoose.set('strictQuery', false);
 
-db.user = UserModel;
-db.token = TokenModel;
-db.role = RoleModel;
-
-db.order = OrderModel;
-db.orderStatus = OrderStatusModel;
-db.payment = PaymentModel;
-db.review = ReviewModel;
-db.image = ImageModel;
-db.chatMessage = ChatMessageModel;
-db.notification = NotificationModel;
-db.card = CardModel;
-
-db.ROLES = ['user', 'admin', 'moderator'];
-
-export default db as IDB;
+export default db;
